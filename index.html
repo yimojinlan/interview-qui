@@ -33,10 +33,11 @@
   .header {
     background: linear-gradient(135deg, #2C3E50, #3498DB);
     color: #fff;
-    padding: 40px 24px 30px;
+    padding: 30px 24px 28px;
     text-align: center;
     position: relative;
   }
+  .header-logo { width: 56px; height: 56px; object-fit: contain; border-radius: 50%; margin-bottom: 6px; }
   .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; }
   .header p { font-size: 13px; opacity: .85; }
   .header .badge {
@@ -213,7 +214,7 @@
   .loading-box p { font-size: 14px; color: #555; }
 
   /* Company name gold-blue */
-  .company-tagline { font-size: 13px; margin-top: 6px; }
+  .company-tagline { font-size: 13px; margin-top: 4px; }
   .gold { color: #DAA520; font-weight: 700; }
   .blue { color: #3498DB; font-weight: 700; }
   .footer .gold { color: #B8860B; }
@@ -223,7 +224,8 @@
 <body>
 
 <div class="header" id="quizHeader">
-  <h1>📋 一抹金蓝面试评测</h1>
+  <img src="logo.jpg" alt="logo" class="header-logo">
+  <h1>一抹金蓝面试评测</h1>
   <p class="company-tagline">一抹<span class="gold">金</span><span class="blue">蓝</span>传媒</p>
   <span class="badge">10题 · 约15分钟</span>
   <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
