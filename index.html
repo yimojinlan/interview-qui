@@ -212,7 +212,7 @@
 
 <div class="header" id="quizHeader">
   <h1>📋 一抹金蓝面试评测</h1>
-  <p>一抹金蓝传媒</p>
+  <p>赣州一抹金蓝传媒</p>
   <span class="badge">10题 · 约15分钟</span>
   <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
 </div>
@@ -240,7 +240,7 @@
     <p>感谢您的参与，测评结果已记录。<br>如有疑问请联系人事部门。</p>
   </div>
 
-  <div class="footer">一抹金蓝传媒 · 人事测评工具</div>
+  <div class="footer">赣州一抹金蓝传媒 · 人事测评工具</div>
 </div>
 
 <!-- Loading overlay -->
@@ -470,7 +470,7 @@ async function submitQuiz() {
       document.getElementById('questionsContainer').style.display = 'none';
       document.querySelector('.nav').style.display = 'none';
       document.getElementById('progressText').style.display = 'none';
-      document.getElementById('quizHeader').querySelector('p').textContent = '一抹金蓝传媒';
+      document.getElementById('quizHeader').querySelector('p').textContent = '赣州一抹金蓝传媒';
 
       // 显示成功页
       document.getElementById('successScreen').style.display = 'block';
@@ -488,19 +488,20 @@ async function submitQuiz() {
 // 姓名输入监听
 document.getElementById('candidateName').addEventListener('input', updateNavState);
 
-// 键盘支持
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight' || e.key === 'Enter') {
-    if (document.getElementById('btnNext').style.display !== 'none' && !document.getElementById('btnNext').disabled) nextQuestion();
-    else if (document.getElementById('btnSubmit').style.display !== 'none' && !document.getElementById('btnSubmit').disabled) submitQuiz();
+// 键盘支持 - 数字键快速选项
+document.addEventListener('keydown', function(e) {
+  const key = e.key;
+  if (['1','2','3','4'].includes(key)) {
+    const letters = ['1','2','3','4'];
+    const idx = letters.indexOf(key);
+    const options = document.querySelector(`#q-${currentQ}`)?.querySelectorAll('.option');
+    if (options && options[idx]) options[idx].click();
   }
-  if (e.key === 'ArrowLeft' && !document.getElementById('btnPrev').disabled) prevQuestion();
-  if (e.key >= '1' && e.key <= '4') {
-    const opts = document.querySelector(`#q-${currentQ} .option:nth-child(${parseInt(e.key)})`);
-    if (opts) opts.click();
-  }
+  if (key === 'ArrowRight' || key === 'Enter') { e.preventDefault(); nextQuestion(); }
+  if (key === 'ArrowLeft') { e.preventDefault(); prevQuestion(); }
 });
 
+// 初始化
 renderQuestions();
 showQuestion(0);
 updateProgress();
