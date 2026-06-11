@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>一抹金蓝面试评测</title>
+<style>
+  :root {
+    --primary: #2C3E50;
+    --accent: #3498DB;
+    --success: #27AE60;
+    --text: #2C3E50;
+    --bg: #F8F9FA;
+    --card: #FFFFFF;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #2C3E50, #3498DB);
+    color: #fff;
+    padding: 40px 24px 30px;
+    text-align: center;
+    position: relative;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; }
+  .header p { font-size: 13px; opacity: .85; }
+  .header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,.2);
+    border-radius: 20px;
+    padding: 3px 14px;
+    font-size: 11px;
+    margin-top: 10px;
+  }
+  .progress-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: rgba(255,255,255,.2);
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: #fff;
+    transition: width .4s ease;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 16px;
+    animation: fadeInUp .35s ease;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-number {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    line-height: 28px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .q-text { font-size: 15px; font-weight: 600; line-height: 1.5; flex: 1; }
+  .q-header { display: flex; align-items: flex-start; margin-bottom: 16px; }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1.5px solid #E8ECF0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .2s;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .option:hover { border-color: var(--accent); background: #EBF5FB; }
+  .option.selected { border-color: var(--accent); background: #EBF5FB; box-shadow: 0 0 0 1px var(--accent); }
+  .option .letter {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid #BDC3C7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #7F8C8D;
+    transition: all .2s;
+  }
+  .option.selected .letter { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .nav { display: flex; gap: 10px; margin-top: 8px; }
+  .nav button {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .nav button:active { transform: scale(.97); }
+  .nav .btn-prev { background: #E8ECF0; color: var(--text); }
+  .nav .btn-next, .nav .btn-submit { background: var(--accent); color: #fff; }
+  .nav .btn-submit { background: var(--success); }
+  .nav .btn-prev:disabled, .nav .btn-next:disabled { opacity: .5; cursor: not-allowed; }
+
+  .progress-text { text-align: center; font-size: 13px; color: #7F8C8D; margin-top: 8px; }
+  .section-title { font-size: 16px; font-weight: 700; padding: 24px 0 10px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+  .section-title .num { font-size: 12px; opacity: .6; }
+
+  /* Name input */
+  .name-input-wrap {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 16px;
+    animation: fadeInUp .35s ease;
+  }
+  .name-input-wrap label { display: block; font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .name-input-wrap label .red { color: #E74C3C; }
+  .name-input-wrap input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #E8ECF0;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: border .2s;
+  }
+  .name-input-wrap input:focus { border-color: var(--accent); }
+
+  /* Submit success */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeInUp .5s ease;
+  }
+  .success-screen .icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+  .success-screen h2 { font-size: 22px; color: var(--success); margin-bottom: 10px; }
+  .success-screen p { font-size: 15px; color: #7F8C8D; line-height: 1.6; }
+
+  .footer { text-align: center; padding: 24px 0 32px; font-size: 12px; color: #BDC3C7; }
+
+  /* Loading overlay */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(44,62,80,.5);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,.15);
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 4px solid #E8ECF0;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-box p { font-size: 14px; color: #555; }
+</style>
+</head>
+<body>
+
+<div class="header" id="quizHeader">
+  <h1>📋 一抹金蓝面试评测</h1>
+  <p>赣州一抹金蓝传媒</p>
+  <span class="badge">10题 · 约15分钟</span>
+  <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div class="container" id="quizApp">
+  <!-- Name input -->
+  <div class="name-input-wrap" id="nameInputWrap">
+    <label>请填写您的姓名 <span class="red">*</span></label>
+    <input type="text" id="candidateName" placeholder="请输入姓名..." maxlength="30" autocomplete="off">
+  </div>
+
+  <div id="questionsContainer"></div>
+
+  <div class="nav">
+    <button class="btn-prev" id="btnPrev" onclick="prevQuestion()">← 上一题</button>
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">下一题 →</button>
+    <button class="btn-submit" id="btnSubmit" onclick="submitQuiz()" style="display:none">✅ 提交测评</button>
+  </div>
+  <div class="progress-text" id="progressText">第 1 / 10 题</div>
+
+  <!-- Success screen -->
+  <div class="success-screen" id="successScreen">
+    <div class="icon">✅</div>
+    <h2>提交成功！</h2>
+    <p>感谢您的参与，测评结果已记录。<br>如有疑问请联系人事部门。</p>
+  </div>
+
+  <div class="footer">赣州一抹金蓝传媒 · 人事测评工具</div>
+</div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p>正在提交测评结果...</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
+<script>
+const QUESTIONS = [
+  { section: 1, text: '一个已推进两周的剧集项目，因AI模型突发崩坏导致角色一致性大面积失控，重渲代价极大，必须向上汇报。你的第一反应是？',
+    options: [
+      { letter: 'A', text: '迅速整理"补救翻盘"方案，重点汇报如何用最少帧替换、风格迁移等手法抢回进度，主动提出延期备选方案，淡化损失。' },
+      { letter: 'B', text: '出一份详尽的事故复盘报告，分析根因（模型版本/抽卡策略/参数设定），证明过程执行符合最优标准，问题出在外部不可控因素。' },
+      { letter: 'C', text: '先私下找制片/组长沟通争取谅解，强调团队加班付出和模型的不稳定性，避免被贴上"质量把控不力"标签。' },
+      { letter: 'D', text: '主动揽下全部责任，表示是自己验收没到位，着重汇报已吸取的教训，表现出诚恳改进的姿态。' }
+    ]
+  },
+  { section: 1, text: '在管线协作中，你和一位跨岗同事长期存在审美/标准分歧，你会？',
+    options: [
+      { letter: 'A', text: '公开划清界限，直接表明"我的专业判断是这样"，用客观数据或参考片说服对方，在专业上压倒对方。' },
+      { letter: 'B', text: '保持礼貌距离，严格用需求文档、修改记录等正式渠道沟通，避免把柄，但内心觉得对方不专业。' },
+      { letter: 'C', text: '时而激烈争论坚持己见，时而又担心破坏气氛而妥协，态度忽冷忽热，内耗严重。' },
+      { letter: 'D', text: '极度压抑不满，表面照单全收修改意见，但内心积累怨气，可能在某处突然爆发或冷暴力不回消息。' }
+    ]
+  },
+  { section: 1, text: '在项目审片会上，精心完成的一批成片/分镜被负责人当众全盘否定并严厉批评，你的本能反应是？',
+    options: [
+      { letter: 'A', text: '当场反驳，指出对方没理解设计意图或技术限制，事后越想越气。' },
+      { letter: 'B', text: '表面镇定内心受打击，会后反复琢磨每个细节，陷入"我是不是能力不行"的自我怀疑。' },
+      { letter: 'C', text: '感到羞辱但马上迎合意见，会后私下找同事发泄，寻求情绪认同。' },
+      { letter: 'D', text: '一言不发脸色异常，会后很长时间不敢再主动提新想法，变得被动保守。' }
+    ]
+  },
+  { section: 1, text: '面对极度枯燥、重复且看不到即时价值的长期工作（如逐帧修复AI伪影、角色一致性校验），你最可能的表现是？',
+    options: [
+      { letter: 'A', text: '极度不耐烦，做一段时间就走捷径/写脚本简化流程，或不断要求换更有挑战的任务。' },
+      { letter: 'B', text: '咬牙坚持但情绪阴郁暴躁，对打扰自己的人发脾气，变得挑剔刻薄。' },
+      { letter: 'C', text: '频繁聊天吐槽，通过摸鱼社交缓解痛苦，拖延症爆发，最后截至日期前赶工。' },
+      { letter: 'D', text: '默默按部就班完成，但进入麻木和情感隔离的状态，对周遭漠不关心。' }
+    ]
+  },
+  { section: 1, text: '这个行业加班是常态，连续三周日均12小时赶项目进度时，你最符合的表现是？',
+    options: [
+      { letter: 'A', text: '主动调整节奏（间隙眯10分钟、换不同环节保持新鲜感），想办法给自己续命，能顶到项目结束。' },
+      { letter: 'B', text: '表面不吭声一直接着干，但内心越来越烦躁，后两周出错率上升，对同事催促变得暴躁。' },
+      { letter: 'C', text: '到处喊累吐槽"干不下去了"，但活能赶完，不过周围人都被负面情绪影响。' },
+      { letter: 'D', text: '变得沉默寡言，机械性干活，能交差但明显不走心了，下班后完全不想说话。' }
+    ]
+  },
+  { section: 2, text: '项目组长在关键决策上长期优柔寡断（反复改风格、迟迟不确认分镜），严重影响你的进度，你最可能走向的极端是？',
+    options: [
+      { letter: 'A', text: '架空他！直接绕过他决策先斩后奏，自己当"实际负责人"，觉得团队没我不行。' },
+      { letter: 'B', text: '拿出更多无可挑剔的参考素材和数据，不断用逻辑论证逼他就范。' },
+      { letter: 'C', text: '拉拢其他组员形成共识，用舆论压力迫使他改变。' },
+      { letter: 'D', text: '内心痛苦但无限期忍耐，替他的每一个犹豫善后，把自己拖垮。' }
+    ]
+  },
+  { section: 2, text: '当得知同级同事获得了一次你渴望已久的晋升机会时，你内心最阴暗的念头是？',
+    options: [
+      { letter: 'A', text: '"他不过是运气好/更会来事"，随即开始分析他上位后的权力格局，准备挑战。' },
+      { letter: 'B', text: '"评审没眼光，看不出谁才是真正懂行的"，之后用专业细节挑对方毛病。' },
+      { letter: 'C', text: '"他肯定在背后做了见不得人的事"，开始有倾向性地传播信息，拉拢"失意者联盟"。' },
+      { letter: 'D', text: '"也许我就是不够好"，陷入自我贬低和不公平感，工作热情锐减。' }
+    ]
+  },
+  { section: 2, text: '公司对AI生成素材的"风格参考度"有模糊的灰色地带，你内心深处对此的态度是？',
+    options: [
+      { letter: 'A', text: '规则是给跟不上节奏的人定的，只要不被追责、能提升效率，灵活操作无所谓。' },
+      { letter: 'B', text: '必须严格按规范执行，而且盯着身边的人也做到。有人打擦边球我会极其愤怒。' },
+      { letter: 'C', text: '规则是可以谈的，如果我跟负责规范的人关系好，标准自然可放宽。' },
+      { letter: 'D', text: '肯定严格照做，但内心感到被束缚，渴望有人带头打破条条框框。' }
+    ]
+  },
+  { section: 3, text: '一位同事私下向你透露了另一位同事的薪资或离职打算，你的处理方式是？',
+    options: [
+      { letter: 'A', text: '根据信息重新评估各方在管线中的位置，不动声色地留作己用。' },
+      { letter: 'B', text: '守口如瓶，但因此形成预判，在工作对接中下意识流露出来。' },
+      { letter: 'C', text: '感到负担又因被信任而愉悦，修饰后跟另一个关系好的同事"分析"一下。' },
+      { letter: 'D', text: '装作什么都没发生，但刻意回避跟被谈论同事的接触，异常疏远。' }
+    ]
+  },
+  { section: 3, text: '在项目赶进度的最忙时期，你怎么看待需要你花时间指导的新人或跟不上节奏的同事？',
+    options: [
+      { letter: 'A', text: '视为累赘，毫不掩饰不耐烦，甚至直接表达不满要求换人。' },
+      { letter: 'B', text: '心生厌恶但隐忍不发，用冷淡和公事公办的态度让对方知趣离开。' },
+      { letter: 'C', text: '一边帮忙一边到处抱怨自己有多累，期望获得情感回报。' },
+      { letter: 'D', text: '无法拒绝，咬牙牺牲自己的时间和质量去帮，但内心积攒委屈。' }
+    ]
+  }
+];
+
+let answers = new Array(QUESTIONS.length).fill(null);
+let currentQ = 0;
+
+// 初始化 AiPexBase 客户端
+const client = aipexbase.createClient({
+  baseUrl: 'https://baas.kuafuai.net/baas-api',
+  apiKey: 'baas_0us8Xwxy'
+});
+
+function renderQuestions() {
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = '';
+  const sectionNames = { 1: '压力与防御机制', 2: '暗面特质倾向', 3: '能量与边界感' };
+
+  QUESTIONS.forEach((q, idx) => {
+    const isNewSection = idx === 0 || QUESTIONS[idx - 1].section !== q.section;
+    if (isNewSection) {
+      const sec = document.createElement('div');
+      sec.className = 'section-title';
+      sec.innerHTML = `<span>📌 第${q.section}部分</span> <span class="num">${sectionNames[q.section]}</span>`;
+      container.appendChild(sec);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `q-${idx}`;
+    card.style.display = idx === 0 ? 'block' : 'none';
+    card.innerHTML = `
+      <div class="q-header">
+        <span class="q-number">${idx + 1}</span>
+        <span class="q-text">${q.text}</span>
+      </div>
+      <div class="options">
+        ${q.options.map((opt, oi) => `
+          <div class="option" data-q="${idx}" data-letter="${opt.letter}" onclick="selectOption(${idx}, '${opt.letter}')">
+            <span class="letter">${opt.letter}</span>
+            <span>${opt.text}</span>
+          </div>
+        `).join('')}
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function selectOption(qIdx, letter) {
+  answers[qIdx] = letter;
+  const card = document.getElementById(`q-${qIdx}`);
+  card.querySelectorAll('.option').forEach(opt => {
+    opt.classList.toggle('selected', opt.dataset.letter === letter);
+  });
+  updateNavState();
+}
+
+function showQuestion(idx) {
+  document.querySelectorAll('.card').forEach((c, i) => { c.style.display = i === idx ? 'block' : 'none'; });
+  currentQ = idx;
+  updateNavState();
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = answers.filter(a => a !== null).length;
+  const pct = (answered / QUESTIONS.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `第 ${currentQ + 1} / ${QUESTIONS.length} 题 | 已完成 ${answered}/10`;
+}
+
+function updateNavState() {
+  const prevBtn = document.getElementById('btnPrev');
+  const nextBtn = document.getElementById('btnNext');
+  const submitBtn = document.getElementById('btnSubmit');
+
+  prevBtn.disabled = currentQ === 0;
+  if (currentQ === QUESTIONS.length - 1) {
+    nextBtn.style.display = 'none';
+    submitBtn.style.display = 'block';
+    const name = document.getElementById('candidateName').value.trim();
+    submitBtn.disabled = answers.some(a => a === null) || !name;
+  } else {
+    nextBtn.style.display = 'block';
+    submitBtn.style.display = 'none';
+    nextBtn.disabled = answers[currentQ] === null;
+  }
+}
+
+function nextQuestion() {
+  if (currentQ < QUESTIONS.length - 1) {
+    showQuestion(currentQ + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    showQuestion(currentQ - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+async function submitQuiz() {
+  const name = document.getElementById('candidateName').value.trim();
+  if (!name) { alert('请先填写您的姓名'); return; }
+  if (answers.some(a => a === null)) { alert('还有题目未作答'); return; }
+
+  // 计算统计
+  const counts = { A: 0, B: 0, C: 0, D: 0 };
+  answers.forEach(a => counts[a]++);
+  let dominant = 'A';
+  let maxCount = 0;
+  for (const [key, val] of Object.entries(counts)) {
+    if (val > maxCount) { maxCount = val; dominant = key; }
+  }
+
+  // 显示 loading
+  document.getElementById('loadingOverlay').classList.add('show');
+
+  try {
+    // 写入数据库
+    const res = await client.db.from('quiz_results').insert().values({
+      candidate_name: name,
+      answers: JSON.stringify(answers),
+      count_a: counts.A,
+      count_b: counts.B,
+      count_c: counts.C,
+      count_d: counts.D,
+      dominant_type: dominant
+    });
+
+    if (res.success) {
+      // 隐藏题目、导航
+      document.getElementById('nameInputWrap').style.display = 'none';
+      document.getElementById('questionsContainer').style.display = 'none';
+      document.querySelector('.nav').style.display = 'none';
+      document.getElementById('progressText').style.display = 'none';
+      document.getElementById('quizHeader').querySelector('p').textContent = '赣州一抹金蓝传媒';
+
+      // 显示成功页
+      document.getElementById('successScreen').style.display = 'block';
+      document.getElementById('progressFill').style.width = '100%';
+    } else {
+      alert('提交失败，请重试：' + (res.message || '未知错误'));
+    }
+  } catch (e) {
+    alert('提交失败，请检查网络后重试：' + e.message);
+  } finally {
+    document.getElementById('loadingOverlay').classList.remove('show');
+  }
+}
+
+// 姓名输入监听
+document.getElementById('candidateName').addEventListener('input', updateNavState);
+
+// 键盘支持
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'Enter') {
+    if (document.getElementById('btnNext').style.display !== 'none' && !document.getElementById('btnNext').disabled) nextQuestion();
+    else if (document.getElementById('btnSubmit').style.display !== 'none' && !document.getElementById('btnSubmit').disabled) submitQuiz();
+  }
+  if (e.key === 'ArrowLeft' && !document.getElementById('btnPrev').disabled) prevQuestion();
+  if (e.key >= '1' && e.key <= '4') {
+    const opts = document.querySelector(`#q-${currentQ} .option:nth-child(${parseInt(e.key)})`);
+    if (opts) opts.click();
+  }
+});
+
+renderQuestions();
+showQuestion(0);
+updateProgress();
+</script>
+</body>
+</html>

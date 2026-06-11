@@ -1,0 +1,84 @@
+{
+  "name": "专业性格测评-AIGC动态漫版",
+  "needAuth": false,
+  "tables": [
+    {
+      "tableName": "quiz_results",
+      "description": "测评结果记录表",
+      "columns": [
+        {
+          "columnName": "id",
+          "columnType": "INT",
+          "columnComment": "主键ID",
+          "isRequired": true,
+          "isPrimary": true,
+          "isShow": true
+        },
+        {
+          "columnName": "candidate_name",
+          "columnType": "VARCHAR(100)",
+          "columnComment": "候选人姓名",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "answers",
+          "columnType": "FULLTEXT",
+          "columnComment": "答题记录（JSON字符串，如{"0":"A","1":"B"...}）",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "count_a",
+          "columnType": "INT",
+          "columnComment": "A选项数量",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "count_b",
+          "columnType": "INT",
+          "columnComment": "B选项数量",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "count_c",
+          "columnType": "INT",
+          "columnComment": "C选项数量",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "count_d",
+          "columnType": "INT",
+          "columnComment": "D选项数量",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "dominant_type",
+          "columnType": "VARCHAR(10)",
+          "columnComment": "主导类型（A/B/C/D）",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "created_at",
+          "columnType": "DATETIME",
+          "columnComment": "答题时间",
+          "isRequired": false,
+          "isPrimary": false,
+          "isShow": true
+        }
+      ]
+    }
+  ]
+}

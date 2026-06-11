@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>测评管理后台</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    background: #F0F2F5;
+    color: #2C3E50;
+  }
+  .app-header {
+    background: linear-gradient(135deg, #2C3E50, #34495E);
+    color: #fff;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .app-header h1 { font-size: 18px; font-weight: 700; }
+  .app-header .subtitle { font-size: 12px; opacity: .7; margin-top: 2px; }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 16px; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);
+  }
+  .stat-card .num { font-size: 28px; font-weight: 700; }
+  .stat-card .label { font-size: 12px; color: #7F8C8D; margin-top: 2px; }
+
+  /* Table */
+  .table-wrap {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    overflow-x: auto;
+    padding: 16px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 2px solid #E8ECF0;
+    font-weight: 700;
+    font-size: 12px;
+    color: #7F8C8D;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  td { padding: 10px 8px; border-bottom: 1px solid #EEF0F2; }
+  tr:hover td { background: #F8F9FA; }
+  .type-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .del-btn {
+    background: none;
+    border: 1px solid #E74C3C;
+    color: #E74C3C;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .del-btn:hover { background: #FDEDEC; }
+  .empty-msg { text-align: center; padding: 40px; color: #95A5A6; font-size: 14px; }
+
+  /* Detail modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,.2);
+  }
+  .modal-box h3 { font-size: 16px; margin-bottom: 12px; }
+  .modal-box .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid #F0F2F5; }
+  .modal-box .row .label { color: #7F8C8D; }
+  .modal-close {
+    margin-top: 16px;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #E8ECF0;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* Login gate */
+  .login-gate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2C3E50, #34495E);
+  }
+  .login-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    width: 320px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.3);
+  }
+  .login-box h2 { text-align: center; margin-bottom: 20px; font-size: 18px; }
+  .login-box input {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid #E8ECF0;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .login-box input:focus { border-color: #3498DB; }
+  .login-box button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #3498DB;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .login-box button:active { opacity: .9; }
+  .login-error { color: #E74C3C; font-size: 13px; text-align: center; margin-top: 8px; }
+
+  .section-title { font-size: 15px; font-weight: 700; margin: 16px 0 10px; color: #555; }
+  .count-grid { display: flex; gap: 6px; margin: 4px 0; }
+  .count-block { flex: 1; text-align: center; padding: 6px 4px; border-radius: 6px; font-size: 12px; }
+  .no-data { color: #95A5A6; font-size: 12px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- Login gate -->
+<div class="login-gate" id="loginGate">
+  <div class="login-box">
+    <h2>🔐 测评管理后台</h2>
+    <input type="password" id="loginPwd" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">登录</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div id="mainApp" style="display:none">
+  <div class="app-header">
+    <div>
+      <h1>📊 测评结果管理</h1>
+      <div class="subtitle">赣州一抹金蓝传媒 · AIGC动态漫行业版</div>
+    </div>
+    <div style="font-size:12px;cursor:pointer;opacity:.6" onclick="doLogout()">退出</div>
+  </div>
+
+  <div class="container">
+    <div class="stats-bar" id="statsBar"></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:50px">#</th>
+            <th>姓名</th>
+            <th>主导类型</th>
+            <th>A</th><th>B</th><th>C</th><th>D</th>
+            <th>答题时间</th>
+            <th style="width:60px">详情</th>
+            <th style="width:60px">删除</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="10" class="empty-msg">暂无数据</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">详细信息</h3>
+    <div id="modalContent"></div>
+    <button class="modal-close" onclick="closeModal()">关闭</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
+<script>
+const PASSWORD = 'jinlan2025'; // 你可以改成自己的密码
+const client = aipexbase.createClient({
+  baseUrl: 'https://baas.kuafuai.net/baas-api',
+  apiKey: 'baas_0us8Xwxy'
+});
+
+function doLogin() {
+  const pwd = document.getElementById('loginPwd').value;
+  if (pwd === PASSWORD) {
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    loadData();
+  } else {
+    document.getElementById('loginError').textContent = '密码错误，请重试';
+  }
+}
+
+function doLogout() {
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginGate').style.display = 'flex';
+  document.getElementById('loginPwd').value = '';
+  document.getElementById('loginError').textContent = '';
+}
+
+async function loadData() {
+  try {
+    const res = await client.db.from('quiz_results').list().order('id', 'desc');
+    if (res.success && res.data) {
+      renderTable(res.data);
+      renderStats(res.data);
+    } else {
+      document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" class="empty-msg">加载失败</td></tr>';
+    }
+  } catch (e) {
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" class="empty-msg">加载失败：' + e.message + '</td></tr>';
+  }
+}
+
+function renderStats(data) {
+  const total = data.length;
+  const typeCount = { A: 0, B: 0, C: 0, D: 0 };
+  const today = new Date().toISOString().slice(0,10);
+  let todayCount = 0;
+  data.forEach(r => {
+    if (r.dominant_type && typeCount[r.dominant_type] !== undefined) typeCount[r.dominant_type]++;
+    if (r.created_at && r.created_at.slice(0,10) === today) todayCount++;
+  });
+
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card"><div class="num">${total}</div><div class="label">总答题人数</div></div>
+    <div class="stat-card"><div class="num">${todayCount}</div><div class="label">今日答题</div></div>
+    <div class="stat-card" style="border-left:3px solid #E74C3C"><div class="num" style="color:#E74C3C">${typeCount.A}</div><div class="label">A型·掌控者</div></div>
+    <div class="stat-card" style="border-left:3px solid #3498DB"><div class="num" style="color:#3498DB">${typeCount.B}</div><div class="label">B型·完美主义</div></div>
+    <div class="stat-card" style="border-left:3px solid #F39C12"><div class="num" style="color:#F39C12">${typeCount.C}</div><div class="label">C型·社交家</div></div>
+    <div class="stat-card" style="border-left:3px solid #27AE60"><div class="num" style="color:#27AE60">${typeCount.D}</div><div class="label">D型·讨好者</div></div>
+  `;
+}
+
+const TYPE_STYLES = { A: 'background:#FDEDEC;color:#E74C3C', B: 'background:#EBF5FB;color:#3498DB', C: 'background:#FEF9E7;color:#F39C12', D: 'background:#E8F8F5;color:#27AE60' };
+const TYPE_NAMES = { A: '掌控者', B: '完美主义', C: '社交家', D: '讨好者' };
+
+function renderTable(data) {
+  if (data.length === 0) {
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" class="empty-msg">暂无数据</td></tr>';
+    return;
+  }
+
+  let html = '';
+  data.forEach((r, idx) => {
+    const t = r.dominant_type || '?';
+    const style = TYPE_STYLES[t] || '';
+    const name = TYPE_NAMES[t] || '';
+    html += `<tr>
+      <td>${idx + 1}</td>
+      <td><strong>${r.candidate_name || '-'}</strong></td>
+      <td><span class="type-badge" style="${style}">${t}型·${name}</span></td>
+      <td>${r.count_a ?? '-'}</td>
+      <td>${r.count_b ?? '-'}</td>
+      <td>${r.count_c ?? '-'}</td>
+      <td>${r.count_d ?? '-'}</td>
+      <td style="font-size:12px;color:#7F8C8D">${r.created_at ? formatTime(r.created_at) : '-'}</td>
+      <td><button class="del-btn" style="border-color:#3498DB;color:#3498DB" onclick='showDetail(${JSON.stringify(r)})'>查看</button></td>
+      <td><button class="del-btn" onclick="deleteRecord(${r.id}, '${r.candidate_name || ''}')">删除</button></td>
+    </tr>`;
+  });
+  document.getElementById('tableBody').innerHTML = html;
+}
+
+function formatTime(t) {
+  if (!t) return '-';
+  const d = new Date(t);
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function showDetail(r) {
+  document.getElementById('modalTitle').textContent = `📋 ${r.candidate_name || '未知'} 的测评结果`;
+  
+  let answersHtml = '';
+  try {
+    const ans = JSON.parse(r.answers || '[]');
+    const sectionNames = ['', '压力与防御机制', '暗面特质倾向', '能量与边界感'];
+    let curSection = 0;
+    const QUESTIONS_TEXT = [
+      '', // index 0 is unused for display
+      '1. AI模型崩坏导致角色一致性失控，你如何汇报？',
+      '2. 与跨岗同事审美/标准分歧',
+      '3. 成片被当众全盘否定并批评',
+      '4. 面对极度枯燥重复的工作',
+      '5. 连续三周日均12小时加班',
+      '6. 组长优柔寡断影响进度',
+      '7. 同级同事获得晋升机会',
+      '8. AI素材"风格参考度"灰色地带',
+      '9. 同事透露别人的秘密',
+      '10. 忙期指导新人或慢节奏同事'
+    ];
+    const originalQuestions = [
+      '一个已推进两周的剧集项目，因AI模型突发崩坏导致角色一致性大面积失控，重渲代价极大，必须向上汇报。你的第一反应是？',
+      '在管线协作中，你和一位跨岗同事长期存在审美/标准分歧，你会？',
+      '在项目审片会上，精心完成的一批成片/分镜被负责人当众全盘否定并严厉批评，你的本能反应是？',
+      '面对极度枯燥、重复且看不到即时价值的长期工作（如逐帧修复AI伪影、角色一致性校验），你最可能的表现是？',
+      '这个行业加班是常态，连续三周日均12小时赶项目进度时，你最符合的表现是？',
+      '项目组长在关键决策上长期优柔寡断（反复改风格、迟迟不确认分镜），严重影响你的进度，你最可能走向的极端是？',
+      '当得知同级同事获得了一次你渴望已久的晋升机会时，你内心最阴暗的念头是？',
+      '公司对AI生成素材的"风格参考度"有模糊的灰色地带，你内心深处对此的态度是？',
+      '一位同事私下向你透露了另一位同事的薪资或离职打算，你的处理方式是？',
+      '在项目赶进度的最忙时期，你怎么看待需要你花时间指导的新人或跟不上节奏的同事？'
+    ];
+    ans.forEach((a, i) => {
+      if (i < QUESTIONS.length) {
+        const q = QUESTIONS[i];
+        const sectionNum = q.section;
+        if (sectionNum !== curSection) {
+          curSection = sectionNum;
+          answersHtml += `<div style="font-weight:700;margin:12px 0 6px;padding:4px 0;border-bottom:1px solid #E8ECF0;font-size:13px;color:#555">第${sectionNum}部分：${sectionNames[sectionNum]}</div>`;
+        }
+        answersHtml += `<div class="row"><span class="label">Q${i+1}</span><span>选 ${a}</span></div>`;
+      }
+    });
+  } catch(e) {
+    answersHtml = '<div class="no-data">无法解析答题详情</div>';
+  }
+
+  const style = TYPE_STYLES[r.dominant_type] || '';
+  const name = TYPE_NAMES[r.dominant_type] || '';
+
+  document.getElementById('modalContent').innerHTML = `
+    <div class="row"><span class="label">姓名</span><span>${r.candidate_name || '-'}</span></div>
+    <div class="row"><span class="label">主导类型</span><span><span class="type-badge" style="${style}">${r.dominant_type}型·${name}</span></span></div>
+    <div class="row"><span class="label">统计</span><span>
+      <div class="count-grid">
+        <div class="count-block" style="background:#FDEDEC;color:#E74C3C">A: ${r.count_a ?? 0}</div>
+        <div class="count-block" style="background:#EBF5FB;color:#3498DB">B: ${r.count_b ?? 0}</div>
+        <div class="count-block" style="background:#FEF9E7;color:#F39C12">C: ${r.count_c ?? 0}</div>
+        <div class="count-block" style="background:#E8F8F5;color:#27AE60">D: ${r.count_d ?? 0}</div>
+      </div>
+    </span></div>
+    <div class="row"><span class="label">答题时间</span><span>${r.created_at ? formatTime(r.created_at) : '-'}</span></div>
+    <div class="section-title">📝 答题详情</div>
+    ${answersHtml}
+  `;
+
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('show');
+}
+
+async function deleteRecord(id, name) {
+  if (!confirm(`确定要删除 ${name} 的测评记录吗？此操作不可恢复。`)) return;
+  try {
+    const res = await client.db.from('quiz_results').delete().eq('id', id);
+    if (res.success) {
+      loadData();
+    } else {
+      alert('删除失败：' + (res.message || '未知错误'));
+    }
+  } catch (e) {
+    alert('删除失败：' + e.message);
+  }
+}
+
+// Click outside modal to close
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// 每60秒自动刷新
+setInterval(loadData, 60000);
+
+// ===== 本地题目文本引用（供详情展示使用） =====
+const QUESTIONS = [
+  { section: 1 },
+  { section: 1 },
+  { section: 1 },
+  { section: 1 },
+  { section: 1 },
+  { section: 2 },
+  { section: 2 },
+  { section: 2 },
+  { section: 3 },
+  { section: 3 }
+];
+</script>
+</body>
+</html>
