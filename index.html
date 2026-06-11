@@ -211,12 +211,20 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-box p { font-size: 14px; color: #555; }
+
+  /* Company name gold-blue */
+  .company-tagline { font-size: 13px; margin-top: 6px; }
+  .gold { color: #DAA520; font-weight: 700; }
+  .blue { color: #3498DB; font-weight: 700; }
+  .footer .gold { color: #B8860B; }
+  .footer .blue { color: #2980B9; }
 </style>
 </head>
 <body>
 
 <div class="header" id="quizHeader">
   <h1>📋 一抹金蓝面试评测</h1>
+  <p class="company-tagline">一抹<span class="gold">金</span><span class="blue">蓝</span>传媒</p>
   <span class="badge">10题 · 约15分钟</span>
   <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
 </div>
@@ -524,7 +532,6 @@ async function submitQuiz() {
       document.getElementById('questionsContainer').style.display = 'none';
       document.querySelector('.nav').style.display = 'none';
       document.getElementById('progressText').style.display = 'none';
-      //
 
       // 显示成功页
       document.getElementById('successScreen').style.display = 'block';
