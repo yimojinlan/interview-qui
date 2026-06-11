@@ -217,7 +217,6 @@
 
 <div class="header" id="quizHeader">
   <h1>📋 一抹金蓝面试评测</h1>
-  <p>一抹金蓝传媒</p>
   <span class="badge">10题 · 约15分钟</span>
   <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
 </div>
@@ -525,7 +524,7 @@ async function submitQuiz() {
       document.getElementById('questionsContainer').style.display = 'none';
       document.querySelector('.nav').style.display = 'none';
       document.getElementById('progressText').style.display = 'none';
-      document.getElementById('quizHeader').querySelector('p').textContent = '一抹金蓝传媒';
+      //
 
       // 显示成功页
       document.getElementById('successScreen').style.display = 'block';
