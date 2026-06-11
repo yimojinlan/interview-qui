@@ -140,8 +140,8 @@
   .section-title { font-size: 16px; font-weight: 700; padding: 24px 0 10px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
   .section-title .num { font-size: 12px; opacity: .6; }
 
-  /* Name input */
-  .name-input-wrap {
+  /* Basic info card */
+  .basic-info-wrap {
     background: var(--card);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -149,18 +149,23 @@
     margin-bottom: 16px;
     animation: fadeInUp .35s ease;
   }
-  .name-input-wrap label { display: block; font-size: 15px; font-weight: 600; margin-bottom: 8px; }
-  .name-input-wrap label .red { color: #E74C3C; }
-  .name-input-wrap input {
+  .basic-info-wrap h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .basic-info-wrap .field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .basic-info-wrap .field-full { grid-column: 1 / -1; }
+  .basic-info-wrap label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .basic-info-wrap label .red { color: #E74C3C; }
+  .basic-info-wrap input, .basic-info-wrap select {
     width: 100%;
-    padding: 12px 14px;
+    padding: 10px 12px;
     border: 1.5px solid #E8ECF0;
-    border-radius: 10px;
-    font-size: 15px;
+    border-radius: 8px;
+    font-size: 14px;
     outline: none;
     transition: border .2s;
+    background: #fff;
   }
-  .name-input-wrap input:focus { border-color: var(--accent); }
+  .basic-info-wrap input:focus, .basic-info-wrap select:focus { border-color: var(--accent); }
+  .basic-info-wrap select { appearance: auto; }
 
   /* Submit success */
   .success-screen {
@@ -212,16 +217,48 @@
 
 <div class="header" id="quizHeader">
   <h1>📋 一抹金蓝面试评测</h1>
-  <p>赣州一抹金蓝传媒</p>
+  <p>一抹金蓝传媒</p>
   <span class="badge">10题 · 约15分钟</span>
   <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
 </div>
 
 <div class="container" id="quizApp">
-  <!-- Name input -->
-  <div class="name-input-wrap" id="nameInputWrap">
-    <label>请填写您的姓名 <span class="red">*</span></label>
-    <input type="text" id="candidateName" placeholder="请输入姓名..." maxlength="30" autocomplete="off">
+  <!-- Basic info -->
+  <div class="basic-info-wrap" id="basicInfoWrap">
+    <h3>📝 基本信息</h3>
+    <div class="field-group">
+      <div class="field-full">
+        <label>姓名 <span class="red">*</span></label>
+        <input type="text" id="candidateName" placeholder="请输入姓名" maxlength="30" autocomplete="off">
+      </div>
+      <div>
+        <label>性别 <span class="red">*</span></label>
+        <select id="gender">
+          <option value="">请选择</option>
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+      </div>
+      <div>
+        <label>年龄 <span class="red">*</span></label>
+        <input type="number" id="age" placeholder="如 25" min="16" max="99">
+      </div>
+      <div>
+        <label>学历 <span class="red">*</span></label>
+        <select id="education">
+          <option value="">请选择</option>
+          <option value="高中/中专">高中/中专</option>
+          <option value="大专">大专</option>
+          <option value="本科">本科</option>
+          <option value="硕士">硕士</option>
+          <option value="博士">博士</option>
+        </select>
+      </div>
+      <div>
+        <label>专业</label>
+        <input type="text" id="major" placeholder="如 编导、数字媒体" maxlength="40">
+      </div>
+    </div>
   </div>
 
   <div id="questionsContainer"></div>
@@ -240,7 +277,7 @@
     <p>感谢您的参与，测评结果已记录。<br>如有疑问请联系人事部门。</p>
   </div>
 
-  <div class="footer">赣州一抹金蓝传媒 · 人事测评工具</div>
+  <div class="footer">一抹金蓝传媒 · 人事测评工具</div>
 </div>
 
 <!-- Loading overlay -->
@@ -403,6 +440,14 @@ function updateProgress() {
   document.getElementById('progressText').textContent = `第 ${currentQ + 1} / ${QUESTIONS.length} 题 | 已完成 ${answered}/10`;
 }
 
+function isBasicInfoValid() {
+  const name = document.getElementById('candidateName').value.trim();
+  const gender = document.getElementById('gender').value;
+  const age = document.getElementById('age').value.trim();
+  const edu = document.getElementById('education').value;
+  return name && gender && age && edu;
+}
+
 function updateNavState() {
   const prevBtn = document.getElementById('btnPrev');
   const nextBtn = document.getElementById('btnNext');
@@ -412,8 +457,7 @@ function updateNavState() {
   if (currentQ === QUESTIONS.length - 1) {
     nextBtn.style.display = 'none';
     submitBtn.style.display = 'block';
-    const name = document.getElementById('candidateName').value.trim();
-    submitBtn.disabled = answers.some(a => a === null) || !name;
+    submitBtn.disabled = !isBasicInfoValid() || answers.some(a => a === null);
   } else {
     nextBtn.style.display = 'block';
     submitBtn.style.display = 'none';
@@ -436,9 +480,17 @@ function prevQuestion() {
 }
 
 async function submitQuiz() {
-  const name = document.getElementById('candidateName').value.trim();
-  if (!name) { alert('请先填写您的姓名'); return; }
+  if (!isBasicInfoValid()) {
+    alert('请先填写完整基本信息（姓名、性别、年龄、学历为必填）');
+    return;
+  }
   if (answers.some(a => a === null)) { alert('还有题目未作答'); return; }
+
+  const name = document.getElementById('candidateName').value.trim();
+  const gender = document.getElementById('gender').value;
+  const age = parseInt(document.getElementById('age').value.trim(), 10);
+  const education = document.getElementById('education').value;
+  const major = document.getElementById('major').value.trim();
 
   // 计算统计
   const counts = { A: 0, B: 0, C: 0, D: 0 };
@@ -453,9 +505,12 @@ async function submitQuiz() {
   document.getElementById('loadingOverlay').classList.add('show');
 
   try {
-    // 写入数据库
     const res = await client.db.from('quiz_results').insert().values({
       candidate_name: name,
+      gender: gender,
+      age: age,
+      education: education,
+      major: major || '',
       answers: JSON.stringify(answers),
       count_a: counts.A,
       count_b: counts.B,
@@ -465,12 +520,12 @@ async function submitQuiz() {
     });
 
     if (res.success) {
-      // 隐藏题目、导航
-      document.getElementById('nameInputWrap').style.display = 'none';
+      // 隐藏基本信息和题目
+      document.getElementById('basicInfoWrap').style.display = 'none';
       document.getElementById('questionsContainer').style.display = 'none';
       document.querySelector('.nav').style.display = 'none';
       document.getElementById('progressText').style.display = 'none';
-      document.getElementById('quizHeader').querySelector('p').textContent = '赣州一抹金蓝传媒';
+      document.getElementById('quizHeader').querySelector('p').textContent = '一抹金蓝传媒';
 
       // 显示成功页
       document.getElementById('successScreen').style.display = 'block';
@@ -485,10 +540,13 @@ async function submitQuiz() {
   }
 }
 
-// 姓名输入监听
+// 基本信息输入监听
 document.getElementById('candidateName').addEventListener('input', updateNavState);
+document.getElementById('gender').addEventListener('change', updateNavState);
+document.getElementById('age').addEventListener('input', updateNavState);
+document.getElementById('education').addEventListener('change', updateNavState);
 
-// 键盘支持 - 数字键快速选项
+// 键盘支持
 document.addEventListener('keydown', function(e) {
   const key = e.key;
   if (['1','2','3','4'].includes(key)) {

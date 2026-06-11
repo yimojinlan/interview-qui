@@ -264,17 +264,21 @@
       <table>
         <thead>
           <tr>
-            <th style="width:40px">#</th>
+            <th style="width:32px">#</th>
             <th>姓名</th>
+            <th>性别</th>
+            <th>年龄</th>
+            <th>学历</th>
+            <th>专业</th>
             <th>主导类型</th>
             <th>A</th><th>B</th><th>C</th><th>D</th>
             <th>答题时间</th>
-            <th style="width:55px">详情</th>
-            <th style="width:55px">删除</th>
+            <th style="width:50px">详情</th>
+            <th style="width:50px">删除</th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="10" class="empty-msg">暂无数据</td></tr>
+          <tr><td colspan="13" class="empty-msg">暂无数据</td></tr>
         </tbody>
       </table>
     </div>
@@ -503,6 +507,10 @@ function renderTable(data) {
     html += `<tr>
       <td>${idx + 1}</td>
       <td><strong>${r.candidate_name || '-'}</strong></td>
+      <td>${r.gender || '-'}</td>
+      <td>${r.age ?? '-'}</td>
+      <td>${r.education || '-'}</td>
+      <td>${r.major || '-'}</td>
       <td><span class="type-badge" style="${style}">${t}型·${name}</span></td>
       <td>${r.count_a ?? '-'}</td>
       <td>${r.count_b ?? '-'}</td>
@@ -574,6 +582,9 @@ function showDetail(r) {
         ${prof.emoji} ${t}型 — ${prof.name}
       </span>
       <h2 style="margin:10px 0 4px;font-size:20px">${r.candidate_name || '未知'}</h2>
+      <div style="font-size:13px;color:#7F8C8D;margin-bottom:6px">
+        ${r.gender || '-'} · ${r.age ?? '-'}岁 · ${r.education || '-'}${r.major ? ' · '+r.major : ''}
+      </div>
       <div style="font-size:13px;color:#7F8C8D">答题时间：${r.created_at ? formatTime(r.created_at) : '-'}</div>
       <div class="count-grid" style="max-width:320px;margin:8px auto">
         <div class="count-block" style="background:#FDEDEC;color:#E74C3C">A: ${counts.A}</div>
