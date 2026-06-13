@@ -176,6 +176,106 @@
   }
   .btn-close-modal:hover { background: #D5D9DC; }
 
+  /* ========== SEARCH / FILTER BAR ========== */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+  .toolbar input, .toolbar select {
+    padding: 8px 12px;
+    border: 1.5px solid #E8ECF0;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    background: #fff;
+  }
+  .toolbar input:focus, .toolbar select:focus { border-color: #3498DB; }
+  .toolbar .search-box { flex: 1; min-width: 160px; }
+  .toolbar .search-box input { width: 100%; }
+  .toolbar .btn-export {
+    padding: 8px 16px;
+    border: 1.5px solid #27AE60;
+    border-radius: 8px;
+    background: #fff;
+    color: #27AE60;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .toolbar .btn-export:hover { background: #E8F8F5; }
+
+  /* ========== MINI BAR (分布柱) ========== */
+  .mini-bar-wrap {
+    display: flex;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+    min-width: 80px;
+    max-width: 120px;
+  }
+  .mini-bar-wrap .bar-seg {
+    height: 100%;
+    transition: width .3s;
+  }
+
+  /* ========== RISK BADGE ========== */
+  .risk-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .risk-high { background: #FDEDEC; color: #E74C3C; }
+  .risk-mid { background: #FEF9E7; color: #F39C12; }
+  .risk-low { background: #E8F8F5; color: #27AE60; }
+  .risk-info { font-size: 11px; color: #95A5A6; }
+
+  /* ========== DASHBOARD CHARTS AREA ========== */
+  .dashboard-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .dashboard-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);
+  }
+  .dashboard-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .pie-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .pie-legend-item { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+  .pie-legend-item .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .trend-bar-wrap { display: flex; align-items: flex-end; gap: 4px; height: 60px; padding-top: 4px; }
+  .trend-bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    position: relative;
+  }
+  .trend-bar .trend-label {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: #95A5A6;
+    white-space: nowrap;
+  }
+
+  /* ========== COMPACT TABLE ========== */
+  .table-wrap .type-bar-cell { min-width: 100px; }
+  .table-wrap .risk-cell { min-width: 72px; text-align: center; }
+
+  .count-grid-inline { display: flex; gap: 3px; font-size: 11px; font-weight: 700; }
+  .count-grid-inline span { padding: 1px 4px; border-radius: 3px; }
+
   /* ========== LOGIN ========== */
   .login-gate {
     display: flex;
@@ -260,25 +360,46 @@
   </div>
   <div class="container">
     <div class="stats-bar" id="statsBar"></div>
+
+    <!-- Dashboard row -->
+    <div class="dashboard-row" id="dashboardRow"></div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 按姓名搜索..." oninput="applyFilter()"></div>
+      <select id="typeFilter" onchange="applyFilter()">
+        <option value="">全部类型</option>
+        <option value="A">A型·掌控者</option>
+        <option value="B">B型·完美主义</option>
+        <option value="C">C型·社交家</option>
+        <option value="D">D型·讨好者</option>
+      </select>
+      <select id="riskFilter" onchange="applyFilter()">
+        <option value="">全部风险</option>
+        <option value="high">🔴 高风险</option>
+        <option value="mid">🟡 有冲突</option>
+        <option value="low">🟢 低风险</option>
+      </select>
+      <button class="btn-export" onclick="exportCSV()">📥 导出CSV</button>
+    </div>
+
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th style="width:32px">#</th>
             <th>姓名</th>
-            <th>性别</th>
-            <th>年龄</th>
-            <th>学历</th>
-            <th>专业</th>
+            <th>基本信息</th>
             <th>主导类型</th>
-            <th>A</th><th>B</th><th>C</th><th>D</th>
+            <th class="type-bar-cell">选项分布</th>
+            <th class="risk-cell">风险预警</th>
             <th>答题时间</th>
             <th style="width:50px">详情</th>
             <th style="width:50px">删除</th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="13" class="empty-msg">暂无数据</td></tr>
+          <tr><td colspan="9" class="empty-msg">暂无数据</td></tr>
         </tbody>
       </table>
     </div>
@@ -466,34 +587,86 @@ function doLogout() {
 }
 
 // ============================================================
+// DATA STORE
+// ============================================================
+let allData = [];
+
+// ============================================================
 // DATA LOADING
 // ============================================================
 async function loadData() {
   try {
     const res = await client.db.from('quiz_results').list().order('id', 'desc');
     if (res.success && res.data) {
-      renderTable(res.data);
-      renderStats(res.data);
+      allData = res.data;
+      renderStats(allData);
+      renderDashboard(allData);
+      applyFilter();
     } else {
-      document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" class="empty-msg">加载失败</td></tr>';
+      document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-msg">加载失败</td></tr>';
     }
   } catch (e) {
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" class="empty-msg">加载失败：' + e.message + '</td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-msg">加载失败：' + e.message + '</td></tr>';
   }
 }
 
+// ============================================================
+// FILTER + SEARCH
+// ============================================================
+function applyFilter() {
+  const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+  const typeVal = document.getElementById('typeFilter').value;
+  const riskVal = document.getElementById('riskFilter').value;
+
+  let filtered = allData;
+  if (searchVal) {
+    filtered = filtered.filter(r => (r.candidate_name || '').toLowerCase().includes(searchVal));
+  }
+  if (typeVal) {
+    filtered = filtered.filter(r => r.dominant_type === typeVal);
+  }
+  if (riskVal) {
+    filtered = filtered.filter(r => calcRiskLevel(r.dominant_type || 'A') === riskVal);
+  }
+  renderTable(filtered);
+}
+
+// ============================================================
+// RISK CALC
+// ============================================================
+function calcRiskLevel(type) {
+  const riskMap = { A: 'mid', B: 'low', C: 'high', D: 'mid' };
+  return riskMap[type] || 'low';
+}
+function riskDisplay(level) {
+  if (level === 'high') return '<span class="risk-badge risk-high">🔴 高</span>';
+  if (level === 'mid') return '<span class="risk-badge risk-mid">🟡 中</span>';
+  return '<span class="risk-badge risk-low">🟢 低</span>';
+}
+
+// ============================================================
+// STATS BAR
+// ============================================================
 function renderStats(data) {
   const total = data.length;
   const typeCount = { A: 0, B: 0, C: 0, D: 0 };
   const today = new Date().toISOString().slice(0,10);
-  let todayCount = 0;
+  let todayCount = 0, maleCount = 0, femaleCount = 0;
+  let ageSum = 0, ageCount = 0, ageMin = 99, ageMax = 0;
   data.forEach(r => {
     if (r.dominant_type && typeCount[r.dominant_type] !== undefined) typeCount[r.dominant_type]++;
     if (r.created_at && r.created_at.slice(0,10) === today) todayCount++;
+    if (r.gender === '男') maleCount++;
+    if (r.gender === '女') femaleCount++;
+    const a = parseInt(r.age, 10);
+    if (!isNaN(a) && a > 0) { ageSum += a; ageCount++; if (a < ageMin) ageMin = a; if (a > ageMax) ageMax = a; }
   });
+  const avgAge = ageCount > 0 ? (ageSum / ageCount).toFixed(1) : '-';
   document.getElementById('statsBar').innerHTML = `
     <div class="stat-card"><div class="num">${total}</div><div class="label">总答题人数</div></div>
     <div class="stat-card"><div class="num">${todayCount}</div><div class="label">今日答题</div></div>
+    <div class="stat-card"><div class="num">${avgAge}</div><div class="label">平均年龄</div></div>
+    <div class="stat-card"><div class="num">${maleCount}/${femaleCount}</div><div class="label">男/女</div></div>
     <div class="stat-card" style="border-left:3px solid #E74C3C"><div class="num" style="color:#E74C3C">${typeCount.A}</div><div class="label">A型·掌控者</div></div>
     <div class="stat-card" style="border-left:3px solid #3498DB"><div class="num" style="color:#3498DB">${typeCount.B}</div><div class="label">B型·完美主义</div></div>
     <div class="stat-card" style="border-left:3px solid #F39C12"><div class="num" style="color:#F39C12">${typeCount.C}</div><div class="label">C型·社交家</div></div>
@@ -501,31 +674,124 @@ function renderStats(data) {
   `;
 }
 
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard(data) {
+  if (data.length === 0) {
+    document.getElementById('dashboardRow').innerHTML = '<div class="dashboard-card" style="grid-column:1/-1;text-align:center;color:#95A5A6;padding:30px">暂无数据，无法生成分析图表</div>';
+    return;
+  }
+
+  // --- 左：类型分布雷达 ---
+  const typeCount = { A: 0, B: 0, C: 0, D: 0 };
+  data.forEach(r => { if (r.dominant_type && typeCount[r.dominant_type] !== undefined) typeCount[r.dominant_type]++; });
+  const total = data.length;
+  const typeColors = { A: '#E74C3C', B: '#3498DB', C: '#F39C12', D: '#27AE60' };
+  const typeNames = { A: '掌控者', B: '完美主义', C: '社交家', D: '讨好者' };
+
+  let pieHtml = `<h4>📊 候选人类型分布</h4>`;
+  let hasData = false;
+  for (const k of ['A','B','C','D']) {
+    if (typeCount[k] > 0) {
+      hasData = true;
+      const pct = ((typeCount[k] / total) * 100).toFixed(1);
+      pieHtml += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <div style="width:12px;height:12px;border-radius:3px;background:${typeColors[k]};flex-shrink:0"></div>
+        <div style="flex:1;font-size:13px">${k}型 ${typeNames[k]}</div>
+        <div style="font-size:13px;font-weight:700;color:${typeColors[k]}">${typeCount[k]}人</div>
+        <div style="width:100px;height:12px;background:#F0F0F0;border-radius:6px;overflow:hidden;flex-shrink:0">
+          <div style="height:100%;width:${pct}%;background:${typeColors[k]};border-radius:6px"></div>
+        </div>
+        <div style="font-size:11px;color:#95A5A6;width:36px;text-align:right">${pct}%</div>
+      </div>`;
+    }
+  }
+  if (!hasData) pieHtml += '<div style="color:#95A5A6;font-size:13px;text-align:center;padding:12px">暂无数据</div>';
+  pieHtml += `<div class="pie-legend">🏷️ 类型说明：A=果断进攻 · B=严谨求稳 · C=创意社交 · D=配合执行</div>`;
+
+  // --- 右：近7天趋势 ---
+  let trendHtml = '<h4>📈 近7天答题趋势</h4><div class="trend-bar-wrap">';
+  const days = [];
+  const today = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  const dayCounts = {};
+  days.forEach(d => dayCounts[d] = 0);
+  data.forEach(r => {
+    if (r.created_at) {
+      const day = r.created_at.slice(0,10);
+      if (dayCounts[day] !== undefined) dayCounts[day]++;
+    }
+  });
+  const maxCount = Math.max(1, ...Object.values(dayCounts));
+  const dayNames = ['日','一','二','三','四','五','六'];
+  days.forEach(d => {
+    const cnt = dayCounts[d] || 0;
+    const h = Math.max(4, (cnt / maxCount) * 56);
+    const dateObj = new Date(d + 'T00:00:00');
+    const dow = dayNames[dateObj.getDay()];
+    const label = (d === days[6]) ? '今天' : (d === days[5] ? '昨天' : `${dateObj.getMonth()+1}/${dateObj.getDate()}`);
+    trendHtml += `<div class="trend-bar" style="height:${h}px;background:#3498DB">
+      <div class="trend-label">${label}<br>${cnt}</div>
+    </div>`;
+  });
+  trendHtml += '</div>';
+  trendHtml += '<div style="margin-top:18px;font-size:12px;color:#7F8C8D">📌 合计 ' + data.length + ' 人，类型占比可在一览中快速判断面试者结构偏向</div>';
+
+  document.getElementById('dashboardRow').innerHTML =
+    '<div class="dashboard-card">' + pieHtml + '</div>' +
+    '<div class="dashboard-card">' + trendHtml + '</div>';
+}
+
+// ============================================================
+// TABLE RENDER (COMPACT)
+// ============================================================
 function renderTable(data) {
   if (data.length === 0) {
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" class="empty-msg">暂无数据</td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-msg">无匹配数据</td></tr>';
     return;
   }
   const TYPE_STYLES = { A: 'background:#FDEDEC;color:#E74C3C', B: 'background:#EBF5FB;color:#3498DB', C: 'background:#FEF9E7;color:#F39C12', D: 'background:#E8F8F5;color:#27AE60' };
   const TYPE_NAMES = { A: '掌控者', B: '完美主义', C: '社交家', D: '讨好者' };
+  const BAR_COLORS = { A: '#E74C3C', B: '#3498DB', C: '#F39C12', D: '#27AE60' };
   let html = '';
   data.forEach((r, idx) => {
-    const t = r.dominant_type || '?';
+    const t = r.dominant_type || 'A';
     const style = TYPE_STYLES[t] || '';
     const name = TYPE_NAMES[t] || '';
     const safeName = (r.candidate_name || '').replace(/'/g, "\\'");
+
+    // Mini bar
+    const counts = { A: r.count_a||0, B: r.count_b||0, C: r.count_c||0, D: r.count_d||0 };
+    const totalC = counts.A + counts.B + counts.C + counts.D || 1;
+    const barHtml = `<div class="mini-bar-wrap">
+      <div class="bar-seg" style="width:${(counts.A/totalC*100).toFixed(0)}%;background:#E74C3C" title="A:${counts.A}"></div>
+      <div class="bar-seg" style="width:${(counts.B/totalC*100).toFixed(0)}%;background:#3498DB" title="B:${counts.B}"></div>
+      <div class="bar-seg" style="width:${(counts.C/totalC*100).toFixed(0)}%;background:#F39C12" title="C:${counts.C}"></div>
+      <div class="bar-seg" style="width:${(counts.D/totalC*100).toFixed(0)}%;background:#27AE60" title="D:${counts.D}"></div>
+    </div>`;
+
+    // Risk
+    const riskLvl = calcRiskLevel(t);
+
+    // Basic info
+    const infoParts = [];
+    if (r.gender) infoParts.push(r.gender);
+    if (r.age) infoParts.push(r.age + '岁');
+    if (r.education) infoParts.push(r.education);
+    if (r.major) infoParts.push(r.major.length > 6 ? r.major.slice(0,6) + '…' : r.major);
+
     html += `<tr>
       <td>${idx + 1}</td>
       <td><strong>${r.candidate_name || '-'}</strong></td>
-      <td>${r.gender || '-'}</td>
-      <td>${r.age ?? '-'}</td>
-      <td>${r.education || '-'}</td>
-      <td>${r.major || '-'}</td>
+      <td style="font-size:12px;color:#7F8C8D">${infoParts.join(' · ') || '-'}</td>
       <td><span class="type-badge" style="${style}">${t}型·${name}</span></td>
-      <td>${r.count_a ?? '-'}</td>
-      <td>${r.count_b ?? '-'}</td>
-      <td>${r.count_c ?? '-'}</td>
-      <td>${r.count_d ?? '-'}</td>
+      <td>${barHtml}</td>
+      <td class="risk-cell">${riskDisplay(riskLvl)}</td>
       <td style="font-size:12px;color:#7F8C8D">${r.created_at ? formatTime(r.created_at) : '-'}</td>
       <td><button class="btn-sm btn-view" onclick='showDetail(${JSON.stringify(r).replace(/'/g,"&#39;")})'>查看</button></td>
       <td><button class="btn-sm btn-del" onclick="deleteRecord(${r.id}, '${safeName}')">删除</button></td>
@@ -782,6 +1048,28 @@ async function deleteRecord(id, name) {
 // ============================================================
 // AUTO REFRESH
 // ============================================================
+// ============================================================
+// CSV EXPORT
+// ============================================================
+function exportCSV() {
+  if (allData.length === 0) { alert('暂无数据可导出'); return; }
+  const rows = [['序号','姓名','性别','年龄','学历','专业','主导类型','A数','B数','C数','D数','答题时间']];
+  allData.forEach((r, idx) => {
+    rows.push([
+      idx+1, r.candidate_name||'', r.gender||'', r.age||'', r.education||'', r.major||'',
+      r.dominant_type||'', r.count_a||0, r.count_b||0, r.count_c||0, r.count_d||0,
+      r.created_at ? formatTime(r.created_at) : ''
+    ]);
+  });
+  const csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '一抹金蓝测评结果_' + new Date().toISOString().slice(0,10) + '.csv';
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
 setInterval(loadData, 60000);
 </script>
 </body>
