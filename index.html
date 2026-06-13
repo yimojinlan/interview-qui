@@ -392,14 +392,12 @@ const client = aipexbase.createClient({
 function renderQuestions() {
   const container = document.getElementById('questionsContainer');
   container.innerHTML = '';
-  const sectionNames = { 1: '压力与防御机制', 2: '暗面特质倾向', 3: '能量与边界感' };
-
   QUESTIONS.forEach((q, idx) => {
     const isNewSection = idx === 0 || QUESTIONS[idx - 1].section !== q.section;
     if (isNewSection) {
       const sec = document.createElement('div');
       sec.className = 'section-title';
-      sec.innerHTML = `<span>📌 第${q.section}部分</span> <span class="num">${sectionNames[q.section]}</span>`;
+      sec.innerHTML = `<span>📌 第${q.section}部分</span>`;
       container.appendChild(sec);
     }
 
