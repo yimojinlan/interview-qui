@@ -225,7 +225,7 @@
 <div class="header" id="quizHeader">
   <h1>📋 一抹金蓝面试评测</h1>
   <p class="company-tagline">一抹<span class="gold">金</span><span class="blue">蓝</span>传媒</p>
-  <span class="badge">10题 · 约15分钟</span>
+  <span class="badge">15题 · 约20分钟</span>
   <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
 </div>
 
@@ -377,6 +377,51 @@ const QUESTIONS = [
       { letter: 'C', text: '一边帮忙一边到处抱怨自己有多累，期望获得情感回报。' },
       { letter: 'D', text: '无法拒绝，咬牙牺牲自己的时间和质量去帮，但内心积攒委屈。' }
     ]
+  },
+  // Part 1·防御机制扩展-技术迭代适应力
+  { section: 1, text: '公司刚引入了一套全新的AI工具链，你之前熟练的工作流程完全被推翻，需要从头学习。你最可能的表现是？',
+    options: [
+      { letter: 'A', text: '立刻研究新工具的优势，主动探索出比旧工具更高效的工作方式，快速切换。' },
+      { letter: 'B', text: '先仔细读完所有官方文档和教程，确认完全理解后才开始使用，进度偏慢但步骤扎实。' },
+      { letter: 'C', text: '兴奋地跟同事讨论新功能，尝试各种花哨效果，但对核心生产流程的掌握不够扎实。' },
+      { letter: 'D', text: '感到焦虑和抗拒，继续用旧工具干活能拖就拖，直到被强制要求切换。' }
+    ]
+  },
+  // Part 2·暗面扩展-Excitable维度
+  { section: 2, text: '在项目中，你被分配到一个跟你工作风格完全不搭的搭档组队。几周下来配合极差，项目进度严重滞后。你的走向是？',
+    options: [
+      { letter: 'A', text: '直接找组长要求换搭档，不接受"磨合"建议，认为时间成本耗不起。' },
+      { letter: 'B', text: '内心极度不满但隐忍不发，工作效率大幅下降，对搭档的一切产出都用最高标准挑剔。' },
+      { letter: 'C', text: '尝试拉近关系（请客/帮忙），希望用感情牌化解矛盾，无效后开始向其他人抱怨。' },
+      { letter: 'D', text: '默默扛下大部分工作，独自加班完成本该两人分担的任务，内心积怨越来越深。' }
+    ]
+  },
+  // Part 2·暗面扩展-Reserved维度
+  { section: 2, text: '你在工作中有一套自己摸索出来的高效工作流，但公司推行统一标准化流程，要求所有人一致执行。你的态度是？',
+    options: [
+      { letter: 'A', text: '认为标准化是效率的敌人，表面遵守实际保留自己的流程，暗地里"两手抓"。' },
+      { letter: 'B', text: '认为标准化是对的但自己的流程更优，不断在会议上论证标准流程的缺陷。' },
+      { letter: 'C', text: '配合一阵子后很快感到被束缚，开始在非正式场合吐槽标准流程"扼杀创意"。' },
+      { letter: 'D', text: '默默遵守但效率明显下滑，不主动反馈问题，等别人发现问题来优化。' }
+    ]
+  },
+  // Part 3·边界扩展-跨部门协作
+  { section: 3, text: '公司有一个跨部门协作需求，需要你频繁与风格截然不同的编剧或技术团队对接。对方经常提出你看来"外行"的要求，你会？',
+    options: [
+      { letter: 'A', text: '定义清晰边界，明确你的专业范围，不接受越界指挥也坚决不插手对方领域。' },
+      { letter: 'B', text: '内心烦躁但礼貌回应，用专业术语和详细文档回复对方，让对方"知难而退"。' },
+      { letter: 'C', text: '表面热情配合，私下频繁向本部门同事吐槽"那群人什么都不懂"，引发对立情绪。' },
+      { letter: 'D', text: '来者不拒什么需求都接，结果自己工作被拖垮，还不敢跟对方说"不"。' }
+    ]
+  },
+  // Part 3·边界扩展-评价反馈能力
+  { section: 3, text: '项目结束后复盘会上需要客观评价协作过的同事。你和一个同事配合得特别不愉快，你会？',
+    options: [
+      { letter: 'A', text: '客观指出问题点，提出具体改进建议，对事不对人。' },
+      { letter: 'B', text: '只谈事实不谈感受，用数据说话但措辞严苛不留情面。' },
+      { letter: 'C', text: '回避正面评价用"还可以""还行"模糊带过，私下跟信任的人说真话。' },
+      { letter: 'D', text: '为维护和谐给出超出实际情况的好评，但心里憋屈。' }
+    ]
   }
 ];
 
@@ -442,7 +487,7 @@ function updateProgress() {
   const answered = answers.filter(a => a !== null).length;
   const pct = (answered / QUESTIONS.length) * 100;
   document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = `第 ${currentQ + 1} / ${QUESTIONS.length} 题 | 已完成 ${answered}/10`;
+  document.getElementById('progressText').textContent = `第 ${currentQ + 1} / ${QUESTIONS.length} 题 | 已完成 ${answered}/${QUESTIONS.length}`;
 }
 
 function isBasicInfoValid() {

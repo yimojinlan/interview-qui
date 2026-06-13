@@ -416,7 +416,12 @@ const QUESTIONS_TEXT = [
   '当得知同级同事获得了一次你渴望已久的晋升机会时，你内心最阴暗的念头是？',
   '公司对AI生成素材的"风格参考度"有模糊的灰色地带，你内心深处对此的态度是？',
   '一位同事私下向你透露了另一位同事的薪资或离职打算，你的处理方式是？',
-  '在项目赶进度的最忙时期，你怎么看待需要你花时间指导的新人或跟不上节奏的同事？'
+  '在项目赶进度的最忙时期，你怎么看待需要你花时间指导的新人或跟不上节奏的同事？',
+  '公司刚引入了一套全新的AI工具链，你之前熟练的工作流程完全被推翻，需要从头学习。你最可能的表现是？',
+  '在项目中，你被分配到一个跟你工作风格完全不搭的搭档组队。几周下来配合极差，项目进度严重滞后。你的走向是？',
+  '你在工作中有一套自己摸索出来的高效工作流，但公司推行统一标准化流程，要求所有人一致执行。你的态度是？',
+  '公司有一个跨部门协作需求，需要你频繁与风格截然不同的编剧或技术团队对接。对方经常提出你看来"外行"的要求，你会？',
+  '项目结束后复盘会上需要客观评价协作过的同事。你和一个同事配合得特别不愉快，你会？'
 ];
 
 const OPTIONS_TEXT = [
@@ -429,11 +434,16 @@ const OPTIONS_TEXT = [
   { A: 'A. "运气好而已"，准备挑战', B: 'B. "评审没眼光"，用专业刁难', C: 'C. 传播信息拉拢失意者联盟', D: 'D. 自我贬低，消极应付' },
   { A: 'A. 规则是给弱者定的，灵活操作', B: 'B. 严格按规范执行，盯别人也做到', C: 'C. 关系好标准可放宽', D: 'D. 照做但内心渴望打破' },
   { A: 'A. 评估可用价值，留作己用', B: 'B. 守口如瓶但形成预判', C: 'C. 修饰后跟熟人"分析"', D: 'D. 装作无事但刻意回避' },
-  { A: 'A. 视为累赘，表达不满', B: 'B. 厌恶但冷淡让对方知趣', C: 'C. 边帮边抱怨求回报', D: 'D. 牺牲自己去帮，积攒委屈' }
+  { A: 'A. 视为累赘，表达不满', B: 'B. 厌恶但冷淡让对方知趣', C: 'C. 边帮边抱怨求回报', D: 'D. 牺牲自己去帮，积攒委屈' },
+  { A: 'A. 立刻研究新工具的优势，主动探索出更高效的工作方式，快速切换', B: 'B. 仔细读完所有文档再开始，进度偏慢但步骤扎实', C: 'C. 兴奋讨论新功能，但对核心流程掌握不够扎实', D: 'D. 感到焦虑和抗拒，能拖就拖直到被强制要求切换' },
+  { A: 'A. 直接找组长要求换搭档，不接受磨合建议', B: 'B. 内心不满隐忍不发，对搭档产出用高标准挑剔', C: 'C. 拉近关系化解矛盾无效后向其他人抱怨', D: 'D. 独自扛下大部分工作，内心积怨越来越深' },
+  { A: 'A. 认为标准化是效率的敌人，表面遵守实际保留自己的流程', B: 'B. 认为自己的流程更优，不断论证标准流程缺陷', C: 'C. 被束缚后开始吐槽标准流程扼杀创意', D: 'D. 默默遵守但效率下滑，不主动反馈' },
+  { A: 'A. 定义清晰边界，不接受越界指挥也不插手对方领域', B: 'B. 用专业术语和详细文档回复让对方知难而退', C: 'C. 表面配合，私下吐槽引发对立情绪', D: 'D. 来者不拒结果被拖垮也不敢拒绝' },
+  { A: 'A. 客观指出问题点，提出改进建议，对事不对人', B: 'B. 只谈事实用数据，措辞严苛不留情面', C: 'C. 模糊带过，私下跟信任的人说真话', D: 'D. 为维护和谐给出超出实际的好评，心里憋屈' }
 ];
 
 const SECTION_NAMES = ['', '压力与防御机制', '暗面特质倾向', '能量与边界感'];
-const QUESTIONS_SECTION = [1,1,1,1,1,2,2,2,3,3];
+const QUESTIONS_SECTION = [1,1,1,1,1,2,2,2,3,3,1,2,2,3,3];
 
 // ============================================================
 // LOGIN
@@ -562,15 +572,95 @@ function showDetail(r) {
     </div>`;
   });
 
+  // Build section analysis (各部分分析)
+  const sectionCounts = {1:{A:0,B:0,C:0,D:0},2:{A:0,B:0,C:0,D:0},3:{A:0,B:0,C:0,D:0}};
+  const sectionTotals = {1:0,2:0,3:0};
+  answers.forEach((a, i) => {
+    if (i >= QUESTIONS_SECTION.length || !a) return;
+    const sn = QUESTIONS_SECTION[i];
+    if (sectionCounts[sn] && sectionCounts[sn][a] !== undefined) {
+      sectionCounts[sn][a]++;
+      sectionTotals[sn]++;
+    }
+  });
+  const SECTION_THEORY = {
+    1: '防御机制理论（Vaillant层级）：评估候选人面对压力、冲突、枯燥时的心理防御方式——从成熟的幽默/升华到不成熟的压抑/行为发泄。',
+    2: '暗面人格理论（HDS 11维度）：评估候选人在压力下暴露的"职场暗面"——Excitable（情绪化波动）、Skeptical（多疑不信任）、Reserved（退缩回避）等维度倾向。',
+    3: '能量边界理论：评估候选人的人际能量管理——边界清晰度、拒绝能力、情绪劳动承受度、反馈接收与输出方式。'
+  };
+  const SECTION_DOMINANT = {
+    1: { A: '适应性高，主动控制局面', B: '防御性合规，靠逻辑自保', C: '情绪驱动，寻求外部认同', D: '被动压抑，内耗高风险' },
+    2: { A: '权力导向，挑战等级秩序', B: '道德审判，严苛标尺', C: '关系操控，拉帮结派倾向', D: '顺从退缩，隐性记仇' },
+    3: { A: '清晰果断，边界分明', B: '防御性封闭，疏离沟通', C: '情绪渗漏，三角化倾向', D: '无边界吸收，耗竭风险' }
+  };
+  let sectionHtml = '';
+  for (let sn = 1; sn <= 3; sn++) {
+    const sc = sectionCounts[sn];
+    const total = sectionTotals[sn] || 1;
+    let dom = 'A';
+    let maxC = 0;
+    for (const k of ['A','B','C','D']) {
+      if (sc[k] > maxC) { maxC = sc[k]; dom = k; }
+    }
+    const profile = SECTION_DOMINANT[sn][dom];
+    sectionHtml += `<div style="background:#F8F9FA;border-radius:8px;padding:10px 14px;margin-bottom:10px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">📌 第${sn}部分：${SECTION_NAMES[sn]}</div>
+      <div style="font-size:12px;color:#7F8C8D;margin-bottom:6px">${SECTION_THEORY[sn]}</div>
+      <div class="count-grid" style="max-width:280px;margin:4px 0">
+        <div class="count-block" style="background:#FDEDEC;color:#E74C3C;font-size:12px;padding:4px">A: ${sc.A}</div>
+        <div class="count-block" style="background:#EBF5FB;color:#3498DB;font-size:12px;padding:4px">B: ${sc.B}</div>
+        <div class="count-block" style="background:#FEF9E7;color:#F39C12;font-size:12px;padding:4px">C: ${sc.C}</div>
+        <div class="count-block" style="background:#E8F8F5;color:#27AE60;font-size:12px;padding:4px">D: ${sc.D}</div>
+      </div>
+      <div style="font-size:13px;color:#555"><strong>主导倾向 (${dom}选型)：</strong>${profile}</div>
+    </div>`;
+  }
+
+  // Build interview suggestions (面试追问建议)
+  const INTERVIEW_QUESTIONS = {
+    A: [
+      '🎯 挑战越权倾向："请回忆一次你绕过直接上级、自行决策的经历。后果是什么？如果再给你一次机会，你会怎么做？"',
+      '🎯 规则尊重度："面对一条你认为明显不合理的工作流程，你的处理方式是怎样的？请举具体例子。"',
+      '🎯 团队协作："描述一次你与非常缓慢/低于你标准的同事协作的经历。你是忍了、说了、还是采取了行动？结果如何？"',
+      '🎯 长期耐力："你能否接受完全重复性工作长达数月的岗位？如果必须做，你会如何调整自己？"',
+      '🎯 学习适应力（Q11衍生）："面对完全颠覆现有技能的新工具/新流程，你的具体学习策略是什么？请举例。"'
+    ],
+    B: [
+      '🎯 完美主义与进度平衡："当质量与截止时间冲突时，你如何取舍？请举一个你为进度牺牲过质量（或反之）的例子。"',
+      '🎯 协作中的标准冲突："如果协作方的交付质量明显低于你接受的标准，而你反馈多次无效，你的极限在哪里？"',
+      '🎯 暗面评判倾向："你如何看待那些专业水准不如你的同事？你会跟他们建立工作关系还是保持距离？"',
+      '🎯 沟通方式："当你有不同意见时，你更倾向于写邮件文档、当面说服、还是向上汇报？请举例说明最有效的方式。"',
+      '🎯 灵活性与创新（Q13衍生）："标准化流程和你自己摸索的高效工作流冲突时，你怎么解决这个矛盾？请具体描述。"'
+    ],
+    C: [
+      '🎯 注意力持久性："描述一个需要长时间（1个月以上）高度专注但没有即时反馈的项目。你的状态变化是怎样的？"',
+      '🎯 情绪独立："当你的创意或方案被连续否定时，你会如何面对？是继续争取还是换个方向？"',
+      '🎯 工作边界："同事频繁找你倾诉工作烦恼/吐槽，你如何处理这种情况？"',
+      '🎯 独立产出能力："请分享一次你完全独立完成一项从0到1任务的经历——没有团队互动、没有外部认可。感受如何？"',
+      '🎯 跨部门协作（Q14衍生）："对方提出你看来\"外行\"的要求时，你的真实第一反应是什么？之后你实际怎么处理的？"'
+    ],
+    D: [
+      '🎯 拒绝能力："请回忆一次你明确对上级或同事说\"不\"的经历。如果完全没有过，为什么？"',
+      '🎯 主动表达分歧："当所有同事都同意一个方向，但你心里觉得有问题时，你会说出来吗？为什么？"',
+      '🎯 压抑与爆发："你上一次感到工作中极度不公平是什么时候？你是怎么处理的？"',
+      '🎯 自我保护机制："如果你的工作量已经饱和，但同事还把任务推给你，你会怎么做？"',
+      '🎯 反馈评价倾向（Q15衍生）："当需要客观评价一个与你协作不愉快的同事时，你的本能处理方式是什么？为什么？"'
+    ]
+  };
+  let interviewHtml = '';
+  const iqList = INTERVIEW_QUESTIONS[t] || INTERVIEW_QUESTIONS['A'];
+  interviewHtml += '<div style="margin-bottom:8px;font-size:13px;color:#7F8C8D">基于候选人认定为【' + t + '型 · ' + prof.name + '】类型的针对性追问建议（适用于面试官根据测评结果深入挖掘）：</div>';
+  interviewHtml += '<ul style="padding-left:18px;margin:4px 0">' + iqList.map(q => '<li style="font-size:13px;line-height:1.6;margin-bottom:6px">' + q + '</li>').join('') + '</ul>';
+  interviewHtml += '<div style="margin-top:8px;font-size:12px;color:#7F8C8D">💡 建议根据投递岗位（编剧/抽卡师/剪辑/组长等）选择2-3个最相关的问题深入追问，观察候选人回答时的诚实度与自我觉察能力。</div>';
+
   // Build red line match
   let redLineHtml = '';
   RED_LINES.forEach(rl => {
     const conflictTypes = rl.conflict.match(/[A-D]/g) || [];
     const isMatch = conflictTypes.includes(t);
     if (isMatch) {
-      redLineHtml += `<div style="background:#FDEDEC;padding:8px 12px;border-radius:8px;margin-bottom:6px;border-left:3px solid #E74C3C">
-        <strong>${rl.job}</strong> → ${rl.conflict}<br><span style="font-size:13px;color:#666">${rl.reason}</span>
-      </div>`;
+      redLineHtml += '<div style="background:#FDEDEC;padding:8px 12px;border-radius:8px;margin-bottom:6px;border-left:3px solid #E74C3C">' +
+        '<strong>' + rl.job + '</strong> → ' + rl.conflict + '<br><span style="font-size:13px;color:#666">' + rl.reason + '</span></div>';
     }
   });
   if (!redLineHtml) redLineHtml = '<p style="color:#7F8C8D;font-size:13px">该类型在标准红线范围内无明显冲突。</p>';
@@ -638,6 +728,18 @@ function showDetail(r) {
         </tbody>
       </table>
       <p style="margin-top:6px;font-size:12px;color:#E74C3C">⚠️ C型在常态化高压下存活期最短；D型耐力最长但可能无声崩盘。</p>
+    </div>
+
+    <!-- 各部分分析 -->
+    <div class="report-section">
+      <h3>📊 各部分分析</h3>
+      ${sectionHtml || '无各部分数据'}
+    </div>
+
+    <!-- 面试追问建议 -->
+    <div class="report-section">
+      <h3>🎙️ 面试追问建议</h3>
+      ${interviewHtml || '无追问建议数据'}
     </div>
 
     <!-- 红线冲突评估 -->
