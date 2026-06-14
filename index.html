@@ -31,106 +31,33 @@
 
   /* ===== Header ===== */
   .header {
-    background: #fff;
-    padding: 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 1px 0 rgba(0,0,0,.06);
-  }
-  .header-inner {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 18px 20px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .header-left .logo {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, #d4a843, #4361ee);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
+    background: linear-gradient(135deg, #2C3E50, #3498DB);
     color: #fff;
-    font-weight: 700;
-  }
-  .header-left .title {
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: .5px;
-  }
-  .header-left .subtitle {
-    font-size: 11px;
-    color: var(--text-light);
-    margin-top: -1px;
-  }
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .header-right .badge {
-    font-size: 12px;
-    color: var(--text-light);
-    background: var(--bg);
-    padding: 3px 10px;
-    border-radius: 20px;
-  }
-
-  /* ===== Dot Progress Bar ===== */
-  .progress-dots-wrap {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 0 20px 14px;
-  }
-  .progress-dots {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    justify-content: center;
-  }
-  .progress-dots .dot {
-    flex: 1;
-    max-width: 32px;
-    height: 4px;
-    border-radius: 2px;
-    background: #e5e7eb;
-    transition: all .4s cubic-bezier(.34,1.56,.64,1);
+    padding: 30px 24px 28px;
+    text-align: center;
     position: relative;
   }
-  .progress-dots .dot.answered { background: var(--accent); }
-  .progress-dots .dot.current { 
-    background: var(--accent); 
-    box-shadow: 0 0 0 2px var(--accent-light);
-    transform: scaleY(1.8);
+  .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; letter-spacing: 1px; }
+  .header p { font-size: 13px; opacity: .85; }
+  .header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,.2);
+    border-radius: 20px;
+    padding: 3px 14px;
+    font-size: 11px;
+    margin-top: 8px;
   }
-  .progress-dots .dot.current.answered {
-    transform: scaleY(1.8);
+  .progress-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: rgba(255,255,255,.2);
   }
-  .progress-dots .dot.correct { background: var(--success); }
-  .progress-text-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 6px;
-  }
-  .progress-text-bar .pct {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--accent);
-  }
-  .progress-text-bar .label {
-    font-size: 12px;
-    color: var(--text-light);
+  .progress-bar .fill {
+    height: 100%;
+    background: #fff;
+    transition: width .4s ease;
+    border-radius: 0 2px 2px 0;
   }
 
   /* ===== Container ===== */
@@ -410,33 +337,17 @@
     .option { padding: 12px 14px; font-size: 13px; }
     .basic-info-wrap .field-group { grid-template-columns: 1fr; }
     .basic-info-wrap .field-group .field-full { grid-column: unset; }
-    .progress-dots-wrap { padding: 0 16px 10px; }
-    .header-inner { padding: 14px 16px 10px; }
+    .header { padding: 24px 16px 22px; }
   }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-inner">
-    <div class="header-left">
-      <div class="logo">JB</div>
-      <div>
-        <div class="title">面试评测</div>
-        <div class="subtitle">一抹金蓝传媒</div>
-      </div>
-    </div>
-    <div class="header-right">
-      <span class="badge" id="qCountBadge">15题</span>
-    </div>
-  </div>
-  <div class="progress-dots-wrap">
-    <div class="progress-dots" id="progressDots"></div>
-    <div class="progress-text-bar">
-      <span class="label" id="answeredLabel">已答 0/15</span>
-      <span class="pct" id="pctLabel">0%</span>
-    </div>
-  </div>
+  <h1>📋 一抹金蓝面试评测</h1>
+  <p>一抹金蓝传媒</p>
+  <span class="badge">15题 · 约20分钟</span>
+  <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
 </div>
 
 <div class="container" id="quizApp">
@@ -640,16 +551,12 @@ const client = aipexbase.createClient({
   apiKey: 'baas_0us8Xwxy'
 });
 
-// ========== 渲染进度条圆点 ==========
-function renderDots() {
-  const container = document.getElementById('progressDots');
-  container.innerHTML = '';
-  QUESTIONS.forEach((_, i) => {
-    const dot = document.createElement('div');
-    dot.className = 'dot' + (i === 0 ? ' current' : '');
-    dot.dataset.idx = i;
-    container.appendChild(dot);
-  });
+// ========== 更新底部进度条 ==========
+function updateProgressFill() {
+  const answered = answers.filter(a => a !== null).length;
+  const total = QUESTIONS.length;
+  const pct = Math.round((answered / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
 }
 
 // ========== 渲染题目 ==========
@@ -685,8 +592,7 @@ function selectOption(qIdx, letter) {
   card.querySelectorAll('.option').forEach(opt => {
     opt.classList.toggle('selected', opt.dataset.letter === letter);
   });
-  updateDots();
-  updateProgressText();
+  updateProgressFill();
   updateNavState();
 
   // 自动跳到下一题（如果是最后一题则不动）
@@ -717,28 +623,9 @@ function showQuestion(idx) {
       void nextCard.offsetWidth;
     }
     currentQ = idx;
-    updateDots();
-    updateProgressText();
+    updateProgressFill();
     updateNavState();
   }, 200);
-}
-
-// ========== 更新进度条 ==========
-function updateDots() {
-  const dots = document.querySelectorAll('.dot');
-  dots.forEach((dot, i) => {
-    dot.className = 'dot';
-    if (answers[i] !== null) dot.classList.add('answered');
-    if (i === currentQ) dot.classList.add('current');
-  });
-}
-
-function updateProgressText() {
-  const answered = answers.filter(a => a !== null).length;
-  const total = QUESTIONS.length;
-  const pct = Math.round((answered / total) * 100);
-  document.getElementById('answeredLabel').textContent = `已答 ${answered}/${total}`;
-  document.getElementById('pctLabel').textContent = `${pct}%`;
 }
 
 // ========== 基本信息校验 ==========
@@ -816,10 +703,7 @@ async function submitQuiz() {
       document.getElementById('questionsContainer').style.display = 'none';
       document.querySelector('.nav').style.display = 'none';
       document.getElementById('successScreen').style.display = 'block';
-      // 进度条全部点亮
-      document.querySelectorAll('.dot').forEach(d => d.classList.add('answered'));
-      document.getElementById('pctLabel').textContent = '100%';
-      document.getElementById('answeredLabel').textContent = '已完成';
+      document.getElementById('progressFill').style.width = '100%';
     } else {
       alert('提交失败，请重试：' + (res.message || '未知错误'));
     }
@@ -849,10 +733,9 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ========== 初始化 ==========
-renderDots();
 renderQuestions();
 showQuestion(0);
-updateProgressText();
+updateProgressFill();
 updateNavState();
 </script>
 </body>
