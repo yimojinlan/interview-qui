@@ -2,7 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2C3E50">
 <title>一抹金蓝面试评测</title>
 <style>
   :root {
@@ -10,22 +11,22 @@
     --accent: #4361ee;
     --accent-light: #eef0ff;
     --success: #06d6a0;
-    --gold: #d4a843;
     --text: #1a1a2e;
     --text-light: #6b7280;
     --bg: #f5f6fa;
     --card: #ffffff;
-    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-    --radius: 14px;
-    --radius-sm: 10px;
+    --radius: 12px;
+    --safe-bottom: env(safe-area-inset-bottom, 16px);
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.6;
+    line-height: 1.5;
     min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: 90px;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -33,121 +34,101 @@
   .header {
     background: linear-gradient(135deg, #2C3E50, #3498DB);
     color: #fff;
-    padding: 30px 24px 28px;
+    padding: 18px 20px 20px;
     text-align: center;
     position: relative;
   }
-  .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; letter-spacing: 1px; }
-  .header p { font-size: 13px; opacity: .85; }
+  .header h1 { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+  .header p { font-size: 12px; opacity: .75; }
   .header .badge {
     display: inline-block;
-    background: rgba(255,255,255,.2);
+    background: rgba(255,255,255,.18);
     border-radius: 20px;
-    padding: 3px 14px;
+    padding: 2px 12px;
     font-size: 11px;
-    margin-top: 8px;
+    margin-top: 6px;
   }
   .progress-bar {
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    height: 4px;
-    background: rgba(255,255,255,.2);
+    height: 3px;
+    background: rgba(255,255,255,.15);
   }
   .progress-bar .fill {
     height: 100%;
     background: #fff;
-    transition: width .4s ease;
+    transition: width .35s ease;
     border-radius: 0 2px 2px 0;
   }
 
   /* ===== Container ===== */
   .container {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 16px 20px 80px;
+    max-width: 100%;
+    padding: 12px 16px 0;
   }
 
   /* ===== Card ===== */
   .card {
     background: var(--card);
     border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 24px 20px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    padding: 20px 16px 16px;
     margin-bottom: 0;
-    animation: fadeInUp .4s cubic-bezier(.34,1.56,.64,1);
-    border: 1px solid rgba(0,0,0,.04);
+    animation: fadeInUp .3s ease;
   }
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(18px); }
+    from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeOut {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-12px); }
-  }
-  .card.exit {
-    animation: fadeOut .2s ease forwards;
   }
 
   /* ===== Question ===== */
   .q-number-wrap {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
+    gap: 8px;
+    margin-bottom: 12px;
   }
   .q-number {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    width: 26px; height: 26px;
     background: var(--accent);
     color: #fff;
     border-radius: 50%;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     flex-shrink: 0;
   }
-  .q-tag {
-    font-size: 11px;
-    color: var(--text-light);
-    background: var(--bg);
-    padding: 2px 10px;
-    border-radius: 20px;
-  }
   .q-text {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    line-height: 1.7;
-    margin-bottom: 20px;
+    line-height: 1.6;
+    margin-bottom: 16px;
     color: var(--text);
   }
 
   /* ===== Options ===== */
-  .options { display: flex; flex-direction: column; gap: 10px; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
   .option {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 14px 16px;
+    gap: 10px;
+    padding: 13px 14px;
     border: 1.5px solid #e5e7eb;
-    border-radius: var(--radius-sm);
+    border-radius: 10px;
     cursor: pointer;
-    transition: all .2s;
+    transition: all .15s;
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.5;
     user-select: none;
-    -webkit-tap-highlight-color: transparent;
     position: relative;
-    overflow: hidden;
+    min-height: 48px;
   }
-  .option:active { transform: scale(.985); }
-  .option:hover { border-color: #c7d2fe; background: #fafbff; }
+  .option:active { background: #f8f9ff; transform: scale(.99); }
   .option .letter {
     flex-shrink: 0;
-    width: 26px;
-    height: 26px;
+    width: 24px; height: 24px;
     border-radius: 50%;
     border: 1.5px solid #d1d5db;
     display: flex;
@@ -156,7 +137,8 @@
     font-size: 12px;
     font-weight: 700;
     color: #9ca3af;
-    transition: all .25s;
+    transition: all .2s;
+    margin-top: 1px;
   }
   .option.selected {
     border-color: var(--accent);
@@ -167,64 +149,53 @@
     border-color: var(--accent);
     color: #fff;
   }
-  /* ripple effect on select */
-  .option.selected::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--accent);
-    opacity: .04;
-    pointer-events: none;
-  }
 
   /* ===== Basic Info ===== */
   .basic-info-wrap {
     background: var(--card);
     border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 24px 20px;
-    margin-bottom: 16px;
-    animation: fadeInUp .4s ease;
-    border: 1px solid rgba(0,0,0,.04);
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    padding: 14px 16px;
+    margin-bottom: 12px;
   }
-  .basic-info-wrap h3 {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 4px;
+  .basic-info-wrap .info-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
   }
-  .basic-info-wrap .hint {
+  .basic-info-wrap .info-header h3 { font-size: 14px; font-weight: 600; }
+  .basic-info-wrap .info-header .toggle-collapse {
     font-size: 12px;
-    color: var(--text-light);
-    margin-bottom: 16px;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 4px 0;
   }
   .basic-info-wrap .field-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 8px;
+    margin-top: 10px;
   }
   .basic-info-wrap .field-full { grid-column: 1 / -1; }
   .basic-info-wrap label {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     color: var(--text-light);
   }
   .basic-info-wrap label .red { color: #ef4444; }
   .basic-info-wrap input,
   .basic-info-wrap select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border: 1.5px solid #e5e7eb;
     border-radius: 8px;
     font-size: 14px;
     outline: none;
-    transition: border .2s, box-shadow .2s;
     background: #fff;
     font-family: inherit;
+    min-height: 42px;
   }
   .basic-info-wrap input:focus,
   .basic-info-wrap select:focus {
@@ -232,70 +203,78 @@
     box-shadow: 0 0 0 3px var(--accent-light);
   }
 
-  /* ===== Nav ===== */
-  .nav {
+  /* ===== Bottom Nav Bar (sticky) ===== */
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 10px 16px calc(10px + var(--safe-bottom));
     display: flex;
+    gap: 10px;
+    box-shadow: 0 -1px 6px rgba(0,0,0,.06);
+    z-index: 200;
     align-items: center;
-    justify-content: space-between;
-    margin-top: 16px;
-    padding: 0 2px;
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,.95);
   }
-  .nav .btn-prev {
-    padding: 10px 18px;
+  .nav-bar button {
     border: none;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
+    border-radius: 10px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: all .2s;
-    background: transparent;
-    color: var(--text-light);
+    transition: all .15s;
+    padding: 12px 0;
+    flex: 1;
+    min-height: 48px;
   }
-  .nav .btn-prev:hover:not(:disabled) { background: var(--bg); color: var(--text); }
-  .nav .btn-prev:disabled { opacity: .3; cursor: not-allowed; }
-  .nav .btn-submit {
-    padding: 10px 28px;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .2s;
+  .nav-bar button:active { transform: scale(.97); }
+  .nav-bar .btn-prev {
+    background: #E8ECF0;
+    color: var(--text);
+    flex: 0 0 90px;
+  }
+  .nav-bar .btn-prev:disabled { opacity: .3; cursor: not-allowed; }
+  .nav-bar .btn-next {
+    background: var(--accent);
+    color: #fff;
+  }
+  .nav-bar .btn-next:disabled { opacity: .5; cursor: not-allowed; }
+  .nav-bar .btn-submit {
     background: var(--success);
     color: #fff;
   }
-  .nav .btn-submit:disabled { opacity: .4; cursor: not-allowed; }
-  .nav .btn-submit:not(:disabled):hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(6,208,160,.35); }
-  .nav .btn-submit:not(:disabled):active { transform: translateY(0); }
+  .nav-bar .btn-submit:disabled { opacity: .4; cursor: not-allowed; }
 
   /* ===== Success ===== */
   .success-screen {
     display: none;
     text-align: center;
-    padding: 60px 20px;
-    animation: fadeInUp .5s cubic-bezier(.34,1.56,.64,1);
+    padding: 80px 20px;
+    animation: fadeInUp .4s ease;
   }
   .success-screen .check-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 16px;
+    width: 56px; height: 56px;
+    margin: 0 auto 14px;
     background: linear-gradient(135deg, #06d6a0, #059669);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: 24px;
     color: #fff;
-    box-shadow: 0 8px 24px rgba(6,208,160,.3);
+    box-shadow: 0 6px 20px rgba(6,208,160,.3);
   }
-  .success-screen h2 { font-size: 22px; color: #059669; margin-bottom: 8px; }
-  .success-screen p { font-size: 14px; color: var(--text-light); line-height: 1.7; }
+  .success-screen h2 { font-size: 20px; color: #059669; margin-bottom: 6px; }
+  .success-screen p { font-size: 14px; color: var(--text-light); line-height: 1.6; }
 
   /* ===== Footer ===== */
   .footer {
     text-align: center;
-    padding: 32px 20px;
-    font-size: 12px;
+    padding: 24px 20px;
+    font-size: 11px;
     color: #d1d5db;
   }
 
@@ -304,8 +283,8 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(15,15,30,.45);
-    backdrop-filter: blur(2px);
+    background: rgba(15,15,30,.4);
+    backdrop-filter: blur(3px);
     z-index: 999;
     justify-content: center;
     align-items: center;
@@ -313,38 +292,29 @@
   .loading-overlay.show { display: flex; }
   .loading-box {
     background: #fff;
-    border-radius: 20px;
-    padding: 36px 44px;
+    border-radius: 18px;
+    padding: 32px 40px;
     text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    box-shadow: 0 16px 48px rgba(0,0,0,.12);
   }
   .spinner {
-    width: 36px; height: 36px;
+    width: 32px; height: 32px;
     border: 3px solid #e5e7eb;
     border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin .7s linear infinite;
-    margin: 0 auto 12px;
+    margin: 0 auto 10px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-box p { font-size: 14px; color: var(--text-light); }
 
-  /* ===== Responsive ===== */
-  @media (max-width: 480px) {
-    .container { padding: 12px 16px 80px; }
-    .card { padding: 20px 16px; }
-    .q-text { font-size: 15px; }
-    .option { padding: 12px 14px; font-size: 13px; }
-    .basic-info-wrap .field-group { grid-template-columns: 1fr; }
-    .basic-info-wrap .field-group .field-full { grid-column: unset; }
-    .header { padding: 24px 16px 22px; }
-  }
+  /* ===== Mobile first: everything already mobile-optimized ===== */
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>📋 一抹金蓝面试评测</h1>
+  <h1>📋 面试评测</h1>
   <p>一抹金蓝传媒</p>
   <span class="badge">15题 · 约20分钟</span>
   <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
@@ -394,15 +364,8 @@
     </div>
   </div>
 
-  <!-- 题目容器 -->
+  <!-- 题目 -->
   <div id="questionsContainer"></div>
-
-  <!-- 导航 -->
-  <div class="nav">
-    <button class="btn-prev" id="btnPrev" onclick="prevQuestion()">← 上一题</button>
-    <button class="btn-next" id="btnNext" onclick="nextQuestion()">下一题 →</button>
-    <button class="btn-submit" id="btnSubmit" onclick="submitQuiz()" style="display:none">✅ 提交测评</button>
-  </div>
 
   <!-- 提交成功 -->
   <div class="success-screen" id="successScreen">
@@ -412,6 +375,13 @@
   </div>
 
   <div class="footer">一抹金蓝传媒 · 人事测评工具</div>
+</div>
+
+<!-- 底部导航栏（固定） -->
+<div class="nav-bar" id="navBar">
+  <button class="btn-prev" id="btnPrev" onclick="prevQuestion()">← 上一题</button>
+  <button class="btn-next" id="btnNext" onclick="nextQuestion()">下一题 →</button>
+  <button class="btn-submit" id="btnSubmit" onclick="submitQuiz()" style="display:none">✅ 提交测评</button>
 </div>
 
 <!-- Loading -->
@@ -549,19 +519,18 @@ const QUESTIONS = [
 
 let answers = new Array(QUESTIONS.length).fill(null);
 let currentQ = 0;
-let isTransitioning = false;
+let isAnimating = false;
 
 const client = aipexbase.createClient({
   baseUrl: 'https://baas.kuafuai.net/baas-api',
   apiKey: 'baas_0us8Xwxy'
 });
 
-// ========== 更新底部进度条 ==========
+// ========== 更新进度条 ==========
 function updateProgressFill() {
   const answered = answers.filter(a => a !== null).length;
   const total = QUESTIONS.length;
-  const pct = Math.round((answered / total) * 100);
-  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressFill').style.width = Math.round((answered / total) * 100) + '%';
 }
 
 // ========== 渲染题目 ==========
@@ -579,7 +548,7 @@ function renderQuestions() {
       </div>
       <div class="q-text">${q.text}</div>
       <div class="options">
-        ${q.options.map((opt, oi) => `
+        ${q.options.map(opt => `
           <div class="option" data-q="${idx}" data-letter="${opt.letter}" onclick="selectOption(${idx}, '${opt.letter}')">
             <span class="letter">${opt.letter}</span>
             <span>${opt.text}</span>
@@ -591,7 +560,7 @@ function renderQuestions() {
 }
 
 function selectOption(qIdx, letter) {
-  if (isTransitioning) return;
+  if (isAnimating) return;
   answers[qIdx] = letter;
   const card = document.getElementById(`q-${qIdx}`);
   card.querySelectorAll('.option').forEach(opt => {
@@ -602,45 +571,33 @@ function selectOption(qIdx, letter) {
 }
 
 function nextQuestion() {
-  if (currentQ < QUESTIONS.length - 1 && !isTransitioning) {
-    isTransitioning = true;
-    setTimeout(() => {
-      showQuestion(currentQ + 1);
-      isTransitioning = false;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 200);
+  if (currentQ < QUESTIONS.length - 1 && !isAnimating) {
+    showQuestion(currentQ + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
 
 function showQuestion(idx) {
-  // exit animation on current
+  if (idx === currentQ) return;
+  isAnimating = true;
   const currentCard = document.getElementById(`q-${currentQ}`);
-  if (currentCard) currentCard.classList.add('exit');
-
-  setTimeout(() => {
-    document.querySelectorAll('.card').forEach(c => {
-      c.style.display = 'none';
-      c.classList.remove('exit');
-    });
-    const nextCard = document.getElementById(`q-${idx}`);
-    if (nextCard) {
-      nextCard.style.display = 'block';
-      // trigger reflow for animation
-      void nextCard.offsetWidth;
-    }
-    currentQ = idx;
-    updateProgressFill();
-    updateNavState();
-  }, 200);
+  if (currentCard) currentCard.style.display = 'none';
+  const nextCard = document.getElementById(`q-${idx}`);
+  if (nextCard) nextCard.style.display = 'block';
+  currentQ = idx;
+  updateProgressFill();
+  updateNavState();
+  isAnimating = false;
 }
 
 // ========== 基本信息校验 ==========
 function isBasicInfoValid() {
-  const name = document.getElementById('candidateName').value.trim();
-  const gender = document.getElementById('gender').value;
-  const age = document.getElementById('age').value.trim();
-  const edu = document.getElementById('education').value;
-  return name && gender && age && edu;
+  return !!(
+    document.getElementById('candidateName').value.trim() &&
+    document.getElementById('gender').value &&
+    document.getElementById('age').value.trim() &&
+    document.getElementById('education').value
+  );
 }
 
 // ========== 导航状态 ==========
@@ -662,7 +619,7 @@ function updateNavState() {
 }
 
 function prevQuestion() {
-  if (currentQ > 0 && !isTransitioning) {
+  if (currentQ > 0 && !isAnimating) {
     showQuestion(currentQ - 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -670,10 +627,7 @@ function prevQuestion() {
 
 // ========== 提交 ==========
 async function submitQuiz() {
-  if (!isBasicInfoValid()) {
-    alert('请先填写完整基本信息（姓名、性别、年龄、学历为必填）');
-    return;
-  }
+  if (!isBasicInfoValid()) { alert('请先填完基本信息（姓名、性别、年龄、学历为必填）'); return; }
   if (answers.some(a => a === null)) { alert('还有题目未作答'); return; }
 
   const name = document.getElementById('candidateName').value.trim();
@@ -684,46 +638,35 @@ async function submitQuiz() {
 
   const counts = { A: 0, B: 0, C: 0, D: 0 };
   answers.forEach(a => counts[a]++);
-  let dominant = 'A';
-  let maxCount = 0;
-  for (const [key, val] of Object.entries(counts)) {
-    if (val > maxCount) { maxCount = val; dominant = key; }
-  }
+  let dominant = 'A', max = 0;
+  for (const [k, v] of Object.entries(counts)) { if (v > max) { max = v; dominant = k; } }
 
   document.getElementById('loadingOverlay').classList.add('show');
-
   try {
     const res = await client.db.from('quiz_results').insert().values({
-      candidate_name: name,
-      gender: gender,
-      age: age,
-      education: education,
+      candidate_name: name, gender, age, education,
       major: major || '',
       answers: JSON.stringify(answers),
-      count_a: counts.A,
-      count_b: counts.B,
-      count_c: counts.C,
-      count_d: counts.D,
+      count_a: counts.A, count_b: counts.B, count_c: counts.C, count_d: counts.D,
       dominant_type: dominant
     });
-
     if (res.success) {
       document.getElementById('basicInfoWrap').style.display = 'none';
       document.getElementById('questionsContainer').style.display = 'none';
-      document.querySelector('.nav').style.display = 'none';
+      document.getElementById('navBar').style.display = 'none';
       document.getElementById('successScreen').style.display = 'block';
       document.getElementById('progressFill').style.width = '100%';
     } else {
-      alert('提交失败，请重试：' + (res.message || '未知错误'));
+      alert('提交失败：' + (res.message || '未知错误'));
     }
   } catch (e) {
-    alert('提交失败，请检查网络后重试：' + e.message);
+    alert('提交失败，请检查网络：' + e.message);
   } finally {
     document.getElementById('loadingOverlay').classList.remove('show');
   }
 }
 
-// ========== 基本输入监听 ==========
+// ========== 输入监听 ==========
 ['candidateName','gender','age','education'].forEach(id => {
   const el = document.getElementById(id);
   el.addEventListener('input', updateNavState);
@@ -731,28 +674,22 @@ async function submitQuiz() {
 });
 
 // ========== 键盘快捷操作 ==========
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', e => {
   if (['1','2','3','4'].includes(e.key)) {
-    const letters = ['1','2','3','4'];
-    const idx = letters.indexOf(e.key);
-    const options = document.querySelector(`#q-${currentQ}`)?.querySelectorAll('.option');
-    if (options && options[idx]) options[idx].click();
+    const opts = document.querySelector(`#q-${currentQ}`)?.querySelectorAll('.option');
+    if (opts && opts[+e.key - 1]) opts[+e.key - 1].click();
   }
   if (e.key === 'ArrowLeft') { e.preventDefault(); prevQuestion(); }
   if (e.key === 'ArrowRight') { e.preventDefault(); nextQuestion(); }
 });
 
-// ========== 基本信息折叠 ==========
+// ========== 基础信息折叠 ==========
 function toggleBasicInfo() {
   const body = document.getElementById('basicInfoBody');
   const toggle = document.getElementById('toggleInfo');
-  if (body.style.display === 'none') {
-    body.style.display = 'block';
-    toggle.textContent = '收起 ▲';
-  } else {
-    body.style.display = 'none';
-    toggle.textContent = '展开 ▼';
-  }
+  const isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? 'block' : 'none';
+  toggle.textContent = isHidden ? '收起 ▲' : '展开 ▼';
 }
 
 // ========== 初始化 ==========
