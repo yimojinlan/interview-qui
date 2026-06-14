@@ -11,7 +11,6 @@
     --accent: #3498DB;
     --success: #27AE60;
     --danger: #E74C3C;
-    --warning: #F39C12;
     --text: #2C3E50;
     --text-light: #7F8C8D;
     --bg: #F5F6FA;
@@ -28,6 +27,54 @@
     min-height: 100dvh;
   }
 
+  /* ===== 密码门 ===== */
+  .password-gate {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    flex-direction: column;
+    padding: 32px;
+  }
+  .password-gate .lock-icon { font-size: 48px; margin-bottom: 16px; }
+  .password-gate h2 { color: #fff; font-size: 20px; margin-bottom: 6px; font-weight: 700; }
+  .password-gate p { color: rgba(255,255,255,.5); font-size: 13px; margin-bottom: 20px; }
+  .password-gate input {
+    width: 280px; max-width: 90%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 4px;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    backdrop-filter: blur(4px);
+  }
+  .password-gate input::placeholder { color: rgba(255,255,255,.35); letter-spacing: 0; }
+  .password-gate input:focus { background: rgba(255,255,255,.2); }
+  .password-gate .error { color: #F87171; font-size: 13px; margin-top: 10px; min-height: 20px; }
+  .password-gate .btn-unlock {
+    margin-top: 14px;
+    padding: 10px 36px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    background: rgba(255,255,255,.15);
+    color: #fff;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .password-gate .btn-unlock:active { transform: scale(.96); }
+  .password-gate .btn-unlock:hover { background: rgba(255,255,255,.25); }
+
+  .app-content { display: none; }
+
   .header {
     background: linear-gradient(135deg, #1a1a2e, #16213e);
     color: #fff;
@@ -39,9 +86,8 @@
   .header h1 { font-size: 18px; font-weight: 700; }
   .header p { font-size: 12px; opacity: .6; margin-top: 2px; }
 
-  .container { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
 
-  /* ===== Stats bar ===== */
   .stats-bar {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -57,10 +103,7 @@
   }
   .stat-card .num { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
   .stat-card .label { font-size: 11px; color: var(--text-light); }
-  .stat-card.profit .num { color: var(--success); }
-  .stat-card.loss .num { color: var(--danger); }
 
-  /* ===== Filter ===== */
   .filter-bar {
     display: flex;
     gap: 8px;
@@ -77,11 +120,8 @@
     flex: 1;
     min-width: 120px;
   }
-  .filter-bar input:focus, .filter-bar select:focus {
-    border-color: var(--accent);
-  }
+  .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); }
 
-  /* ===== Table ===== */
   .table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -89,10 +129,10 @@
     border-radius: var(--radius);
     box-shadow: 0 1px 4px rgba(0,0,0,.05);
   }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1050px; }
   th {
     background: #f8f9fb;
-    padding: 10px 10px;
+    padding: 10px 8px;
     text-align: left;
     font-weight: 600;
     font-size: 12px;
@@ -103,7 +143,7 @@
     top: 0;
   }
   td {
-    padding: 10px 10px;
+    padding: 10px 8px;
     border-bottom: 1px solid #f0f1f3;
     vertical-align: middle;
   }
@@ -113,7 +153,7 @@
     border-bottom: 1px dashed var(--accent);
     transition: background .15s;
   }
-  .editable:hover { background: var(--accent-light); }
+  .editable:hover { background: #EBF5FB; }
   .editable-input {
     width: 100%;
     padding: 4px 6px;
@@ -122,18 +162,16 @@
     font-size: 13px;
     outline: none;
     background: #fff;
+    max-width: 90px;
   }
-  .amount { text-align: right; font-family: 'SF Mono', 'Menlo', monospace; font-size: 13px; }
-  .amount.positive { color: var(--success); }
-  .amount.negative { color: var(--danger); }
+  .amount { text-align: right; font-family: 'SF Mono', 'Menlo', monospace; font-size: 13px; white-space: nowrap; }
 
-  /* ===== Detail toggle ===== */
   .detail-row { display: none; }
   .detail-row.show { display: table-row; }
   .detail-row td { background: #fafbfc; padding: 14px 16px; }
   .detail-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     gap: 10px;
   }
   .detail-item {}
@@ -141,29 +179,10 @@
   .detail-item .d-value { font-size: 14px; font-weight: 600; margin-top: 2px; }
 
   .expand-btn {
-    background: none;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-    color: var(--text-light);
-    padding: 2px 6px;
-    border-radius: 4px;
+    background: none; border: none; font-size: 14px; cursor: pointer;
+    color: var(--text-light); padding: 2px 6px; border-radius: 4px;
   }
   .expand-btn:hover { background: #f0f1f3; }
-
-  .btn-edit {
-    display: inline-block;
-    padding: 3px 10px;
-    border: none;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    background: var(--accent);
-    color: #fff;
-  }
-  .btn-edit:hover { filter: brightness(1.1); }
-
   .btn-delete {
     display: inline-block;
     padding: 3px 10px;
@@ -177,11 +196,10 @@
   }
   .btn-delete:hover { filter: brightness(1.1); }
 
-  /* ===== Mobile responsive ===== */
   @media (max-width: 640px) {
     .stats-bar { grid-template-columns: repeat(3, 1fr); }
     .container { padding: 12px; }
-    th, td { padding: 8px 6px; }
+    th, td { padding: 8px 5px; font-size: 12px; }
   }
 
   .loading-overlay {
@@ -214,6 +232,18 @@
 </head>
 <body>
 
+<!-- ===== 密码门 ===== -->
+<div class="password-gate" id="passwordGate">
+  <div class="lock-icon">🔐</div>
+  <h2>制作管理后台</h2>
+  <p>请输入管理密码</p>
+  <input type="password" id="pwdInput" placeholder="管理密码" maxlength="30" autocomplete="off">
+  <div class="error" id="pwdError"></div>
+  <button class="btn-unlock" onclick="checkPassword()">进入后台</button>
+</div>
+
+<!-- ===== 主内容 ===== -->
+<div class="app-content" id="appContent">
 <div class="header">
   <h1>📊 制作管理后台</h1>
   <p>一抹金蓝传媒 · 项目成本利润核算</p>
@@ -223,9 +253,10 @@
   <div class="stats-bar" id="statsBar">
     <div class="stat-card"><div class="num" id="statProjects">-</div><div class="label">项目总数</div></div>
     <div class="stat-card"><div class="num" id="statTotalStaff">-</div><div class="label">总人力（人月）</div></div>
-    <div class="stat-card"><div class="num" id="statTotalCost">-</div><div class="label">总成本</div></div>
-    <div class="stat-card profit"><div class="num" id="statTotalRevenue">-</div><div class="label">总收入</div></div>
-    <div class="stat-card" id="statProfitCard"><div class="num" id="statTotalProfit">-</div><div class="label">总利润</div></div>
+    <div class="stat-card"><div class="num" id="statTotalCompute">-</div><div class="label">总算力成本</div></div>
+    <div class="stat-card"><div class="num" id="statTotalCost">-</div><div class="label">总成本（含算力）</div></div>
+    <div class="stat-card"><div class="num" id="statTotalRevenue">-</div><div class="label">总收入</div></div>
+    <div class="stat-card"><div class="num" id="statTotalProfit">-</div><div class="label">总利润</div></div>
   </div>
 
   <div class="filter-bar">
@@ -242,19 +273,18 @@
     <table>
       <thead>
         <tr>
-          <th style="width:30px"></th>
+          <th style="width:26px"></th>
           <th>项目名称</th>
-          <th>总时长</th>
-          <th>集数</th>
+          <th>时长/集数</th>
           <th>周期/人数</th>
+          <th>算力成本</th>
           <th>人员成本</th>
-          <th>电脑成本</th>
-          <th>场地费</th>
+          <th>电脑+场地</th>
           <th>总成本</th>
           <th>订单单价</th>
           <th>提成</th>
           <th>利润</th>
-          <th style="width:80px">操作</th>
+          <th style="width:60px"></th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -262,6 +292,7 @@
   </div>
 
   <div class="footer">一抹金蓝传媒 · 制作部管理系统</div>
+</div>
 </div>
 
 <div class="loading-overlay" id="loadingOverlay">
@@ -273,11 +304,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
 <script>
-// ========== 常量 ==========
-const AVG_SALARY_PER_MONTH = 3500;      // 人均月薪
-const WORK_DAYS_PER_MONTH = 26;         // 每月工作天数
-const PC_COST_PER_MONTH = 193;           // 每台电脑月租
-const VENUE_COST_PER_MONTH = 8000;       // 场地月租
+const ADMIN_PASSWORD = 'ymjl2026088';
+
+// ===== 常量 =====
+const AVG_SALARY_PER_MONTH = 3500;
+const WORK_DAYS_PER_MONTH = 26;
+const PC_COST_PER_MONTH = 193;
+const VENUE_COST_PER_MONTH = 8000;
 
 const client = aipexbase.createClient({
   baseUrl: 'https://baas.kuafuai.net/baas-api',
@@ -285,109 +318,134 @@ const client = aipexbase.createClient({
 });
 
 let projects = [];
-let editingId = null;  // 正在编辑哪个项目的 order_price / commission
+let editingId = null;
 
-// ========== 核算函数 ==========
+// ===== 密码 =====
+function checkPassword() {
+  const input = document.getElementById('pwdInput').value;
+  const err = document.getElementById('pwdError');
+  if (input === ADMIN_PASSWORD) {
+    document.getElementById('passwordGate').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    loadData();
+  } else {
+    err.textContent = '密码错误';
+    document.getElementById('pwdInput').value = '';
+    document.getElementById('pwdInput').focus();
+  }
+}
+document.getElementById('pwdInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPassword();
+});
+
+// ===== 核算 =====
 function calcCosts(p) {
   const days = p.production_days;
   const months = days / WORK_DAYS_PER_MONTH;
-  // 每日成本
   const laborPerDay = AVG_SALARY_PER_MONTH / WORK_DAYS_PER_MONTH;
   const pcPerDay = PC_COST_PER_MONTH / WORK_DAYS_PER_MONTH;
   const venuePerDay = VENUE_COST_PER_MONTH / WORK_DAYS_PER_MONTH;
-  // 总成本
   const laborCost = days * p.team_size * laborPerDay;
   const pcCost = days * p.team_size * pcPerDay;
   const venueCost = days * venuePerDay;
-  const totalCost = laborCost + pcCost + venueCost;
+  const baseCost = laborCost + pcCost + venueCost;
+  const computeCost = parseFloat(p.total_compute_cost) || 0;
+  const totalCost = baseCost + computeCost;
   const revenue = parseFloat(p.order_price) || 0;
   const commission = parseFloat(p.commission) || 0;
   const profit = revenue - totalCost - commission;
-  return { days, months, laborPerDay, pcPerDay, venuePerDay, laborCost, pcCost, venueCost, totalCost, revenue, commission, profit };
+  return { days, months, laborPerDay, pcPerDay, venuePerDay, laborCost, pcCost, venueCost, computeCost, baseCost, totalCost, revenue, commission, profit };
 }
 
-// ========== 格式化 ==========
 const fmt = v => '¥' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 const fmt2 = v => Number(v).toFixed(2);
 
-// ========== 渲染表格 ==========
+// ===== 渲染 =====
 function renderTable(list) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-  list.forEach((p, idx) => {
+  list.forEach(p => {
     const c = calcCosts(p);
+    const pcAndVenue = c.pcCost + c.venueCost;
     const profitClass = c.profit >= 0 ? 'positive' : 'negative';
-    const profitIcon = c.profit >= 0 ? '📈' : '📉';
-    const rowId = `row-${p.id}`;
-    const detailId = `detail-${p.id}`;
+    // 内联样式因为amount类没有定义positive/negative颜色
+    const profitColor = c.profit >= 0 ? 'var(--success)' : 'var(--danger)';
+    const linkDisplay = p.cloud_link && p.cloud_link.length > 0
+      ? `<a href="${escHtml(p.cloud_link)}" target="_blank" style="font-size:11px;color:var(--accent)">🔗 查看</a>`
+      : '<span style="color:var(--text-light);font-size:11px">—</span>';
 
     tbody.innerHTML += `
-      <tr id="${rowId}">
+      <tr id="row-${p.id}">
         <td><button class="expand-btn" onclick="toggleDetail(${p.id})">▶</button></td>
-        <td><strong>${p.project_name}</strong></td>
-        <td>${p.total_duration}min</td>
-        <td>${p.total_episodes}集</td>
+        <td><strong>${escHtml(p.project_name)}</strong></td>
+        <td>${p.total_duration}min / ${p.total_episodes}集</td>
         <td>${p.production_days}天/${p.team_size}人</td>
+        <td class="amount">${c.computeCost ? fmt(c.computeCost) : '—'}</td>
         <td class="amount">${fmt(c.laborCost)}</td>
-        <td class="amount">${fmt(c.pcCost)}</td>
-        <td class="amount">${fmt(c.venueCost)}</td>
+        <td class="amount">${fmt(pcAndVenue)}</td>
         <td class="amount"><strong>${fmt(c.totalCost)}</strong></td>
         <td class="amount">
           ${editingId === p.id
-            ? `<input class="editable-input" type="number" id="editPrice-${p.id}" value="${c.revenue}" style="width:80px" step="0.01" min="0">
-               <button class="btn-edit" onclick="saveEdit(${p.id})">✓</button>`
+            ? `<input class="editable-input" type="number" id="editPrice-${p.id}" value="${c.revenue}" step="0.01" min="0">
+               <button style="padding:2px 8px;border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;background:var(--success);color:#fff;vertical-align:middle" onclick="saveEdit(${p.id})">✓</button>`
             : `<span class="editable" onclick="startEdit(${p.id})">${c.revenue ? fmt(c.revenue) : '—'}</span>`
           }
         </td>
         <td class="amount">
           ${editingId === p.id
-            ? `<input class="editable-input" type="number" id="editComm-${p.id}" value="${c.commission}" style="width:70px" step="0.01" min="0">`
+            ? `<input class="editable-input" type="number" id="editComm-${p.id}" value="${c.commission}" step="0.01" min="0">`
             : `<span class="editable" onclick="startEdit(${p.id})">${c.commission ? fmt(c.commission) : '—'}</span>`
           }
         </td>
-        <td class="amount ${profitClass}"><strong>${profitIcon} ${fmt(c.profit)}</strong></td>
+        <td class="amount" style="color:${profitColor};font-weight:700">${c.profit >= 0 ? '📈' : '📉'} ${fmt(c.profit)}</td>
         <td>
-          <button class="btn-delete" onclick="deleteProject(${p.id}, '${p.project_name.replace(/'/g, "\\'")}')">删除</button>
+          <button class="btn-delete" onclick="deleteProject(${p.id}, '${escHtml(p.project_name).replace(/'/g, "\\'")}')">删除</button>
         </td>
       </tr>
-      <tr class="detail-row" id="${detailId}">
-        <td colspan="13">
+      <tr class="detail-row" id="detail-${p.id}">
+        <td colspan="12">
           <div class="detail-grid">
             <div class="detail-item"><div class="d-label">制作周期</div><div class="d-value">${p.production_days} 天</div></div>
             <div class="detail-item"><div class="d-label">制作人数</div><div class="d-value">${p.team_size} 人</div></div>
-            <div class="detail-item"><div class="d-label">每日人力（${fmt(AVG_SALARY_PER_MONTH)}÷26天）</div><div class="d-value">${fmt(c.laborPerDay)}/人/天</div></div>
+            <div class="detail-item"><div class="d-label">每日人力（${fmt(AVG_SALARY_PER_MONTH)}÷26）</div><div class="d-value">${fmt(c.laborPerDay)}/人/天</div></div>
             <div class="detail-item"><div class="d-label">人员成本</div><div class="d-value">${fmt(c.laborCost)}</div></div>
-            <div class="detail-item"><div class="d-label">每日电脑（${fmt(PC_COST_PER_MONTH)}÷26天）</div><div class="d-value">${fmt(c.pcPerDay)}/台/天</div></div>
+            <div class="detail-item"><div class="d-label">每日电脑（${fmt(PC_COST_PER_MONTH)}÷26）</div><div class="d-value">${fmt(c.pcPerDay)}/台/天</div></div>
             <div class="detail-item"><div class="d-label">电脑成本</div><div class="d-value">${fmt(c.pcCost)}</div></div>
-            <div class="detail-item"><div class="d-label">每日场地（${fmt(VENUE_COST_PER_MONTH)}÷26天）</div><div class="d-value">${fmt(c.venuePerDay)}/天</div></div>
+            <div class="detail-item"><div class="d-label">每日场地（${fmt(VENUE_COST_PER_MONTH)}÷26）</div><div class="d-value">${fmt(c.venuePerDay)}/天</div></div>
             <div class="detail-item"><div class="d-label">场地费</div><div class="d-value">${fmt(c.venueCost)}</div></div>
-            <div class="detail-item" style="grid-column:1/-1;border-top:1px solid #eee;padding-top:6px"><div class="d-label">总成本</div><div class="d-value"><strong>${fmt(c.totalCost)}</strong></div></div>
+            <div class="detail-item"><div class="d-label">每分钟算力成本</div><div class="d-value">${p.compute_cost_per_min ? fmt(p.compute_cost_per_min) + '/min' : '—'}</div></div>
+            <div class="detail-item"><div class="d-label">总算力成本</div><div class="d-value">${c.computeCost ? fmt(c.computeCost) : '—'}</div></div>
+            <div class="detail-item" style="grid-column:1/-1;border-top:1px solid #eee;padding-top:6px"><div class="d-label">不含算力的基础成本</div><div class="d-value">${fmt(c.baseCost)}</div></div>
+            <div class="detail-item"><div class="d-label">总成本</div><div class="d-value"><strong>${fmt(c.totalCost)}</strong></div></div>
             <div class="detail-item"><div class="d-label">订单单价</div><div class="d-value">${c.revenue ? fmt(c.revenue) : '— 未填'}</div></div>
             <div class="detail-item"><div class="d-label">提成</div><div class="d-value">${c.commission ? fmt(c.commission) : '— 未填'}</div></div>
-            <div class="detail-item"><div class="d-label">利润</div><div class="d-value" style="color:${c.profit >= 0 ? 'var(--success)' : 'var(--danger)'}">${profitIcon} ${fmt(c.profit)}</div></div>
+            <div class="detail-item"><div class="d-label">利润</div><div class="d-value" style="color:${profitColor}">${c.profit >= 0 ? '📈' : '📉'} ${fmt(c.profit)}</div></div>
           </div>
-          ${p.cloud_link ? `<div style="margin-top:8px; font-size:12px"><strong>网盘：</strong><a href="${p.cloud_link}" target="_blank">${p.cloud_link}</a></div>` : ''}
-          ${p.software ? `<div style="margin-top:4px; font-size:12px"><strong>软件：</strong>${p.software}</div>` : ''}
-          ${p.computing_power ? `<div style="margin-top:4px; font-size:12px"><strong>算力：</strong>${p.computing_power}</div>` : ''}
-          <div style="margin-top:4px; font-size:11px; color:var(--text-light)">登记时间：${p.created_at}</div>
+          <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:10px; font-size:12px">
+            <span><strong>软件：</strong>${p.software || '—'}</span>
+            <span><strong>网盘：</strong>${linkDisplay}</span>
+          </div>
+          <div style="margin-top:4px; font-size:11px; color:var(--text-light)">登记时间：${p.created_at || '—'}</div>
         </td>
       </tr>
     `;
   });
 }
 
-// ========== 更新统计 ==========
+// ===== 统计 =====
 function updateStats(list) {
   document.getElementById('statProjects').textContent = list.length;
-  let totalMonths = 0, totalCost = 0, totalRevenue = 0, totalProfit = 0;
+  let totalMonths = 0, totalCompute = 0, totalCost = 0, totalRevenue = 0, totalProfit = 0;
   list.forEach(p => {
     const c = calcCosts(p);
     totalMonths += c.months * p.team_size;
+    totalCompute += c.computeCost;
     totalCost += c.totalCost;
     totalRevenue += c.revenue;
     totalProfit += c.profit;
   });
   document.getElementById('statTotalStaff').textContent = totalMonths.toFixed(1);
+  document.getElementById('statTotalCompute').textContent = fmt(totalCompute);
   document.getElementById('statTotalCost').textContent = fmt(totalCost);
   document.getElementById('statTotalRevenue').textContent = fmt(totalRevenue);
   const profitEl = document.getElementById('statTotalProfit');
@@ -395,17 +453,14 @@ function updateStats(list) {
   profitEl.style.color = totalProfit >= 0 ? 'var(--success)' : 'var(--danger)';
 }
 
-// ========== 过滤 & 排序 ==========
+// ===== 过滤排序 =====
 function applyFilters() {
   const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
   const sort = document.getElementById('sortSelect').value;
   let list = [...projects];
-  if (keyword) {
-    list = list.filter(p => p.project_name.toLowerCase().includes(keyword));
-  }
+  if (keyword) list = list.filter(p => p.project_name.toLowerCase().includes(keyword));
   list.sort((a, b) => {
-    const ca = calcCosts(a);
-    const cb = calcCosts(b);
+    const ca = calcCosts(a), cb = calcCosts(b);
     switch (sort) {
       case 'oldest': return new Date(a.created_at) - new Date(b.created_at);
       case 'profit_desc': return cb.profit - ca.profit;
@@ -417,7 +472,7 @@ function applyFilters() {
   updateStats(list);
 }
 
-// ========== 展开详情 ==========
+// ===== 展开 =====
 function toggleDetail(id) {
   const row = document.getElementById(`detail-${id}`);
   const btn = document.querySelector(`#row-${id} .expand-btn`);
@@ -426,11 +481,8 @@ function toggleDetail(id) {
   btn.textContent = row.classList.contains('show') ? '▼' : '▶';
 }
 
-// ========== 编辑 ==========
-function startEdit(id) {
-  editingId = id;
-  applyFilters();
-}
+// ===== 编辑 =====
+function startEdit(id) { editingId = id; applyFilters(); }
 function saveEdit(id) {
   const price = parseFloat(document.getElementById(`editPrice-${id}`).value) || 0;
   const comm = parseFloat(document.getElementById(`editComm-${id}`).value) || 0;
@@ -444,17 +496,15 @@ function saveEdit(id) {
         if (p) { p.order_price = price; p.commission = comm; }
         editingId = null;
         applyFilters();
-      } else {
-        alert('保存失败：' + (res.message || '未知错误'));
-      }
+      } else alert('保存失败：' + (res.message || '未知错误'));
     })
     .catch(e => alert('保存失败：' + e.message))
     .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 
-// ========== 删除 ==========
+// ===== 删除 =====
 function deleteProject(id, name) {
-  if (!confirm(`确认删除「${name}」？此操作不可恢复。`)) return;
+  if (!confirm(`确认删除「${name}」？不可恢复。`)) return;
   document.getElementById('loadingOverlay').classList.add('show');
   client.db.from('projects').delete()
     .where({ id: id })
@@ -462,15 +512,13 @@ function deleteProject(id, name) {
       if (res.success) {
         projects = projects.filter(p => p.id !== id);
         applyFilters();
-      } else {
-        alert('删除失败：' + (res.message || '未知错误'));
-      }
+      } else alert('删除失败：' + (res.message || '未知错误'));
     })
     .catch(e => alert('删除失败：' + e.message))
     .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 
-// ========== 加载数据 ==========
+// ===== 加载 =====
 function loadData() {
   document.getElementById('loadingOverlay').classList.add('show');
   client.db.from('projects')
@@ -486,7 +534,8 @@ function loadData() {
         software: r.software || '',
         production_days: r.production_days,
         team_size: r.team_size,
-        computing_power: r.computing_power || '',
+        compute_cost_per_min: parseFloat(r.compute_cost_per_min) || 0,
+        total_compute_cost: parseFloat(r.total_compute_cost) || 0,
         order_price: parseFloat(r.order_price) || 0,
         commission: parseFloat(r.commission) || 0,
         created_at: r.created_at || ''
@@ -494,13 +543,17 @@ function loadData() {
       applyFilters();
     })
     .catch(e => {
-      document.getElementById('tableBody').innerHTML = `<tr><td colspan="13" style="text-align:center;padding:40px;color:var(--danger)">加载失败：${e.message}</td></tr>`;
+      document.getElementById('tableBody').innerHTML = `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--danger)">加载失败：${e.message}</td></tr>`;
     })
     .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 
-// ========== 自动刷新 ==========
-loadData();
+function escHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
 setInterval(loadData, 30000);
 </script>
 </body>
