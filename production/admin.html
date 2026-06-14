@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a2e">
+<title>制作管理后台 - 一抹金蓝</title>
+<style>
+  :root {
+    --primary: #2C3E50;
+    --accent: #3498DB;
+    --success: #27AE60;
+    --danger: #E74C3C;
+    --warning: #F39C12;
+    --text: #2C3E50;
+    --text-light: #7F8C8D;
+    --bg: #F5F6FA;
+    --card: #fff;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100dvh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #fff;
+    padding: 20px 24px 18px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header h1 { font-size: 18px; font-weight: 700; }
+  .header p { font-size: 12px; opacity: .6; margin-top: 2px; }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 16px; }
+
+  /* ===== Stats bar ===== */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    text-align: center;
+  }
+  .stat-card .num { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+  .stat-card .label { font-size: 11px; color: var(--text-light); }
+  .stat-card.profit .num { color: var(--success); }
+  .stat-card.loss .num { color: var(--danger); }
+
+  /* ===== Filter ===== */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .filter-bar input, .filter-bar select {
+    padding: 8px 12px;
+    border: 1.5px solid #E8ECF0;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    outline: none;
+    background: #fff;
+    flex: 1;
+    min-width: 120px;
+  }
+  .filter-bar input:focus, .filter-bar select:focus {
+    border-color: var(--accent);
+  }
+
+  /* ===== Table ===== */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
+  th {
+    background: #f8f9fb;
+    padding: 10px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-light);
+    white-space: nowrap;
+    border-bottom: 1px solid #E8ECF0;
+    position: sticky;
+    top: 0;
+  }
+  td {
+    padding: 10px 10px;
+    border-bottom: 1px solid #f0f1f3;
+    vertical-align: middle;
+  }
+  tr:hover td { background: #fafbfc; }
+  .editable {
+    cursor: pointer;
+    border-bottom: 1px dashed var(--accent);
+    transition: background .15s;
+  }
+  .editable:hover { background: var(--accent-light); }
+  .editable-input {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    background: #fff;
+  }
+  .amount { text-align: right; font-family: 'SF Mono', 'Menlo', monospace; font-size: 13px; }
+  .amount.positive { color: var(--success); }
+  .amount.negative { color: var(--danger); }
+
+  /* ===== Detail toggle ===== */
+  .detail-row { display: none; }
+  .detail-row.show { display: table-row; }
+  .detail-row td { background: #fafbfc; padding: 14px 16px; }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  .detail-item {}
+  .detail-item .d-label { font-size: 11px; color: var(--text-light); }
+  .detail-item .d-value { font-size: 14px; font-weight: 600; margin-top: 2px; }
+
+  .expand-btn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text-light);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .expand-btn:hover { background: #f0f1f3; }
+
+  .btn-edit {
+    display: inline-block;
+    padding: 3px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-edit:hover { filter: brightness(1.1); }
+
+  .btn-delete {
+    display: inline-block;
+    padding: 3px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--danger);
+    color: #fff;
+  }
+  .btn-delete:hover { filter: brightness(1.1); }
+
+  /* ===== Mobile responsive ===== */
+  @media (max-width: 640px) {
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+    .container { padding: 12px; }
+    th, td { padding: 8px 6px; }
+  }
+
+  .loading-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(44,62,80,.4);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-box {
+    background: #fff;
+    border-radius: 18px;
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(0,0,0,.12);
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid #E8ECF0;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .footer { text-align: center; padding: 24px; font-size: 11px; color: #BDC3C7; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 制作管理后台</h1>
+  <p>一抹金蓝传媒 · 项目成本利润核算</p>
+</div>
+
+<div class="container">
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card"><div class="num" id="statProjects">-</div><div class="label">项目总数</div></div>
+    <div class="stat-card"><div class="num" id="statTotalStaff">-</div><div class="label">总人力（人月）</div></div>
+    <div class="stat-card"><div class="num" id="statTotalCost">-</div><div class="label">总成本</div></div>
+    <div class="stat-card profit"><div class="num" id="statTotalRevenue">-</div><div class="label">总收入</div></div>
+    <div class="stat-card" id="statProfitCard"><div class="num" id="statTotalProfit">-</div><div class="label">总利润</div></div>
+  </div>
+
+  <div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="🔍 搜索项目..." oninput="applyFilters()">
+    <select id="sortSelect" onchange="applyFilters()">
+      <option value="newest">最新优先</option>
+      <option value="oldest">最早优先</option>
+      <option value="profit_desc">利润从高到低</option>
+      <option value="profit_asc">利润从低到高</option>
+    </select>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:30px"></th>
+          <th>项目名称</th>
+          <th>总时长</th>
+          <th>集数</th>
+          <th>周期/人数</th>
+          <th>人员成本</th>
+          <th>电脑成本</th>
+          <th>场地费</th>
+          <th>总成本</th>
+          <th>订单单价</th>
+          <th>提成</th>
+          <th>利润</th>
+          <th style="width:80px">操作</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">一抹金蓝传媒 · 制作部管理系统</div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p>加载中...</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
+<script>
+// ========== 常量 ==========
+const AVG_SALARY_PER_MONTH = 3500;      // 人均月薪
+const WORK_DAYS_PER_MONTH = 26;         // 每月工作天数
+const PC_COST_PER_MONTH = 193;           // 每台电脑月租
+const VENUE_COST_PER_MONTH = 8000;       // 场地月租
+
+const client = aipexbase.createClient({
+  baseUrl: 'https://baas.kuafuai.net/baas-api',
+  apiKey: 'baas_0us8Xwxy'
+});
+
+let projects = [];
+let editingId = null;  // 正在编辑哪个项目的 order_price / commission
+
+// ========== 核算函数 ==========
+function calcCosts(p) {
+  const months = p.production_days / WORK_DAYS_PER_MONTH;
+  const laborCost = months * p.team_size * AVG_SALARY_PER_MONTH;
+  const pcCost = months * p.team_size * PC_COST_PER_MONTH;
+  const venueCost = months * VENUE_COST_PER_MONTH;
+  const totalCost = laborCost + pcCost + venueCost;
+  const revenue = parseFloat(p.order_price) || 0;
+  const commission = parseFloat(p.commission) || 0;
+  const profit = revenue - totalCost - commission;
+  return { months, laborCost, pcCost, venueCost, totalCost, revenue, commission, profit };
+}
+
+// ========== 格式化 ==========
+const fmt = v => '¥' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const fmt2 = v => Number(v).toFixed(2);
+
+// ========== 渲染表格 ==========
+function renderTable(list) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  list.forEach((p, idx) => {
+    const c = calcCosts(p);
+    const profitClass = c.profit >= 0 ? 'positive' : 'negative';
+    const profitIcon = c.profit >= 0 ? '📈' : '📉';
+    const rowId = `row-${p.id}`;
+    const detailId = `detail-${p.id}`;
+
+    tbody.innerHTML += `
+      <tr id="${rowId}">
+        <td><button class="expand-btn" onclick="toggleDetail(${p.id})">▶</button></td>
+        <td><strong>${p.project_name}</strong></td>
+        <td>${p.total_duration}min</td>
+        <td>${p.total_episodes}集</td>
+        <td>${p.production_days}天/${p.team_size}人</td>
+        <td class="amount">${fmt(c.laborCost)}</td>
+        <td class="amount">${fmt(c.pcCost)}</td>
+        <td class="amount">${fmt(c.venueCost)}</td>
+        <td class="amount"><strong>${fmt(c.totalCost)}</strong></td>
+        <td class="amount">
+          ${editingId === p.id
+            ? `<input class="editable-input" type="number" id="editPrice-${p.id}" value="${c.revenue}" style="width:80px" step="0.01" min="0">
+               <button class="btn-edit" onclick="saveEdit(${p.id})">✓</button>`
+            : `<span class="editable" onclick="startEdit(${p.id})">${c.revenue ? fmt(c.revenue) : '—'}</span>`
+          }
+        </td>
+        <td class="amount">
+          ${editingId === p.id
+            ? `<input class="editable-input" type="number" id="editComm-${p.id}" value="${c.commission}" style="width:70px" step="0.01" min="0">`
+            : `<span class="editable" onclick="startEdit(${p.id})">${c.commission ? fmt(c.commission) : '—'}</span>`
+          }
+        </td>
+        <td class="amount ${profitClass}"><strong>${profitIcon} ${fmt(c.profit)}</strong></td>
+        <td>
+          <button class="btn-delete" onclick="deleteProject(${p.id}, '${p.project_name.replace(/'/g, "\\'")}')">删除</button>
+        </td>
+      </tr>
+      <tr class="detail-row" id="${detailId}">
+        <td colspan="13">
+          <div class="detail-grid">
+            <div class="detail-item"><div class="d-label">制作周期</div><div class="d-value">${p.production_days} 天 (${fmt2(c.months)} 月)</div></div>
+            <div class="detail-item"><div class="d-label">制作人数</div><div class="d-value">${p.team_size} 人</div></div>
+            <div class="detail-item"><div class="d-label">人均月薪</div><div class="d-value">${fmt(AVG_SALARY_PER_MONTH)}</div></div>
+            <div class="detail-item"><div class="d-label">人员成本</div><div class="d-value">${fmt(c.laborCost)}</div></div>
+            <div class="detail-item"><div class="d-label">电脑成本（${fmt(PC_COST_PER_MONTH)}/台/月）</div><div class="d-value">${fmt(c.pcCost)}</div></div>
+            <div class="detail-item"><div class="d-label">场地费（${fmt(VENUE_COST_PER_MONTH)}/月）</div><div class="d-value">${fmt(c.venueCost)}</div></div>
+            <div class="detail-item"><div class="d-label">总成本</div><div class="d-value">${fmt(c.totalCost)}</div></div>
+            <div class="detail-item"><div class="d-label">订单单价</div><div class="d-value">${c.revenue ? fmt(c.revenue) : '未填'}</div></div>
+            <div class="detail-item"><div class="d-label">提成</div><div class="d-value">${c.commission ? fmt(c.commission) : '未填'}</div></div>
+            <div class="detail-item"><div class="d-label">利润</div><div class="d-value" style="color:${c.profit >= 0 ? 'var(--success)' : 'var(--danger)'}">${profitIcon} ${fmt(c.profit)}</div></div>
+          </div>
+          ${p.cloud_link ? `<div style="margin-top:8px; font-size:12px"><strong>网盘：</strong><a href="${p.cloud_link}" target="_blank">${p.cloud_link}</a></div>` : ''}
+          ${p.software ? `<div style="margin-top:4px; font-size:12px"><strong>软件：</strong>${p.software}</div>` : ''}
+          ${p.computing_power ? `<div style="margin-top:4px; font-size:12px"><strong>算力：</strong>${p.computing_power}</div>` : ''}
+          <div style="margin-top:4px; font-size:11px; color:var(--text-light)">登记时间：${p.created_at}</div>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+// ========== 更新统计 ==========
+function updateStats(list) {
+  document.getElementById('statProjects').textContent = list.length;
+  let totalMonths = 0, totalCost = 0, totalRevenue = 0, totalProfit = 0;
+  list.forEach(p => {
+    const c = calcCosts(p);
+    totalMonths += c.months * p.team_size;
+    totalCost += c.totalCost;
+    totalRevenue += c.revenue;
+    totalProfit += c.profit;
+  });
+  document.getElementById('statTotalStaff').textContent = totalMonths.toFixed(1);
+  document.getElementById('statTotalCost').textContent = fmt(totalCost);
+  document.getElementById('statTotalRevenue').textContent = fmt(totalRevenue);
+  const profitEl = document.getElementById('statTotalProfit');
+  profitEl.textContent = fmt(totalProfit);
+  profitEl.style.color = totalProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+}
+
+// ========== 过滤 & 排序 ==========
+function applyFilters() {
+  const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+  const sort = document.getElementById('sortSelect').value;
+  let list = [...projects];
+  if (keyword) {
+    list = list.filter(p => p.project_name.toLowerCase().includes(keyword));
+  }
+  list.sort((a, b) => {
+    const ca = calcCosts(a);
+    const cb = calcCosts(b);
+    switch (sort) {
+      case 'oldest': return new Date(a.created_at) - new Date(b.created_at);
+      case 'profit_desc': return cb.profit - ca.profit;
+      case 'profit_asc': return ca.profit - cb.profit;
+      default: return new Date(b.created_at) - new Date(a.created_at);
+    }
+  });
+  renderTable(list);
+  updateStats(list);
+}
+
+// ========== 展开详情 ==========
+function toggleDetail(id) {
+  const row = document.getElementById(`detail-${id}`);
+  const btn = document.querySelector(`#row-${id} .expand-btn`);
+  if (!row) return;
+  row.classList.toggle('show');
+  btn.textContent = row.classList.contains('show') ? '▼' : '▶';
+}
+
+// ========== 编辑 ==========
+function startEdit(id) {
+  editingId = id;
+  applyFilters();
+}
+function saveEdit(id) {
+  const price = parseFloat(document.getElementById(`editPrice-${id}`).value) || 0;
+  const comm = parseFloat(document.getElementById(`editComm-${id}`).value) || 0;
+  document.getElementById('loadingOverlay').classList.add('show');
+  client.db.from('projects').update()
+    .set({ order_price: price, commission: comm })
+    .where({ id: id })
+    .then(res => {
+      if (res.success) {
+        const p = projects.find(x => x.id === id);
+        if (p) { p.order_price = price; p.commission = comm; }
+        editingId = null;
+        applyFilters();
+      } else {
+        alert('保存失败：' + (res.message || '未知错误'));
+      }
+    })
+    .catch(e => alert('保存失败：' + e.message))
+    .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
+}
+
+// ========== 删除 ==========
+function deleteProject(id, name) {
+  if (!confirm(`确认删除「${name}」？此操作不可恢复。`)) return;
+  document.getElementById('loadingOverlay').classList.add('show');
+  client.db.from('projects').delete()
+    .where({ id: id })
+    .then(res => {
+      if (res.success) {
+        projects = projects.filter(p => p.id !== id);
+        applyFilters();
+      } else {
+        alert('删除失败：' + (res.message || '未知错误'));
+      }
+    })
+    .catch(e => alert('删除失败：' + e.message))
+    .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
+}
+
+// ========== 加载数据 ==========
+function loadData() {
+  document.getElementById('loadingOverlay').classList.add('show');
+  client.db.from('projects')
+    .select()
+    .order('created_at', 'desc')
+    .then(res => {
+      projects = (res.data || []).map(r => ({
+        id: r.id,
+        project_name: r.project_name,
+        cloud_link: r.cloud_link || '',
+        total_duration: r.total_duration,
+        total_episodes: r.total_episodes,
+        software: r.software || '',
+        production_days: r.production_days,
+        team_size: r.team_size,
+        computing_power: r.computing_power || '',
+        order_price: parseFloat(r.order_price) || 0,
+        commission: parseFloat(r.commission) || 0,
+        created_at: r.created_at || ''
+      }));
+      applyFilters();
+    })
+    .catch(e => {
+      document.getElementById('tableBody').innerHTML = `<tr><td colspan="13" style="text-align:center;padding:40px;color:var(--danger)">加载失败：${e.message}</td></tr>`;
+    })
+    .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
+}
+
+// ========== 自动刷新 ==========
+loadData();
+setInterval(loadData, 30000);
+</script>
+</body>
+</html>

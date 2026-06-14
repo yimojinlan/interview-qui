@@ -1,0 +1,108 @@
+{
+  "name": "生产制作登记系统",
+  "needAuth": false,
+  "tables": [
+    {
+      "tableName": "projects",
+      "description": "项目登记表",
+      "columns": [
+        {
+          "columnName": "id",
+          "columnType": "INT",
+          "columnComment": "主键ID",
+          "isRequired": true,
+          "isPrimary": true,
+          "isShow": true
+        },
+        {
+          "columnName": "project_name",
+          "columnType": "VARCHAR(200)",
+          "columnComment": "项目名称",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "cloud_link",
+          "columnType": "TEXT",
+          "columnComment": "网盘链接",
+          "isRequired": false,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "total_duration",
+          "columnType": "VARCHAR(50)",
+          "columnComment": "总时长（分钟）",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "total_episodes",
+          "columnType": "INT",
+          "columnComment": "总集数",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "software",
+          "columnType": "VARCHAR(200)",
+          "columnComment": "制作软件",
+          "isRequired": false,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "production_days",
+          "columnType": "INT",
+          "columnComment": "制作周期（天）",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "team_size",
+          "columnType": "INT",
+          "columnComment": "制作人数",
+          "isRequired": true,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "computing_power",
+          "columnType": "VARCHAR(100)",
+          "columnComment": "消耗算力",
+          "isRequired": false,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "order_price",
+          "columnType": "DECIMAL(12,2)",
+          "columnComment": "订单单价（手填）",
+          "isRequired": false,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "commission",
+          "columnType": "DECIMAL(12,2)",
+          "columnComment": "提成（手填）",
+          "isRequired": false,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "created_at",
+          "columnType": "DATETIME",
+          "columnComment": "创建时间",
+          "isRequired": false,
+          "isPrimary": false,
+          "isShow": true
+        }
+      ]
+    }
+  ]
+}

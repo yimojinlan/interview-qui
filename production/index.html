@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2C3E50">
+<title>制作登记 - 一抹金蓝</title>
+<style>
+  :root {
+    --primary: #2C3E50;
+    --accent: #3498DB;
+    --accent-light: #EBF5FB;
+    --success: #27AE60;
+    --text: #1a1a2e;
+    --text-light: #7F8C8D;
+    --bg: #F5F6FA;
+    --card: #fff;
+    --radius: 12px;
+    --safe-bottom: env(safe-area-inset-bottom, 16px);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100dvh;
+    padding-bottom: 80px;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #2C3E50, #3498DB);
+    color: #fff;
+    padding: 18px 20px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header h1 { font-size: 18px; font-weight: 700; }
+  .header p { font-size: 12px; opacity: .75; margin-top: 2px; }
+
+  .container { max-width: 480px; margin: 0 auto; padding: 12px 16px; }
+
+  .form-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  }
+  .form-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .form-group { margin-bottom: 12px; }
+  .form-group:last-child { margin-bottom: 0; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text-light);
+  }
+  .form-group label .red { color: #e74c3c; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #E8ECF0;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    font-family: inherit;
+    transition: border .2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+  }
+  .form-group textarea { min-height: 60px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+    transition: all .15s;
+    margin-top: 4px;
+  }
+  .btn-submit:active { transform: scale(.98); }
+  .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeInUp .4s ease;
+  }
+  .success-screen .icon {
+    width: 56px; height: 56px;
+    margin: 0 auto 14px;
+    background: linear-gradient(135deg, #27AE60, #1E8449);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(39,174,96,.3);
+  }
+  .success-screen h2 { font-size: 20px; color: #1E8449; margin-bottom: 6px; }
+  .success-screen p { font-size: 14px; color: var(--text-light); line-height: 1.6; }
+  .success-screen .btn-again {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .footer { text-align: center; padding: 20px; font-size: 11px; color: #BDC3C7; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .loading-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(44,62,80,.4);
+    backdrop-filter: blur(3px);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-box {
+    background: #fff;
+    border-radius: 18px;
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(0,0,0,.12);
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid #E8ECF0;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 制作项目登记</h1>
+  <p>一抹金蓝传媒 · 制作部</p>
+</div>
+
+<div class="container" id="formApp">
+  <form class="form-card" id="mainForm">
+    <h3>📝 项目信息</h3>
+    <div class="form-group">
+      <label>项目名称 <span class="red">*</span></label>
+      <input type="text" id="projectName" placeholder="请输入项目名称" maxlength="100" required>
+    </div>
+    <div class="form-group">
+      <label>网盘链接</label>
+      <input type="url" id="cloudLink" placeholder="https://pan.baidu.com/..." maxlength="500">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>总时长（分钟）<span class="red">*</span></label>
+        <input type="number" id="totalDuration" placeholder="如 45" min="1" required>
+      </div>
+      <div class="form-group">
+        <label>总集数 <span class="red">*</span></label>
+        <input type="number" id="totalEpisodes" placeholder="如 12" min="1" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>制作软件</label>
+      <input type="text" id="software" placeholder="如：AE、Blender、ComfyUI 等" maxlength="200">
+    </div>
+  </form>
+
+  <form class="form-card" id="calcForm">
+    <h3>⚙️ 制作资源</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>制作周期（天）<span class="red">*</span></label>
+        <input type="number" id="productionDays" placeholder="如 30" min="1" required>
+      </div>
+      <div class="form-group">
+        <label>制作人数 <span class="red">*</span></label>
+        <input type="number" id="teamSize" placeholder="如 5" min="1" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>消耗算力</label>
+      <input type="text" id="computingPower" placeholder="如：A100 200小时" maxlength="100">
+    </div>
+  </form>
+
+  <button class="btn-submit" id="btnSubmit" onclick="submitForm()">✅ 提交登记</button>
+
+  <div class="success-screen" id="successScreen">
+    <div class="icon">✓</div>
+    <h2>登记成功！</h2>
+    <p>项目已提交至制作部管理系统。<br>后台可查看并核算成本利润。</p>
+    <button class="btn-again" onclick="resetForm()">继续登记</button>
+  </div>
+
+  <div class="footer">一抹金蓝传媒 · 制作部登记系统</div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p>正在提交...</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
+<script>
+const client = aipexbase.createClient({
+  baseUrl: 'https://baas.kuafuai.net/baas-api',
+  apiKey: 'baas_0us8Xwxy'
+});
+
+function submitForm() {
+  const name = document.getElementById('projectName').value.trim();
+  const duration = document.getElementById('totalDuration').value.trim();
+  const episodes = document.getElementById('totalEpisodes').value.trim();
+  const days = document.getElementById('productionDays').value.trim();
+  const team = document.getElementById('teamSize').value.trim();
+
+  if (!name) { alert('请输入项目名称'); return; }
+  if (!duration || parseInt(duration) < 1) { alert('请输入有效的总时长'); return; }
+  if (!episodes || parseInt(episodes) < 1) { alert('请输入有效的总集数'); return; }
+  if (!days || parseInt(days) < 1) { alert('请输入有效的制作周期'); return; }
+  if (!team || parseInt(team) < 1) { alert('请输入有效的制作人数'); return; }
+
+  const data = {
+    project_name: name,
+    cloud_link: document.getElementById('cloudLink').value.trim() || '',
+    total_duration: duration,
+    total_episodes: parseInt(episodes),
+    software: document.getElementById('software').value.trim() || '',
+    production_days: parseInt(days),
+    team_size: parseInt(team),
+    computing_power: document.getElementById('computingPower').value.trim() || '',
+    order_price: 0,
+    commission: 0,
+    created_at: new Date().toISOString().replace('T', ' ').slice(0, 19)
+  };
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = '⏳ 提交中...';
+  document.getElementById('loadingOverlay').classList.add('show');
+
+  client.db.from('projects').insert().values(data)
+    .then(res => {
+      if (res.success) {
+        document.getElementById('mainForm').style.display = 'none';
+        document.getElementById('calcForm').style.display = 'none';
+        btn.style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+      } else {
+        alert('提交失败：' + (res.message || '未知错误'));
+      }
+    })
+    .catch(e => { alert('提交失败：' + e.message); })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = '✅ 提交登记';
+      document.getElementById('loadingOverlay').classList.remove('show');
+    });
+}
+
+function resetForm() {
+  ['projectName','cloudLink','totalDuration','totalEpisodes','software','productionDays','teamSize','computingPower'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('mainForm').style.display = 'block';
+  document.getElementById('calcForm').style.display = 'block';
+  document.getElementById('btnSubmit').style.display = 'block';
+  document.getElementById('successScreen').style.display = 'none';
+}
+</script>
+</body>
+</html>
