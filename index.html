@@ -353,8 +353,11 @@
 <div class="container" id="quizApp">
   <!-- 基本信息 -->
   <div class="basic-info-wrap" id="basicInfoWrap">
-    <h3>📝 基本信息</h3>
-    <p class="hint">请先填写以下信息，所有资料仅用于测评分析</p>
+    <div class="info-header">
+      <h3>📝 基本信息</h3>
+      <span class="toggle-collapse" id="toggleInfo" onclick="toggleBasicInfo()">收起 ▲</span>
+    </div>
+    <div id="basicInfoBody">
     <div class="field-group">
       <div class="field-full">
         <label>姓名 <span class="red">*</span></label>
@@ -388,6 +391,7 @@
         <input type="text" id="major" placeholder="如：编导、数字媒体" maxlength="40">
       </div>
     </div>
+    </div>
   </div>
 
   <!-- 题目容器 -->
@@ -396,6 +400,7 @@
   <!-- 导航 -->
   <div class="nav">
     <button class="btn-prev" id="btnPrev" onclick="prevQuestion()">← 上一题</button>
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">下一题 →</button>
     <button class="btn-submit" id="btnSubmit" onclick="submitQuiz()" style="display:none">✅ 提交测评</button>
   </div>
 
@@ -594,15 +599,16 @@ function selectOption(qIdx, letter) {
   });
   updateProgressFill();
   updateNavState();
+}
 
-  // 自动跳到下一题（如果是最后一题则不动）
-  if (qIdx < QUESTIONS.length - 1) {
+function nextQuestion() {
+  if (currentQ < QUESTIONS.length - 1 && !isTransitioning) {
     isTransitioning = true;
     setTimeout(() => {
-      showQuestion(qIdx + 1);
+      showQuestion(currentQ + 1);
       isTransitioning = false;
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 350);
+    }, 200);
   }
 }
 
@@ -640,14 +646,17 @@ function isBasicInfoValid() {
 // ========== 导航状态 ==========
 function updateNavState() {
   const prevBtn = document.getElementById('btnPrev');
+  const nextBtn = document.getElementById('btnNext');
   const submitBtn = document.getElementById('btnSubmit');
 
   prevBtn.style.visibility = currentQ === 0 ? 'hidden' : 'visible';
 
   if (currentQ === QUESTIONS.length - 1) {
+    nextBtn.style.display = 'none';
     submitBtn.style.display = 'block';
     submitBtn.disabled = !isBasicInfoValid() || answers.some(a => a === null);
   } else {
+    nextBtn.style.display = 'block';
     submitBtn.style.display = 'none';
   }
 }
@@ -730,7 +739,21 @@ document.addEventListener('keydown', function(e) {
     if (options && options[idx]) options[idx].click();
   }
   if (e.key === 'ArrowLeft') { e.preventDefault(); prevQuestion(); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); nextQuestion(); }
 });
+
+// ========== 基本信息折叠 ==========
+function toggleBasicInfo() {
+  const body = document.getElementById('basicInfoBody');
+  const toggle = document.getElementById('toggleInfo');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    toggle.textContent = '收起 ▲';
+  } else {
+    body.style.display = 'none';
+    toggle.textContent = '展开 ▼';
+  }
+}
 
 // ========== 初始化 ==========
 renderQuestions();
