@@ -216,8 +216,7 @@
   <div class="stats-bar">
     <div class="stat-card"><div class="num" id="statTotal">-</div><div class="label">项目总数</div></div>
     <div class="stat-card"><div class="num" id="statTotalCost">-</div><div class="label">总成本</div></div>
-    <div class="stat-card"><div class="num" id="statRevenue">-</div><div class="label">总收入</div></div>
-    <div class="stat-card"><div class="num" id="statProfit">-</div><div class="label">总利润</div></div>
+    <div class="stat-card"><div class="num" id="statDuration">-</div><div class="label">总时长</div></div>
   </div>
 
   <div class="toolbar">
@@ -240,11 +239,6 @@
           <th>人数</th>
           <th>每分钟算力成本</th>
           <th>总算力成本</th>
-          <th>订单单价(元/分)</th>
-          <th>总收入</th>
-          <th>提成</th>
-          <th>利润</th>
-          <th>已结算</th>
           <th>提交时间</th>
           <th>网盘链接</th>
           <th style="width:50px">操作</th>
@@ -424,7 +418,7 @@ function isLinkExpired(createdAt) {
 function renderTable(list) {
   const tbody = document.getElementById('tableBody');
   if (list.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="15"><div class="empty-state"><div class="icon">📋</div><p>暂无项目数据，点击右上角「新增登记」开始</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="icon">📋</div><p>暂无项目数据，点击右上角「新增登记」开始</p></div></td></tr>';
     return;
   }
   tbody.innerHTML = list.map(p => {
@@ -469,11 +463,6 @@ function renderTable(list) {
       <td>${p.team_size}人</td>
       <td class="amount">${computeCell}</td>
       <td class="amount">${totalCompute}</td>
-      <td class="amount">${priceCell}</td>
-      <td class="amount"><strong>${c.revenue > 0 ? fmt(c.revenue) : '—'}</strong></td>
-      <td class="amount">${commCell}</td>
-      <td class="amount">${profitIcon} ${fmt(c.profit)}</td>
-      <td class="amount">${settledCell}</td>
       <td>${subDate}</td>
       <td class="link-cell">${linkDisplay}</td>
       <td>${actions}</td>
@@ -483,16 +472,14 @@ function renderTable(list) {
 
 function updateStats(list) {
   document.getElementById('statTotal').textContent = list.length;
-  let totalCost = 0, totalRevenue = 0, totalProfit = 0;
+  let totalCost = 0, totalDuration = 0;
   list.forEach(p => {
     const c = calcCosts(p);
     totalCost += c.totalCost;
-    totalRevenue += c.revenue;
-    totalProfit += c.profit;
+    totalDuration += parseFloat(p.total_duration) || 0;
   });
   document.getElementById('statTotalCost').textContent = fmt(totalCost);
-  document.getElementById('statRevenue').textContent = fmt(totalRevenue);
-  document.getElementById('statProfit').textContent = fmt(totalProfit);
+  document.getElementById('statDuration').textContent = totalDuration + 'min';
 }
 
 function applyFilters() {
@@ -692,7 +679,7 @@ function loadData() {
   document.getElementById('loadingOverlay').classList.add('show');
   const failTimer = setTimeout(() => {
     document.getElementById('loadingOverlay').classList.remove('show');
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="15" style="text-align:center;padding:40px;color:var(--danger)">⏱ 连接超时，<a href="javascript:loadData()" style="color:var(--accent)">点此重试</a></td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--danger)">⏱ 连接超时，<a href="javascript:loadData()" style="color:var(--accent)">点此重试</a></td></tr>';
   }, 20000);
   api('list', { orderBy: 'created_at', orderDir: 'desc', pageSize: 200 }).then(res => {
     clearTimeout(failTimer);
@@ -714,7 +701,7 @@ function loadData() {
     applyFilters();
   }).catch(e => {
     clearTimeout(failTimer);
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="15" style="text-align:center;padding:40px;color:var(--danger)">加载失败：' + e.message + '，<a href="javascript:loadData()" style="color:var(--accent)">点此重试</a></td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--danger)">加载失败：' + e.message + '，<a href="javascript:loadData()" style="color:var(--accent)">点此重试</a></td></tr>';
   }).finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 
