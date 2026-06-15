@@ -142,13 +142,20 @@
   <div class="loading-box"><div class="spinner"></div><p>请稍候...</p></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
 <script>
 const ACCESS_PASSWORD = 'ymjl2026088';
-const client = aipexbase.createClient({
-  baseUrl: 'https://baas.kuafuai.net/baas-api',
-  apiKey: 'baas_O4m66iqi'
-});
+const API_BASE = 'https://baas.kuafuai.net/baas-api';
+const API_KEY = 'baas_O4m66iqi';
+
+async function api(method, data) {
+  const url = API_BASE + '/api/data/invoke?table=projects&method=' + method;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'CODE_FLYING': API_KEY },
+    body: JSON.stringify(data || {})
+  });
+  return await res.json();
+}
 
 function checkPwd() {
   const input = document.getElementById('pwdInput').value.trim();
@@ -334,37 +341,30 @@ function saveEdit(id) {
   const comm = parseFloat(document.getElementById(`editComm-${id}`).value) || 0;
   const settled = parseFloat(document.getElementById(`editSettled-${id}`).value) || 0;
   document.getElementById('loadingOverlay').classList.add('show');
-  client.db.from('projects').update()
-    .set({ order_price: price, commission: comm, settled_amount: settled })
-    .where({ id: id })
-    .then(res => {
-      if (res.success) {
-        const p = projects.find(x => x.id === id);
-        if (p) { p.order_price = price; p.commission = comm; p.settled_amount = settled; }
-        editingId = null;
-        applyFilters();
-      } else { alert('保存失败：' + (res.message || '未知错误')); }
-    })
-    .catch(e => alert('保存失败：' + e.message))
+  api('update', { id: id, order_price: price, commission: comm, settled_amount: settled }).then(res => {
+    if (res.success) {
+      const p = projects.find(x => x.id === id);
+      if (p) { p.order_price = price; p.commission = comm; p.settled_amount = settled; }
+      editingId = null;
+      applyFilters();
+    } else { alert('保存失败：' + (res.message || '未知错误')); }
+  }).catch(e => alert('保存失败：' + e.message))
     .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 
 function deleteProject(id, name) {
   if (!confirm(`确认删除「${name}」？此操作不可恢复。`)) return;
   document.getElementById('loadingOverlay').classList.add('show');
-  client.db.from('projects').delete().where({ id: id })
-    .then(res => {
-      if (res.success) { projects = projects.filter(p => p.id !== id); applyFilters(); }
-      else { alert('删除失败：' + (res.message || '未知错误')); }
-    })
-    .catch(e => alert('删除失败：' + e.message))
+  api('delete', { id: id }).then(res => {
+    if (res.success) { projects = projects.filter(p => p.id !== id); applyFilters(); }
+    else { alert('删除失败：' + (res.message || '未知错误')); }
+  }).catch(e => alert('删除失败：' + e.message))
     .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 
 function loadData() {
   document.getElementById('loadingOverlay').classList.add('show');
-  client.db.from('projects').select().order('created_at', 'desc')
-    .then(res => {
+  api('list', { orderBy: 'created_at', orderDir: 'desc', pageSize: 100 }).then(res => {
       projects = (res.data || []).map(r => ({
         id: r.id, project_name: r.project_name,
         cloud_link: r.cloud_link || '',
