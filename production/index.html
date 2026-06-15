@@ -240,7 +240,8 @@
           <th>人数</th>
           <th>每分钟算力成本</th>
           <th>总算力成本</th>
-          <th>订单单价</th>
+          <th>订单单价(元/分)</th>
+          <th>总收入</th>
           <th>提成</th>
           <th>利润</th>
           <th>已结算</th>
@@ -312,7 +313,7 @@
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>订单单价（元）</label>
+        <label>订单单价（元/分钟）</label>
         <input type="number" id="f_price" min="0" step="0.01">
       </div>
       <div class="form-group">
@@ -401,12 +402,14 @@ function calcCosts(p) {
   const venueCost = months * 8000;
   const compute = parseComputePower(p);
   const totalCost = laborCost + pcCost + venueCost + compute.total;
-  const revenue = parseFloat(p.order_price) || 0;
+  const perMinPrice = parseFloat(p.order_price) || 0;
+  const totalDuration = parseFloat(p.total_duration) || 0;
+  const revenue = perMinPrice * totalDuration;
   const commission = parseFloat(p.commission) || 0;
   const profit = revenue - totalCost - commission;
   const settled = parseFloat(p.settled_amount) || 0;
   const unsettled = revenue - settled;
-  return { months, laborCost, pcCost, venueCost, computePerMin: compute.perMin, computeCost: compute.total, totalCost, revenue, commission, profit, settled, unsettled };
+  return { months, laborCost, pcCost, venueCost, computePerMin: compute.perMin, computeCost: compute.total, totalCost, perMinPrice, revenue, commission, profit, settled, unsettled };
 }
 
 const fmt = v => '¥' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -421,7 +424,7 @@ function isLinkExpired(createdAt) {
 function renderTable(list) {
   const tbody = document.getElementById('tableBody');
   if (list.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="14"><div class="empty-state"><div class="icon">📋</div><p>暂无项目数据，点击右上角「新增登记」开始</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="15"><div class="empty-state"><div class="icon">📋</div><p>暂无项目数据，点击右上角「新增登记」开始</p></div></td></tr>';
     return;
   }
   tbody.innerHTML = list.map(p => {
@@ -437,8 +440,8 @@ function renderTable(list) {
       : `<span class="editable" onclick="startEdit(${p.id})">${c.computePerMin > 0 ? '¥' + c.computePerMin.toFixed(2) : '—'}</span>`;
 
     const priceCell = isEditing
-      ? `<input class="editable-input" type="number" id="e_price-${p.id}" value="${c.revenue}" step="0.01" min="0">`
-      : `<span class="editable" onclick="startEdit(${p.id})">${c.revenue ? fmt(c.revenue) : '—'}</span>`;
+      ? `<input class="editable-input" type="number" id="e_price-${p.id}" value="${c.perMinPrice}" step="0.01" min="0">`
+      : `<span class="editable" onclick="startEdit(${p.id})">${c.perMinPrice > 0 ? '¥' + c.perMinPrice.toFixed(2) : '—'}</span>`;
 
     const commCell = isEditing
       ? `<input class="editable-input" type="number" id="e_comm-${p.id}" value="${c.commission}" step="0.01" min="0">`
@@ -467,6 +470,7 @@ function renderTable(list) {
       <td class="amount">${computeCell}</td>
       <td class="amount">${totalCompute}</td>
       <td class="amount">${priceCell}</td>
+      <td class="amount"><strong>${c.revenue > 0 ? fmt(c.revenue) : '—'}</strong></td>
       <td class="amount">${commCell}</td>
       <td class="amount">${profitIcon} ${fmt(c.profit)}</td>
       <td class="amount">${settledCell}</td>
@@ -688,7 +692,7 @@ function loadData() {
   document.getElementById('loadingOverlay').classList.add('show');
   const failTimer = setTimeout(() => {
     document.getElementById('loadingOverlay').classList.remove('show');
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--danger)">⏱ 连接超时，<a href="javascript:loadData()" style="color:var(--accent)">点此重试</a></td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="15" style="text-align:center;padding:40px;color:var(--danger)">⏱ 连接超时，<a href="javascript:loadData()" style="color:var(--accent)">点此重试</a></td></tr>';
   }, 20000);
   api('list', { orderBy: 'created_at', orderDir: 'desc', pageSize: 200 }).then(res => {
     clearTimeout(failTimer);
@@ -710,7 +714,7 @@ function loadData() {
     applyFilters();
   }).catch(e => {
     clearTimeout(failTimer);
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--danger)">加载失败：' + e.message + '，<a href="javascript:loadData()" style="color:var(--accent)">点此重试</a></td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="15" style="text-align:center;padding:40px;color:var(--danger)">加载失败：' + e.message + '，<a href="javascript:loadData()" style="color:var(--accent)">点此重试</a></td></tr>';
   }).finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 

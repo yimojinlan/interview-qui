@@ -128,7 +128,7 @@
           <th style="width:28px"></th>
           <th>项目名称</th><th>时长</th><th>集数</th><th>周期/人数</th><th>提交时间</th>
           <th>人员成本</th><th>电脑成本</th><th>场地费</th><th>算力成本</th>
-          <th>总成本</th><th>订单单价</th><th>提成</th><th>利润</th>
+          <th>总成本</th><th>订单单价(元/分)</th><th>总收入</th><th>提成</th><th>利润</th>
           <th>已结算</th><th>未结算</th><th style="width:60px">操作</th>
         </tr>
       </thead>
@@ -206,12 +206,14 @@ function calcCosts(p) {
   const venueCost = months * VENUE_COST_PER_MONTH;
   const compute = parseComputePower(p);
   const totalCost = laborCost + pcCost + venueCost + compute.total;
-  const revenue = parseFloat(p.order_price) || 0;
+  const perMinPrice = parseFloat(p.order_price) || 0;
+  const totalDuration = parseFloat(p.total_duration) || 0;
+  const revenue = perMinPrice * totalDuration;
   const commission = parseFloat(p.commission) || 0;
   const profit = revenue - totalCost - commission;
   const settled = parseFloat(p.settled_amount) || 0;
   const unsettled = revenue - settled;
-  return { months, laborCost, pcCost, venueCost, computePerMin: compute.perMin, computeCost: compute.total, totalCost, revenue, commission, profit, settled, unsettled };
+  return { months, laborCost, pcCost, venueCost, computePerMin: compute.perMin, computeCost: compute.total, totalCost, perMinPrice, revenue, commission, profit, settled, unsettled };
 }
 
 const fmt = v => '¥' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -227,8 +229,8 @@ function renderTable(list) {
     const isEditing = editingId === p.id;
 
     const priceCell = isEditing
-      ? `<div class="edit-actions"><input class="editable-input" type="number" id="editPrice-${p.id}" value="${c.revenue}" step="0.01" min="0"></div>`
-      : `<span class="editable" onclick="startEdit(${p.id})">${c.revenue ? fmt(c.revenue) : '—'}</span>`;
+      ? `<div class="edit-actions"><input class="editable-input" type="number" id="editPrice-${p.id}" value="${c.perMinPrice}" step="0.01" min="0"></div>`
+      : `<span class="editable" onclick="startEdit(${p.id})">${c.perMinPrice > 0 ? '¥' + c.perMinPrice.toFixed(2) : '—'}</span>`;
 
     const commCell = isEditing
       ? `<input class="editable-input" type="number" id="editComm-${p.id}" value="${c.commission}" step="0.01" min="0" style="width:75px">`
@@ -259,6 +261,7 @@ function renderTable(list) {
         <td class="amount">${c.computeCost > 0 ? fmt(c.computeCost) : '—'}</td>
         <td class="amount"><strong>${fmt(c.totalCost)}</strong></td>
         <td class="amount">${priceCell}</td>
+        <td class="amount"><strong>${c.revenue > 0 ? fmt(c.revenue) : '—'}</strong></td>
         <td class="amount">${commCell}</td>
         <td class="amount ${profitClass}"><strong>${profitIcon} ${fmt(c.profit)}</strong></td>
         <td class="amount">${settledCell}</td>
@@ -279,7 +282,8 @@ function renderTable(list) {
             <div class="detail-item"><div class="d-label">每分钟算力</div><div class="d-value">${c.computePerMin > 0 ? '¥' + c.computePerMin.toFixed(2) : '无'}</div></div>
             <div class="detail-item"><div class="d-label">算力成本</div><div class="d-value">${c.computeCost > 0 ? fmt(c.computeCost) : '无'}</div></div>
             <div class="detail-item"><div class="d-label">总成本</div><div class="d-value">${fmt(c.totalCost)}</div></div>
-            <div class="detail-item"><div class="d-label">订单单价</div><div class="d-value">${c.revenue ? fmt(c.revenue) : '未填'}</div></div>
+            <div class="detail-item"><div class="d-label">订单单价(元/分)</div><div class="d-value">${c.perMinPrice > 0 ? '¥' + c.perMinPrice.toFixed(2) : '未填'}</div></div>
+            <div class="detail-item"><div class="d-label">总收入</div><div class="d-value">${c.revenue > 0 ? fmt(c.revenue) : '未填'}</div></div>
             <div class="detail-item"><div class="d-label">提成</div><div class="d-value">${c.commission ? fmt(c.commission) : '未填'}</div></div>
             <div class="detail-item"><div class="d-label">利润</div><div class="d-value" style="color:${c.profit >= 0 ? 'var(--success)' : 'var(--danger)'}">${profitIcon} ${fmt(c.profit)}</div></div>
             <div class="detail-item"><div class="d-label">已结算</div><div class="d-value">${c.settled ? fmt(c.settled) : '—'}</div></div>
