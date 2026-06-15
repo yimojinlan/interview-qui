@@ -373,7 +373,12 @@ function deleteProject(id, name) {
 
 function loadData() {
   document.getElementById('loadingOverlay').classList.add('show');
+  const failTimer = setTimeout(function() {
+    document.getElementById('loadingOverlay').classList.remove('show');
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="17" style="text-align:center;padding:40px;color:var(--danger)"><div style="font-size:16px;margin-bottom:12px">⚠️ 连接超时</div><div style="font-size:13px;margin-bottom:16px;color:var(--text-light)">可能是网络问题，请点击下方按钮重试</div><button onclick="loadData()" style="padding:10px 32px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">🔄 重新加载</button></td></tr>';
+  }, 20000);
   api('list', { orderBy: 'created_at', orderDir: 'desc', pageSize: 100 }).then(res => {
+    clearTimeout(failTimer);
       projects = (res.data || []).map(r => ({
         id: r.id, project_name: r.project_name,
         cloud_link: r.cloud_link || '',
