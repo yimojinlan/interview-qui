@@ -11,8 +11,10 @@
     --accent: #3498DB;
     --accent-light: #EBF5FB;
     --success: #27AE60;
+    --danger: #E74C3C;
     --text: #1a1a2e;
     --text-light: #7F8C8D;
+    --muted: #BDC3C7;
     --bg: #F5F6FA;
     --card: #fff;
     --radius: 12px;
@@ -25,7 +27,6 @@
     line-height: 1.6;
     min-height: 100vh;
   }
-
   .header {
     background: linear-gradient(135deg, #2C3E50, #3498DB);
     color: #fff;
@@ -33,181 +34,111 @@
   }
   .header h1 { font-size: 22px; font-weight: 700; }
   .header p { font-size: 13px; opacity: .75; margin-top: 2px; }
+  .container { max-width: 800px; margin: 0 auto; padding: 32px 24px 60px; }
 
-  .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 32px 24px 60px;
-  }
-
-  /* ===== Password gate ===== */
   .password-gate {
     background: var(--card);
     border-radius: var(--radius);
     padding: 48px 40px;
     text-align: center;
     box-shadow: 0 1px 6px rgba(0,0,0,.06);
-    max-width: 400px;
-    margin: 80px auto;
+    max-width: 400px; margin: 80px auto;
   }
   .password-gate h2 { font-size: 18px; margin-bottom: 8px; color: var(--primary); }
   .password-gate p { font-size: 13px; color: var(--text-light); margin-bottom: 20px; }
   .password-gate input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1.5px solid #E8ECF0;
-    border-radius: 8px;
-    font-size: 16px;
-    outline: none;
-    text-align: center;
-    letter-spacing: 4px;
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid #E8ECF0; border-radius: 8px;
+    font-size: 16px; outline: none; text-align: center; letter-spacing: 4px;
   }
   .password-gate input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
   .password-gate .btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    background: var(--accent);
-    color: #fff;
-    transition: filter .15s;
+    width: 100%; padding: 12px; margin-top: 12px;
+    border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+    cursor: pointer; background: var(--accent); color: #fff;
   }
   .password-gate .btn:hover { filter: brightness(1.08); }
   .password-gate .error { color: var(--danger); font-size: 13px; margin-top: 10px; display: none; }
+  .hidden { display: none !important; }
 
   .form-card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 28px 32px;
-    margin-bottom: 20px;
+    background: var(--card); border-radius: var(--radius);
+    padding: 28px 32px; margin-bottom: 20px;
     box-shadow: 0 1px 6px rgba(0,0,0,.06);
   }
-  .form-card h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--primary);
-  }
+  .form-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; color: var(--primary); }
   .form-group { margin-bottom: 18px; }
   .form-group:last-child { margin-bottom: 0; }
-  .form-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: var(--text-light);
-  }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-light); }
   .form-group label .red { color: #e74c3c; }
   .form-group input, .form-group select, .form-group textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1.5px solid #E8ECF0;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    background: #fff;
-    font-family: inherit;
-    transition: border .2s;
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid #E8ECF0; border-radius: 8px;
+    font-size: 14px; outline: none; background: #fff; font-family: inherit;
   }
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-light);
+    border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light);
   }
-  .form-group textarea { min-height: 80px; resize: vertical; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .form-hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
   .btn-submit {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    background: var(--accent);
-    color: #fff;
-    transition: all .15s;
-    margin-top: 4px;
+    width: 100%; padding: 14px; border: none; border-radius: 10px;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+    background: var(--accent); color: #fff;
   }
   .btn-submit:hover { filter: brightness(1.08); }
-  .btn-submit:active { transform: scale(.98); }
   .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
 
   .success-screen {
-    display: none;
-    text-align: center;
-    padding: 80px 20px;
+    display: none; text-align: center; padding: 60px 20px;
     animation: fadeInUp .4s ease;
   }
   .success-screen .icon {
-    width: 64px; height: 64px;
-    margin: 0 auto 16px;
+    width: 64px; height: 64px; margin: 0 auto 16px;
     background: linear-gradient(135deg, #27AE60, #1E8449);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(39,174,96,.3);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: #fff; box-shadow: 0 6px 20px rgba(39,174,96,.3);
   }
   .success-screen h2 { font-size: 22px; color: #1E8449; margin-bottom: 8px; }
   .success-screen p { font-size: 15px; color: var(--text-light); line-height: 1.6; }
   .success-screen .btn-again {
-    display: inline-block;
-    margin-top: 24px;
-    padding: 12px 40px;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    background: var(--accent);
-    color: #fff;
-    cursor: pointer;
+    display: inline-block; margin-top: 24px; padding: 12px 40px;
+    border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+    background: var(--accent); color: #fff; cursor: pointer;
   }
   .success-screen .btn-again:hover { filter: brightness(1.08); }
 
-  .footer { text-align: center; padding: 24px; font-size: 12px; color: #BDC3C7; }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
+  .history-section { margin-top: 32px; }
+  .history-section h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; color: var(--primary); }
+  .history-section h3 span { font-size: 13px; color: var(--text-light); font-weight: 400; }
+  .history-item {
+    background: var(--card); border-radius: var(--radius);
+    padding: 16px 20px; margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    display: flex; justify-content: space-between; align-items: center;
   }
+  .history-item .h-left { flex: 1; }
+  .history-item .h-name { font-weight: 600; font-size: 14px; }
+  .history-item .h-meta { font-size: 12px; color: var(--text-light); margin-top: 2px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .history-item .h-link { font-size: 12px; color: var(--muted); }
+  .history-item .h-link .locked { color: var(--text-light); font-style: italic; }
+  .history-item .h-link a { color: var(--accent); text-decoration: none; }
+  .history-empty { text-align: center; padding: 30px; color: var(--text-light); font-size: 13px; }
+
+  .footer { text-align: center; padding: 24px; font-size: 12px; color: #BDC3C7; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
   .loading-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(44,62,80,.4);
-    z-index: 999;
-    justify-content: center;
-    align-items: center;
+    display: none; position: fixed; inset: 0;
+    background: rgba(44,62,80,.4); z-index: 999;
+    justify-content: center; align-items: center;
   }
   .loading-overlay.show { display: flex; }
-  .loading-box {
-    background: #fff;
-    border-radius: 18px;
-    padding: 40px 48px;
-    text-align: center;
-    box-shadow: 0 16px 48px rgba(0,0,0,.12);
-  }
-  .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid #E8ECF0;
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-    margin: 0 auto 12px;
-  }
+  .loading-box { background: #fff; border-radius: 18px; padding: 40px 48px; text-align: center; box-shadow: 0 16px 48px rgba(0,0,0,.12); }
+  .spinner { width: 36px; height: 36px; border: 3px solid #E8ECF0; border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .hidden { display: none !important; }
 </style>
 </head>
 <body>
@@ -217,7 +148,6 @@
   <p>一抹金蓝传媒 · 制作部</p>
 </div>
 
-<!-- ===== Password Gate ===== -->
 <div class="password-gate" id="passwordGate">
   <h2>🔐 请输入密码</h2>
   <p>本系统仅供一抹金蓝内部使用</p>
@@ -226,7 +156,6 @@
   <div class="error" id="pwdError">密码错误，请重试</div>
 </div>
 
-<!-- ===== Main App ===== -->
 <div class="container hidden" id="formApp">
   <form class="form-card" id="mainForm">
     <h3>📝 项目信息</h3>
@@ -239,13 +168,14 @@
       <input type="date" id="submissionDate" required>
     </div>
     <div class="form-group">
-      <label>网盘链接</label>
-      <input type="url" id="cloudLink" placeholder="https://pan.baidu.com/..." maxlength="500">
+      <label>网盘链接 <span class="red">*</span></label>
+      <input type="url" id="cloudLink" placeholder="https://pan.baidu.com/s/..." maxlength="500" required>
+      <div class="form-hint">🔒 提交后1小时自动隐藏，仅管理员后台可查看</div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label>总时长（分钟）<span class="red">*</span></label>
-        <input type="number" id="totalDuration" placeholder="如 45" min="1" required>
+        <input type="number" id="totalDuration" placeholder="如 45" min="1" required oninput="calcTotalCompute()">
       </div>
       <div class="form-group">
         <label>总集数 <span class="red">*</span></label>
@@ -259,7 +189,7 @@
   </form>
 
   <form class="form-card" id="calcForm">
-    <h3>⚙️ 制作资源</h3>
+    <h3>⚙️ 制作成本</h3>
     <div class="form-row">
       <div class="form-group">
         <label>制作周期（天）<span class="red">*</span></label>
@@ -270,10 +200,17 @@
         <input type="number" id="teamSize" placeholder="如 5" min="1" required>
       </div>
     </div>
-    <div class="form-group">
-      <label>消耗算力</label>
-      <input type="text" id="computingPower" placeholder="如：A100 200小时" maxlength="100">
+    <div class="form-row">
+      <div class="form-group">
+        <label>每分钟算力成本（元）<span class="red">*</span></label>
+        <input type="number" id="computeCostPerMin" placeholder="如 0.5" min="0" step="0.01" required oninput="calcTotalCompute()">
+      </div>
+      <div class="form-group">
+        <label>总算力成本（元）</label>
+        <input type="text" id="totalComputeCost" readonly style="background:#f5f5f5;font-weight:600;color:var(--primary)">
+      </div>
     </div>
+    <div class="form-hint" style="margin-top:-10px">总算力成本 = 每分钟算力成本 × 总时长</div>
   </form>
 
   <button class="btn-submit" id="btnSubmit" onclick="submitForm()">✅ 提交登记</button>
@@ -283,6 +220,11 @@
     <h2>登记成功！</h2>
     <p>项目已提交至制作部管理系统。<br>后台可查看并核算成本利润。</p>
     <button class="btn-again" onclick="resetForm()">继续登记</button>
+  </div>
+
+  <div class="history-section" id="historySection">
+    <h3>📜 我的提交记录 <span id="historyCount"></span></h3>
+    <div id="historyList"></div>
   </div>
 
   <div class="footer">一抹金蓝传媒 · 制作部登记系统</div>
@@ -299,11 +241,19 @@
 <script>
 const ACCESS_PASSWORD = 'kl2026';
 
+const client = aipexbase.createClient({
+  baseUrl: 'https://baas.kuafuai.net/baas-api',
+  apiKey: 'baas_O4m66iqi'
+});
+const LINK_HIDE_HOURS = 1;
+const STORAGE_KEY = 'production_register_history';
+
 function checkPwd() {
   const input = document.getElementById('pwdInput').value.trim();
   if (input === ACCESS_PASSWORD) {
     document.getElementById('passwordGate').style.display = 'none';
     document.getElementById('formApp').classList.remove('hidden');
+    renderHistory();
   } else {
     document.getElementById('pwdError').style.display = 'block';
     document.getElementById('pwdInput').value = '';
@@ -311,40 +261,103 @@ function checkPwd() {
   }
 }
 
-const client = aipexbase.createClient({
-  baseUrl: 'https://baas.kuafuai.net/baas-api',
-  apiKey: 'baas_O4m66iqi'
-});
+function calcTotalCompute() {
+  const perMin = parseFloat(document.getElementById('computeCostPerMin').value) || 0;
+  const duration = parseFloat(document.getElementById('totalDuration').value) || 0;
+  const total = perMin * duration;
+  document.getElementById('totalComputeCost').value = total > 0 ? '¥' + total.toLocaleString('zh-CN', {minimumFractionDigits:2, maximumFractionDigits:2}) : '';
+  return total;
+}
+
+function isLinkExpired(createdAt) {
+  if (!createdAt) return false;
+  const created = new Date(createdAt.replace(' ', 'T'));
+  const now = new Date();
+  return (now - created) / (1000 * 60 * 60) >= LINK_HIDE_HOURS;
+}
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+}
+
+function addHistory(item) {
+  const history = getHistory();
+  history.unshift(item);
+  if (history.length > 100) history.length = 100;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const count = document.getElementById('historyCount');
+  const history = getHistory();
+  count.textContent = `(${history.length}条)`;
+  if (history.length === 0) {
+    list.innerHTML = '<div class="history-empty">暂无提交记录</div>';
+    return;
+  }
+  list.innerHTML = history.map(item => {
+    const expired = isLinkExpired(item.createdAt);
+    return `<div class="history-item">
+      <div class="h-left">
+        <div class="h-name">${item.name}</div>
+        <div class="h-meta">
+          <span>时长 ${item.duration}min</span>
+          <span>${item.episodes}集</span>
+          <span>${item.days}天/${item.team}人</span>
+          <span>提交：${item.subDate || '—'}</span>
+        </div>
+        <div class="h-link">网盘链接：${expired ? '<span class="locked">🔒 已提交（链接已自动隐藏）</span>' : `<a href="${item.link}" target="_blank">${item.link}</a>`}</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);white-space:nowrap">
+        ${new Date(item.createdAt).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
+      </div>
+    </div>`;
+  }).join('');
+  setTimeout(renderHistory, 60000);
+}
 
 function submitForm() {
   const name = document.getElementById('projectName').value.trim();
   const subDate = document.getElementById('submissionDate').value.trim();
+  const link = document.getElementById('cloudLink').value.trim();
   const duration = document.getElementById('totalDuration').value.trim();
   const episodes = document.getElementById('totalEpisodes').value.trim();
   const days = document.getElementById('productionDays').value.trim();
   const team = document.getElementById('teamSize').value.trim();
+  const software = document.getElementById('software').value.trim();
+  const computePerMin = parseFloat(document.getElementById('computeCostPerMin').value) || 0;
+  const totalCompute = calcTotalCompute();
 
   if (!name) { alert('请输入项目名称'); return; }
   if (!subDate) { alert('请选择提交时间'); return; }
+  if (!link) { alert('请输入网盘链接'); return; }
   if (!duration || parseInt(duration) < 1) { alert('请输入有效的总时长'); return; }
   if (!episodes || parseInt(episodes) < 1) { alert('请输入有效的总集数'); return; }
   if (!days || parseInt(days) < 1) { alert('请输入有效的制作周期'); return; }
   if (!team || parseInt(team) < 1) { alert('请输入有效的制作人数'); return; }
+  if (computePerMin < 0) { alert('请输入有效的每分钟算力成本'); return; }
+
+  const now = new Date();
+  const createdAt = now.toISOString().replace('T', ' ').slice(0, 19);
+
+  // 把算力成本数据序列化存入 computing_power 字段
+  const compPower = JSON.stringify({ perMin: computePerMin, total: totalCompute });
 
   const data = {
     project_name: name,
     submission_date: subDate,
-    cloud_link: document.getElementById('cloudLink').value.trim() || '',
+    cloud_link: link,
     total_duration: duration,
     total_episodes: parseInt(episodes),
-    software: document.getElementById('software').value.trim() || '',
+    software: software || '',
     production_days: parseInt(days),
     team_size: parseInt(team),
-    computing_power: document.getElementById('computingPower').value.trim() || '',
+    computing_power: compPower,
     order_price: 0,
     commission: 0,
     settled_amount: 0,
-    created_at: new Date().toISOString().replace('T', ' ').slice(0, 19)
+    created_at: createdAt
   };
 
   const btn = document.getElementById('btnSubmit');
@@ -355,6 +368,8 @@ function submitForm() {
   client.db.from('projects').insert().values(data)
     .then(res => {
       if (res.success) {
+        addHistory({ name, link, duration, episodes: parseInt(episodes), days, team, subDate, createdAt });
+        renderHistory();
         document.getElementById('mainForm').style.display = 'none';
         document.getElementById('calcForm').style.display = 'none';
         btn.style.display = 'none';
@@ -372,9 +387,10 @@ function submitForm() {
 }
 
 function resetForm() {
-  ['projectName','submissionDate','cloudLink','totalDuration','totalEpisodes','software','productionDays','teamSize','computingPower'].forEach(id => {
+  ['projectName','submissionDate','cloudLink','totalDuration','totalEpisodes','software','productionDays','teamSize','computeCostPerMin'].forEach(id => {
     document.getElementById(id).value = '';
   });
+  document.getElementById('totalComputeCost').value = '';
   document.getElementById('mainForm').style.display = 'block';
   document.getElementById('calcForm').style.display = 'block';
   document.getElementById('btnSubmit').style.display = 'block';

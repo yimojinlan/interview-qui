@@ -6,329 +6,92 @@
 <meta name="theme-color" content="#1a1a2e">
 <title>制作管理后台 - 一抹金蓝</title>
 <style>
-  :root {
-    --primary: #2C3E50;
-    --accent: #3498DB;
-    --accent-light: #EBF5FB;
-    --success: #27AE60;
-    --danger: #E74C3C;
-    --warning: #F39C12;
-    --text: #2C3E50;
-    --text-light: #7F8C8D;
-    --muted: #BDC3C7;
-    --bg: #F5F6FA;
-    --card: #fff;
-    --border: #E8ECF0;
-    --radius: 10px;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-    min-height: 100vh;
-  }
+  :root { --primary:#2C3E50; --accent:#3498DB; --accent-light:#EBF5FB; --success:#27AE60; --danger:#E74C3C; --warning:#F39C12; --text:#2C3E50; --text-light:#7F8C8D; --muted:#BDC3C7; --bg:#F5F6FA; --card:#fff; --border:#E8ECF0; --radius:10px; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Noto Sans SC',sans-serif; background:var(--bg); color:var(--text); line-height:1.5; min-height:100vh; }
 
-  /* ===== Password gate ===== */
-  .password-gate {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 48px 40px;
-    text-align: center;
-    box-shadow: 0 1px 6px rgba(0,0,0,.06);
-    max-width: 400px;
-    margin: 120px auto;
-  }
-  .password-gate h2 { font-size: 20px; margin-bottom: 8px; color: var(--primary); }
-  .password-gate p { font-size: 13px; color: var(--text-light); margin-bottom: 20px; }
-  .password-gate input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-size: 16px;
-    outline: none;
-    text-align: center;
-    letter-spacing: 4px;
-  }
-  .password-gate input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
-  .password-gate .btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    background: var(--primary);
-    color: #fff;
-    transition: filter .15s;
-  }
-  .password-gate .btn:hover { filter: brightness(1.2); }
-  .password-gate .error { color: var(--danger); font-size: 13px; margin-top: 10px; display: none; }
+  .password-gate { background:var(--card); border-radius:var(--radius); padding:48px 40px; text-align:center; box-shadow:0 1px 6px rgba(0,0,0,.06); max-width:400px; margin:120px auto; }
+  .password-gate h2 { font-size:20px; margin-bottom:8px; color:var(--primary); }
+  .password-gate p { font-size:13px; color:var(--text-light); margin-bottom:20px; }
+  .password-gate input { width:100%; padding:12px 16px; border:1.5px solid var(--border); border-radius:8px; font-size:16px; outline:none; text-align:center; letter-spacing:4px; }
+  .password-gate input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-light); }
+  .password-gate .btn { width:100%; padding:12px; margin-top:12px; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; background:var(--primary); color:#fff; }
+  .password-gate .btn:hover { filter:brightness(1.2); }
+  .password-gate .error { color:var(--danger); font-size:13px; margin-top:10px; display:none; }
+  .hidden { display:none!important; }
 
-  .hidden { display: none !important; }
+  .header { background:linear-gradient(135deg,#1a1a2e,#16213e); color:#fff; padding:20px 40px; display:flex; justify-content:space-between; align-items:center; }
+  .header-left h1 { font-size:20px; font-weight:700; }
+  .header-left p { font-size:12px; opacity:.6; margin-top:2px; }
+  .header-right { display:flex; align-items:center; gap:16px; font-size:13px; color:rgba(255,255,255,.5); }
+  .header-right .refresh-btn { background:rgba(255,255,255,.12); border:none; color:#fff; padding:6px 16px; border-radius:6px; font-size:12px; cursor:pointer; }
+  .header-right .refresh-btn:hover { background:rgba(255,255,255,.2); }
 
-  .header {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    color: #fff;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .header-left h1 { font-size: 20px; font-weight: 700; }
-  .header-left p { font-size: 12px; opacity: .6; margin-top: 2px; }
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    font-size: 13px;
-    color: rgba(255,255,255,.5);
-  }
-  .header-right .refresh-btn {
-    background: rgba(255,255,255,.12);
-    border: none;
-    color: #fff;
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: background .15s;
-  }
-  .header-right .refresh-btn:hover { background: rgba(255,255,255,.2); }
+  .container { max-width:1400px; margin:0 auto; padding:24px 32px 40px; }
 
-  .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 24px 32px 40px;
-  }
+  .stats-bar { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+  .stat-card { background:var(--card); border-radius:var(--radius); padding:18px 24px; box-shadow:0 1px 4px rgba(0,0,0,.05); text-align:center; flex:1; min-width:120px; }
+  .stat-card .num { font-size:24px; font-weight:700; margin-bottom:2px; }
+  .stat-card .label { font-size:12px; color:var(--text-light); }
+  .stat-card.profit .num { color:var(--success); }
+  .stat-card.warning .num { color:var(--warning); }
 
-  .stats-bar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-  .stat-card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 18px 24px;
-    box-shadow: 0 1px 4px rgba(0,0,0,.05);
-    text-align: center;
-    flex: 1;
-    min-width: 120px;
-  }
-  .stat-card .num { font-size: 24px; font-weight: 700; margin-bottom: 2px; }
-  .stat-card .label { font-size: 12px; color: var(--text-light); }
-  .stat-card.profit .num { color: var(--success); }
-  .stat-card.warning .num { color: var(--warning); }
+  .filter-bar { display:flex; gap:10px; margin-bottom:16px; align-items:center; }
+  .filter-bar input, .filter-bar select { padding:9px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:14px; outline:none; background:#fff; }
+  .filter-bar input { flex:1; max-width:320px; }
+  .filter-bar input:focus, .filter-bar select:focus { border-color:var(--accent); }
 
-  .filter-bar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
-    align-items: center;
-  }
-  .filter-bar input, .filter-bar select {
-    padding: 9px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    background: #fff;
-  }
-  .filter-bar input { flex: 1; max-width: 320px; }
-  .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); }
+  .table-wrap { background:var(--card); border-radius:var(--radius); box-shadow:0 1px 4px rgba(0,0,0,.05); overflow:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { background:#f8f9fb; padding:12px 10px; text-align:left; font-weight:600; font-size:12px; color:var(--text-light); white-space:nowrap; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:1; }
+  td { padding:11px 10px; border-bottom:1px solid #f0f1f3; vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#f8f9fc; }
+  .amount { text-align:right; font-family:'SF Mono','Menlo','Consolas',monospace; font-size:13px; }
+  .amount.positive { color:var(--success); }
+  .amount.negative { color:var(--danger); }
+  .amount.warning { color:var(--warning); }
 
-  .table-wrap {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: 0 1px 4px rgba(0,0,0,.05);
-    overflow: auto;
-  }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th {
-    background: #f8f9fb;
-    padding: 12px 10px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 12px;
-    color: var(--text-light);
-    white-space: nowrap;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-  td {
-    padding: 11px 10px;
-    border-bottom: 1px solid #f0f1f3;
-    vertical-align: middle;
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #f8f9fc; }
-  .amount {
-    text-align: right;
-    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-    font-size: 13px;
-  }
-  .amount.positive { color: var(--success); }
-  .amount.negative { color: var(--danger); }
-  .amount.warning { color: var(--warning); }
+  .editable { cursor:pointer; border-bottom:1px dashed var(--accent); padding:2px 0; }
+  .editable:hover { background:var(--accent-light); }
+  .editable-input { width:90px; padding:5px 8px; border:1.5px solid var(--accent); border-radius:4px; font-size:13px; outline:none; background:#fff; font-family:'SF Mono','Menlo','Consolas',monospace; }
+  .edit-actions { display:inline-flex; gap:4px; align-items:center; }
+  .btn-save { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border:none; border-radius:4px; font-size:14px; cursor:pointer; background:var(--success); color:#fff; }
+  .btn-save:hover { filter:brightness(1.1); }
+  .btn-cancel { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border:none; border-radius:4px; font-size:14px; cursor:pointer; background:var(--border); color:var(--text-light); }
+  .btn-cancel:hover { filter:brightness(.92); }
+  .btn-delete { display:inline-block; padding:4px 12px; border:none; border-radius:4px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--danger); border:1px solid rgba(231,76,60,.25); }
+  .btn-delete:hover { background:var(--danger); color:#fff; }
+  .editing-row td { background:#f0f7ff!important; }
 
-  .editable {
-    cursor: pointer;
-    border-bottom: 1px dashed var(--accent);
-    transition: background .15s;
-    padding: 2px 0;
-  }
-  .editable:hover { background: var(--accent-light); }
+  .detail-row { display:none; }
+  .detail-row.show { display:table-row; }
+  .detail-row td { background:#fafbfc; padding:18px 20px; }
+  .detail-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .detail-item .d-label { font-size:11px; color:var(--text-light); margin-bottom:2px; }
+  .detail-item .d-value { font-size:14px; font-weight:600; margin-top:1px; word-break:break-all; }
+  .detail-meta { margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; gap:24px; flex-wrap:wrap; font-size:12px; color:var(--text-light); }
+  .detail-meta a { color:var(--accent); text-decoration:none; }
 
-  .editable-input {
-    width: 90px;
-    padding: 5px 8px;
-    border: 1.5px solid var(--accent);
-    border-radius: 4px;
-    font-size: 13px;
-    outline: none;
-    background: #fff;
-    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-  }
+  .expand-btn { background:none; border:none; font-size:12px; cursor:pointer; color:var(--text-light); padding:2px 6px; border-radius:4px; }
+  .expand-btn:hover { background:#e8ecf0; }
 
-  .edit-actions {
-    display: inline-flex;
-    gap: 4px;
-    align-items: center;
-  }
-  .btn-save {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px; height: 28px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    background: var(--success);
-    color: #fff;
-    transition: filter .15s;
-  }
-  .btn-save:hover { filter: brightness(1.1); }
-  .btn-cancel {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px; height: 28px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    background: var(--border);
-    color: var(--text-light);
-    transition: filter .15s;
-  }
-  .btn-cancel:hover { filter: brightness(.92); }
+  .loading-overlay { display:none; position:fixed; inset:0; background:rgba(44,62,80,.4); z-index:999; justify-content:center; align-items:center; }
+  .loading-overlay.show { display:flex; }
+  .loading-box { background:#fff; border-radius:18px; padding:40px 48px; text-align:center; box-shadow:0 16px 48px rgba(0,0,0,.12); }
+  .spinner { width:36px; height:36px; border:3px solid #E8ECF0; border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 12px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
 
-  .btn-delete {
-    display: inline-block;
-    padding: 4px 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    background: transparent;
-    color: var(--danger);
-    border: 1px solid rgba(231,76,60,.25);
-    transition: all .15s;
-  }
-  .btn-delete:hover { background: var(--danger); color: #fff; }
-  .editing-row td { background: #f0f7ff !important; }
-
-  .detail-row { display: none; }
-  .detail-row.show { display: table-row; }
-  .detail-row td {
-    background: #fafbfc;
-    padding: 18px 20px;
-  }
-  .detail-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 16px;
-  }
-  .detail-item .d-label { font-size: 11px; color: var(--text-light); margin-bottom: 2px; }
-  .detail-item .d-value { font-size: 14px; font-weight: 600; margin-top: 1px; }
-  .detail-meta {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-    font-size: 12px;
-    color: var(--text-light);
-  }
-  .detail-meta a { color: var(--accent); text-decoration: none; }
-  .detail-meta a:hover { text-decoration: underline; }
-
-  .expand-btn {
-    background: none;
-    border: none;
-    font-size: 12px;
-    cursor: pointer;
-    color: var(--text-light);
-    padding: 2px 6px;
-    border-radius: 4px;
-    transition: background .15s;
-  }
-  .expand-btn:hover { background: #e8ecf0; }
-
-  .loading-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(44,62,80,.4);
-    z-index: 999;
-    justify-content: center;
-    align-items: center;
-  }
-  .loading-overlay.show { display: flex; }
-  .loading-box {
-    background: #fff;
-    border-radius: 18px;
-    padding: 40px 48px;
-    text-align: center;
-    box-shadow: 0 16px 48px rgba(0,0,0,.12);
-  }
-  .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid #E8ECF0;
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-    margin: 0 auto 12px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .footer { text-align: center; padding: 24px; font-size: 12px; color: var(--muted); }
+  .footer { text-align:center; padding:24px; font-size:12px; color:var(--muted); }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-left">
-    <h1>📊 制作管理后台</h1>
-    <p>一抹金蓝传媒 · 项目成本利润核算</p>
-  </div>
-  <div class="header-right">
-    <span id="lastRefresh">—</span>
-    <button class="refresh-btn" onclick="loadData()">🔄 刷新</button>
-  </div>
+  <div class="header-left"><h1>📊 制作管理后台</h1><p>一抹金蓝传媒 · 项目成本利润核算</p></div>
+  <div class="header-right"><span id="lastRefresh">—</span><button class="refresh-btn" onclick="loadData()">🔄 刷新</button></div>
 </div>
 
-<!-- ===== Password Gate ===== -->
 <div class="password-gate" id="passwordGate">
   <h2>🔐 管理员验证</h2>
   <p>请输入后台管理密码</p>
@@ -337,13 +100,12 @@
   <div class="error" id="pwdError">密码错误，请重试</div>
 </div>
 
-<!-- ===== Main App ===== -->
 <div class="container hidden" id="mainApp">
-  <div class="stats-bar" id="statsBar">
+  <div class="stats-bar">
     <div class="stat-card"><div class="num" id="statProjects">-</div><div class="label">项目总数</div></div>
-    <div class="stat-card profit"><div class="num" id="statTotalRevenue">-</div><div class="label">总收入</div></div>
     <div class="stat-card"><div class="num" id="statTotalCost">-</div><div class="label">总成本</div></div>
-    <div class="stat-card profit"><div class="num" id="statTotalProfit">-</div><div class="label">总利润</div></div>
+    <div class="stat-card profit"><div class="num" id="statTotalRevenue">-</div><div class="label">总收入</div></div>
+    <div class="stat-card" id="statProfitCard"><div class="num" id="statTotalProfit">-</div><div class="label">总利润</div></div>
     <div class="stat-card profit"><div class="num" id="statReceivable">-</div><div class="label">应收账款</div></div>
     <div class="stat-card profit"><div class="num" id="statSettled">-</div><div class="label">已入账</div></div>
     <div class="stat-card warning"><div class="num" id="statUnsettled">-</div><div class="label">未入账</div></div>
@@ -364,40 +126,29 @@
       <thead>
         <tr>
           <th style="width:28px"></th>
-          <th>项目名称</th>
-          <th>时长</th>
-          <th>集数</th>
-          <th>周期/人数</th>
-          <th>提交时间</th>
-          <th>人员成本</th>
-          <th>电脑成本</th>
-          <th>场地费</th>
-          <th>总成本</th>
-          <th>订单单价</th>
-          <th>提成</th>
-          <th>利润</th>
-          <th>已结算</th>
-          <th>未结算</th>
-          <th style="width:60px">操作</th>
+          <th>项目名称</th><th>时长</th><th>集数</th><th>周期/人数</th><th>提交时间</th>
+          <th>人员成本</th><th>电脑成本</th><th>场地费</th><th>算力成本</th>
+          <th>总成本</th><th>订单单价</th><th>提成</th><th>利润</th>
+          <th>已结算</th><th>未结算</th><th style="width:60px">操作</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
   </div>
-
   <div class="footer">一抹金蓝传媒 · 制作部管理系统</div>
 </div>
 
 <div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-box">
-    <div class="spinner"></div>
-    <p>请稍候...</p>
-  </div>
+  <div class="loading-box"><div class="spinner"></div><p>请稍候...</p></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
 <script>
 const ACCESS_PASSWORD = 'ymjl2026088';
+const client = aipexbase.createClient({
+  baseUrl: 'https://baas.kuafuai.net/baas-api',
+  apiKey: 'baas_O4m66iqi'
+});
 
 function checkPwd() {
   const input = document.getElementById('pwdInput').value.trim();
@@ -412,39 +163,43 @@ function checkPwd() {
   }
 }
 
-// ========== 常量 ==========
 const AVG_SALARY_PER_MONTH = 3500;
 const WORK_DAYS_PER_MONTH = 26;
 const PC_COST_PER_MONTH = 193;
 const VENUE_COST_PER_MONTH = 8000;
 
-const client = aipexbase.createClient({
-  baseUrl: 'https://baas.kuafuai.net/baas-api',
-  apiKey: 'baas_O4m66iqi'
-});
-
 let projects = [];
 let editingId = null;
 
-// ========== 核算 ==========
+function parseComputePower(p) {
+  let perMin = 0, total = 0;
+  if (p.computing_power && p.computing_power.startsWith('{')) {
+    try {
+      const j = JSON.parse(p.computing_power);
+      perMin = parseFloat(j.perMin) || 0;
+      total = parseFloat(j.total) || 0;
+    } catch(e) {}
+  }
+  return { perMin, total };
+}
+
 function calcCosts(p) {
   const months = p.production_days / WORK_DAYS_PER_MONTH;
   const laborCost = months * p.team_size * AVG_SALARY_PER_MONTH;
   const pcCost = months * p.team_size * PC_COST_PER_MONTH;
   const venueCost = months * VENUE_COST_PER_MONTH;
-  const totalCost = laborCost + pcCost + venueCost;
+  const compute = parseComputePower(p);
+  const totalCost = laborCost + pcCost + venueCost + compute.total;
   const revenue = parseFloat(p.order_price) || 0;
   const commission = parseFloat(p.commission) || 0;
   const profit = revenue - totalCost - commission;
   const settled = parseFloat(p.settled_amount) || 0;
   const unsettled = revenue - settled;
-  return { months, laborCost, pcCost, venueCost, totalCost, revenue, commission, profit, settled, unsettled };
+  return { months, laborCost, pcCost, venueCost, computePerMin: compute.perMin, computeCost: compute.total, totalCost, revenue, commission, profit, settled, unsettled };
 }
 
 const fmt = v => '¥' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-const fmt2 = v => Number(v).toFixed(2);
 
-// ========== 渲染表格 ==========
 function renderTable(list) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
@@ -456,9 +211,7 @@ function renderTable(list) {
     const isEditing = editingId === p.id;
 
     const priceCell = isEditing
-      ? `<div class="edit-actions">
-           <input class="editable-input" type="number" id="editPrice-${p.id}" value="${c.revenue}" step="0.01" min="0">
-         </div>`
+      ? `<div class="edit-actions"><input class="editable-input" type="number" id="editPrice-${p.id}" value="${c.revenue}" step="0.01" min="0"></div>`
       : `<span class="editable" onclick="startEdit(${p.id})">${c.revenue ? fmt(c.revenue) : '—'}</span>`;
 
     const commCell = isEditing
@@ -470,11 +223,11 @@ function renderTable(list) {
       : `<span class="editable" onclick="startEdit(${p.id})">${c.settled ? fmt(c.settled) : '—'}</span>`;
 
     const actions = isEditing
-      ? `<div class="edit-actions">
-           <button class="btn-save" onclick="saveEdit(${p.id})" title="保存">✓</button>
-           <button class="btn-cancel" onclick="cancelEdit()" title="取消">✕</button>
-         </div>`
-      : `<button class="btn-delete" onclick="deleteProject(${p.id}, '${p.project_name.replace(/'/g, "\\'")}')">删除</button>`;
+      ? `<div class="edit-actions"><button class="btn-save" onclick="saveEdit(${p.id})" title="保存">✓</button><button class="btn-cancel" onclick="cancelEdit()" title="取消">✕</button></div>`
+      : `<button class="btn-delete" onclick="deleteProject(${p.id},'${p.project_name.replace(/'/g,"\\'")}')">删除</button>`;
+
+    // 网盘链接：后台始终显示
+    const linkDisplay = p.cloud_link ? `<a href="${p.cloud_link}" target="_blank">${p.cloud_link}</a>` : '未填写';
 
     tbody.innerHTML += `
       <tr id="row-${p.id}" class="${isEditing ? 'editing-row' : ''}">
@@ -487,6 +240,7 @@ function renderTable(list) {
         <td class="amount">${fmt(c.laborCost)}</td>
         <td class="amount">${fmt(c.pcCost)}</td>
         <td class="amount">${fmt(c.venueCost)}</td>
+        <td class="amount">${c.computeCost > 0 ? fmt(c.computeCost) : '—'}</td>
         <td class="amount"><strong>${fmt(c.totalCost)}</strong></td>
         <td class="amount">${priceCell}</td>
         <td class="amount">${commCell}</td>
@@ -496,9 +250,9 @@ function renderTable(list) {
         <td>${actions}</td>
       </tr>
       <tr class="detail-row" id="detail-${p.id}">
-        <td colspan="16">
+        <td colspan="17">
           <div class="detail-grid">
-            <div class="detail-item"><div class="d-label">制作周期</div><div class="d-value">${p.production_days}天 (${fmt2(c.months)}月)</div></div>
+            <div class="detail-item"><div class="d-label">制作周期</div><div class="d-value">${p.production_days}天 (${(c.months).toFixed(2)}月)</div></div>
             <div class="detail-item"><div class="d-label">制作人数</div><div class="d-value">${p.team_size}人</div></div>
             <div class="detail-item"><div class="d-label">人均月薪</div><div class="d-value">${fmt(AVG_SALARY_PER_MONTH)}</div></div>
             <div class="detail-item"><div class="d-label">人员成本</div><div class="d-value">${fmt(c.laborCost)}</div></div>
@@ -506,6 +260,8 @@ function renderTable(list) {
             <div class="detail-item"><div class="d-label">电脑成本</div><div class="d-value">${fmt(c.pcCost)}</div></div>
             <div class="detail-item"><div class="d-label">场地费</div><div class="d-value">${fmt(VENUE_COST_PER_MONTH)}/月</div></div>
             <div class="detail-item"><div class="d-label">场地成本</div><div class="d-value">${fmt(c.venueCost)}</div></div>
+            <div class="detail-item"><div class="d-label">每分钟算力</div><div class="d-value">${c.computePerMin > 0 ? '¥' + c.computePerMin.toFixed(2) : '无'}</div></div>
+            <div class="detail-item"><div class="d-label">算力成本</div><div class="d-value">${c.computeCost > 0 ? fmt(c.computeCost) : '无'}</div></div>
             <div class="detail-item"><div class="d-label">总成本</div><div class="d-value">${fmt(c.totalCost)}</div></div>
             <div class="detail-item"><div class="d-label">订单单价</div><div class="d-value">${c.revenue ? fmt(c.revenue) : '未填'}</div></div>
             <div class="detail-item"><div class="d-label">提成</div><div class="d-value">${c.commission ? fmt(c.commission) : '未填'}</div></div>
@@ -514,18 +270,16 @@ function renderTable(list) {
             <div class="detail-item"><div class="d-label">未结算</div><div class="d-value" style="color:${c.unsettled > 0 ? 'var(--warning)' : 'var(--success)'}">${c.unsettled > 0 ? fmt(c.unsettled) : '—'}</div></div>
           </div>
           <div class="detail-meta">
-            ${p.submission_date ? `<span>📅 提交时间：${p.submission_date}</span>` : ''}
+            ${p.submission_date ? '<span>📅 提交时间：'+p.submission_date+'</span>' : ''}
             <span>🕐 登记时间：${p.created_at}</span>
-            ${p.cloud_link ? `<span>🔗 网盘：<a href="${p.cloud_link}" target="_blank">${p.cloud_link}</a></span>` : ''}
-            ${p.software ? `<span>🛠 软件：${p.software}</span>` : ''}
-            ${p.computing_power ? `<span>⚡ 算力：${p.computing_power}</span>` : ''}
+            <span>🔗 网盘：${linkDisplay}</span>
+            ${p.software ? '<span>🛠 软件：'+p.software+'</span>' : ''}
           </div>
         </td>
       </tr>`;
   });
 }
 
-// ========== 统计 ==========
 function updateStats(list) {
   document.getElementById('statProjects').textContent = list.length;
   let totalCost = 0, totalRevenue = 0, totalProfit = 0;
@@ -547,14 +301,11 @@ function updateStats(list) {
   document.getElementById('statUnsettled').textContent = fmt(totalUnsettled);
 }
 
-// ========== 过滤排序 ==========
 function applyFilters() {
   const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
   const sort = document.getElementById('sortSelect').value;
   let list = [...projects];
-  if (keyword) {
-    list = list.filter(p => p.project_name.toLowerCase().includes(keyword));
-  }
+  if (keyword) list = list.filter(p => p.project_name.toLowerCase().includes(keyword));
   list.sort((a, b) => {
     const ca = calcCosts(a), cb = calcCosts(b);
     switch (sort) {
@@ -568,7 +319,6 @@ function applyFilters() {
   updateStats(list);
 }
 
-// ========== 展开详情 ==========
 function toggleDetail(id) {
   const row = document.getElementById(`detail-${id}`);
   const btn = document.querySelector(`#row-${id} .expand-btn`);
@@ -577,15 +327,8 @@ function toggleDetail(id) {
   btn.textContent = row.classList.contains('show') ? '▼' : '▶';
 }
 
-// ========== 编辑 ==========
-function startEdit(id) {
-  editingId = id;
-  applyFilters();
-}
-function cancelEdit() {
-  editingId = null;
-  applyFilters();
-}
+function startEdit(id) { editingId = id; applyFilters(); }
+function cancelEdit() { editingId = null; applyFilters(); }
 function saveEdit(id) {
   const price = parseFloat(document.getElementById(`editPrice-${id}`).value) || 0;
   const comm = parseFloat(document.getElementById(`editComm-${id}`).value) || 0;
@@ -600,48 +343,34 @@ function saveEdit(id) {
         if (p) { p.order_price = price; p.commission = comm; p.settled_amount = settled; }
         editingId = null;
         applyFilters();
-      } else {
-        alert('保存失败：' + (res.message || '未知错误'));
-      }
+      } else { alert('保存失败：' + (res.message || '未知错误')); }
     })
     .catch(e => alert('保存失败：' + e.message))
     .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 
-// ========== 删除 ==========
 function deleteProject(id, name) {
   if (!confirm(`确认删除「${name}」？此操作不可恢复。`)) return;
   document.getElementById('loadingOverlay').classList.add('show');
-  client.db.from('projects').delete()
-    .where({ id: id })
+  client.db.from('projects').delete().where({ id: id })
     .then(res => {
-      if (res.success) {
-        projects = projects.filter(p => p.id !== id);
-        applyFilters();
-      } else {
-        alert('删除失败：' + (res.message || '未知错误'));
-      }
+      if (res.success) { projects = projects.filter(p => p.id !== id); applyFilters(); }
+      else { alert('删除失败：' + (res.message || '未知错误')); }
     })
     .catch(e => alert('删除失败：' + e.message))
     .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 
-// ========== 加载 ==========
 function loadData() {
   document.getElementById('loadingOverlay').classList.add('show');
-  client.db.from('projects')
-    .select()
-    .order('created_at', 'desc')
+  client.db.from('projects').select().order('created_at', 'desc')
     .then(res => {
       projects = (res.data || []).map(r => ({
-        id: r.id,
-        project_name: r.project_name,
+        id: r.id, project_name: r.project_name,
         cloud_link: r.cloud_link || '',
-        total_duration: r.total_duration,
-        total_episodes: r.total_episodes,
+        total_duration: r.total_duration, total_episodes: r.total_episodes,
         software: r.software || '',
-        production_days: r.production_days,
-        team_size: r.team_size,
+        production_days: r.production_days, team_size: r.team_size,
         computing_power: r.computing_power || '',
         order_price: parseFloat(r.order_price) || 0,
         commission: parseFloat(r.commission) || 0,
@@ -653,13 +382,12 @@ function loadData() {
       document.getElementById('lastRefresh').textContent = '最后更新：' + new Date().toLocaleString('zh-CN');
     })
     .catch(e => {
-      document.getElementById('tableBody').innerHTML = `<tr><td colspan="16" style="text-align:center;padding:40px;color:var(--danger)">加载失败：${e.message}</td></tr>`;
+      document.getElementById('tableBody').innerHTML = '<tr><td colspan="17" style="text-align:center;padding:40px;color:var(--danger)">加载失败：'+e.message+'</td></tr>';
     })
     .finally(() => document.getElementById('loadingOverlay').classList.remove('show'));
 }
 
-// 由密码验证成功后调用 loadData，不再自动调用
-setInterval(() => { if (projects.length > 0) loadData(); }, 60000);
+setInterval(() => { if (projects.length > 0 && !document.getElementById('mainApp').classList.contains('hidden')) loadData(); }, 60000);
 </script>
 </body>
 </html>
