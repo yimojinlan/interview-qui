@@ -149,12 +149,21 @@ const API_KEY = 'baas_O4m66iqi';
 
 async function api(method, data) {
   const url = API_BASE + '/api/data/invoke?table=projects&method=' + method;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'CODE_FLYING': API_KEY },
-    body: JSON.stringify(data || {})
-  });
-  return await res.json();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'CODE_FLYING': API_KEY },
+      body: JSON.stringify(data || {}),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+    return await res.json();
+  } catch(e) {
+    clearTimeout(timer);
+    throw new Error('网络请求失败，请检查网络后刷新重试：' + e.message);
+  }
 }
 
 function checkPwd() {
