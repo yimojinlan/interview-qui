@@ -71,17 +71,9 @@
           "isShow": true
         },
         {
-          "columnName": "compute_cost_per_min",
-          "columnType": "DECIMAL(10,2)",
-          "columnComment": "每分钟算力成本（元）",
-          "isRequired": false,
-          "isPrimary": false,
-          "isShow": true
-        },
-        {
-          "columnName": "total_compute_cost",
-          "columnType": "DECIMAL(12,2)",
-          "columnComment": "总算力成本（元）",
+          "columnName": "computing_power",
+          "columnType": "VARCHAR(100)",
+          "columnComment": "消耗算力",
           "isRequired": false,
           "isPrimary": false,
           "isShow": true
@@ -98,6 +90,22 @@
           "columnName": "commission",
           "columnType": "DECIMAL(12,2)",
           "columnComment": "提成（手填）",
+          "isRequired": false,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "submission_date",
+          "columnType": "DATE",
+          "columnComment": "提交时间",
+          "isRequired": false,
+          "isPrimary": false,
+          "isShow": true
+        },
+        {
+          "columnName": "settled_amount",
+          "columnType": "DECIMAL(12,2)",
+          "columnComment": "已结算金额",
           "isRequired": false,
           "isPrimary": false,
           "isShow": true
