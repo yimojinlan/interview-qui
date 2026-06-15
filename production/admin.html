@@ -127,7 +127,7 @@
         <tr>
           <th style="width:28px"></th>
           <th>项目名称</th><th>时长</th><th>集数</th><th>周期/人数</th><th>提交时间</th>
-          <th>人员成本</th><th>电脑成本</th><th>场地费</th><th>算力成本</th>
+          <th>人员成本</th><th>电脑成本</th><th>算力成本</th>
           <th>总成本</th><th>订单单价(元/分)</th><th>总收入</th><th>提成</th><th>利润</th>
           <th>已结算</th><th>未结算</th><th style="width:60px">操作</th>
         </tr>
@@ -182,7 +182,6 @@ function checkPwd() {
 const AVG_SALARY_PER_MONTH = 3500;
 const WORK_DAYS_PER_MONTH = 26;
 const PC_COST_PER_MONTH = 193;
-const VENUE_COST_PER_MONTH = 8000;
 
 let projects = [];
 let editingId = null;
@@ -203,9 +202,9 @@ function calcCosts(p) {
   const months = p.production_days / WORK_DAYS_PER_MONTH;
   const laborCost = months * p.team_size * AVG_SALARY_PER_MONTH;
   const pcCost = months * p.team_size * PC_COST_PER_MONTH;
-  const venueCost = months * VENUE_COST_PER_MONTH;
+  
   const compute = parseComputePower(p);
-  const totalCost = laborCost + pcCost + venueCost + compute.total;
+  const totalCost = laborCost + pcCost + compute.total;
   const perMinPrice = parseFloat(p.order_price) || 0;
   const totalDuration = parseFloat(p.total_duration) || 0;
   const revenue = perMinPrice * totalDuration;
@@ -213,7 +212,7 @@ function calcCosts(p) {
   const profit = revenue - totalCost - commission;
   const settled = parseFloat(p.settled_amount) || 0;
   const unsettled = revenue - settled;
-  return { months, laborCost, pcCost, venueCost, computePerMin: compute.perMin, computeCost: compute.total, totalCost, perMinPrice, revenue, commission, profit, settled, unsettled };
+  return { months, laborCost, pcCost, computePerMin: compute.perMin, computeCost: compute.total, totalCost, perMinPrice, revenue, commission, profit, settled, unsettled };
 }
 
 const fmt = v => '¥' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -257,7 +256,6 @@ function renderTable(list) {
         <td>${subDate}</td>
         <td class="amount">${fmt(c.laborCost)}</td>
         <td class="amount">${fmt(c.pcCost)}</td>
-        <td class="amount">${fmt(c.venueCost)}</td>
         <td class="amount">${c.computeCost > 0 ? fmt(c.computeCost) : '—'}</td>
         <td class="amount"><strong>${fmt(c.totalCost)}</strong></td>
         <td class="amount">${priceCell}</td>
@@ -269,7 +267,7 @@ function renderTable(list) {
         <td>${actions}</td>
       </tr>
       <tr class="detail-row" id="detail-${p.id}">
-        <td colspan="17">
+        <td colspan="16">
           <div class="detail-grid">
             <div class="detail-item"><div class="d-label">制作周期</div><div class="d-value">${p.production_days}天 (${(c.months).toFixed(2)}月)</div></div>
             <div class="detail-item"><div class="d-label">制作人数</div><div class="d-value">${p.team_size}人</div></div>
@@ -277,8 +275,6 @@ function renderTable(list) {
             <div class="detail-item"><div class="d-label">人员成本</div><div class="d-value">${fmt(c.laborCost)}</div></div>
             <div class="detail-item"><div class="d-label">电脑租金</div><div class="d-value">${fmt(PC_COST_PER_MONTH)}/台/月</div></div>
             <div class="detail-item"><div class="d-label">电脑成本</div><div class="d-value">${fmt(c.pcCost)}</div></div>
-            <div class="detail-item"><div class="d-label">场地费</div><div class="d-value">${fmt(VENUE_COST_PER_MONTH)}/月</div></div>
-            <div class="detail-item"><div class="d-label">场地成本</div><div class="d-value">${fmt(c.venueCost)}</div></div>
             <div class="detail-item"><div class="d-label">每分钟算力</div><div class="d-value">${c.computePerMin > 0 ? '¥' + c.computePerMin.toFixed(2) : '无'}</div></div>
             <div class="detail-item"><div class="d-label">算力成本</div><div class="d-value">${c.computeCost > 0 ? fmt(c.computeCost) : '无'}</div></div>
             <div class="detail-item"><div class="d-label">总成本</div><div class="d-value">${fmt(c.totalCost)}</div></div>
@@ -382,7 +378,7 @@ function loadData() {
   const failTimer = setTimeout(function() {
     if (myToken !== loadDataToken) return;
     document.getElementById('loadingOverlay').classList.remove('show');
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="17" style="text-align:center;padding:40px;color:var(--danger)"><div style="font-size:16px;margin-bottom:12px">⚠️ 连接超时</div><div style="font-size:13px;margin-bottom:16px;color:var(--text-light)">可能是网络问题，请点击下方按钮重试</div><button onclick="loadData()" style="padding:10px 32px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">🔄 重新加载</button></td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="16" style="text-align:center;padding:40px;color:var(--danger)"><div style="font-size:16px;margin-bottom:12px">⚠️ 连接超时</div><div style="font-size:13px;margin-bottom:16px;color:var(--text-light)">可能是网络问题，请点击下方按钮重试</div><button onclick="loadData()" style="padding:10px 32px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">🔄 重新加载</button></td></tr>';
   }, 20000);
   api('list', { orderBy: 'created_at', orderDir: 'desc', pageSize: 100 }).then(res => {
     if (myToken !== loadDataToken) return;
@@ -405,7 +401,7 @@ function loadData() {
     })
     .catch(e => {
       if (myToken !== loadDataToken) return;
-      document.getElementById('tableBody').innerHTML = '<tr><td colspan="17" style="text-align:center;padding:40px;color:var(--danger)">加载失败：'+e.message+'</td></tr>';
+      document.getElementById('tableBody').innerHTML = '<tr><td colspan="16" style="text-align:center;padding:40px;color:var(--danger)">加载失败：'+e.message+'</td></tr>';
     })
     .finally(() => { if (myToken !== loadDataToken) return; document.getElementById('loadingOverlay').classList.remove('show'); });
 }

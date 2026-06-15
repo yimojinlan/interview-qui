@@ -393,9 +393,9 @@ function calcCosts(p) {
   const months = p.production_days / 26;
   const laborCost = months * p.team_size * 3500;
   const pcCost = months * p.team_size * 193;
-  const venueCost = months * 8000;
+  
   const compute = parseComputePower(p);
-  const totalCost = laborCost + pcCost + venueCost + compute.total;
+  const totalCost = laborCost + pcCost + compute.total;
   const perMinPrice = parseFloat(p.order_price) || 0;
   const totalDuration = parseFloat(p.total_duration) || 0;
   const revenue = perMinPrice * totalDuration;
@@ -403,7 +403,7 @@ function calcCosts(p) {
   const profit = revenue - totalCost - commission;
   const settled = parseFloat(p.settled_amount) || 0;
   const unsettled = revenue - settled;
-  return { months, laborCost, pcCost, venueCost, computePerMin: compute.perMin, computeCost: compute.total, totalCost, perMinPrice, revenue, commission, profit, settled, unsettled };
+  return { months, laborCost, pcCost, computePerMin: compute.perMin, computeCost: compute.total, totalCost, perMinPrice, revenue, commission, profit, settled, unsettled };
 }
 
 const fmt = v => '¥' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
