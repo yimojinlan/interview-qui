@@ -62,6 +62,8 @@
   .btn-cancel:hover { filter:brightness(.92); }
   .btn-delete { display:inline-block; padding:4px 12px; border:none; border-radius:4px; font-size:12px; font-weight:600; cursor:pointer; background:transparent; color:var(--danger); border:1px solid rgba(231,76,60,.25); }
   .btn-delete:hover { background:var(--danger); color:#fff; }
+  .link-cell { font-size:12px; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .link-cell a { color:var(--accent); text-decoration:none; }
   .editing-row td { background:#f0f7ff!important; }
 
   .detail-row { display:none; }
@@ -129,7 +131,7 @@
           <th>项目名称</th><th>时长</th><th>集数</th><th>周期/人数</th><th>提交时间</th>
           <th>人员成本</th><th>电脑成本</th><th>算力成本</th>
           <th>总成本</th><th>订单单价(元/分)</th><th>总收入</th><th>提成</th><th>利润</th>
-          <th>已结算</th><th>未结算</th><th style="width:60px">操作</th>
+          <th>已结算</th><th>未结算</th><th>网盘</th><th style="width:60px">操作</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -264,10 +266,11 @@ function renderTable(list) {
         <td class="amount ${profitClass}"><strong>${profitIcon} ${fmt(c.profit)}</strong></td>
         <td class="amount">${settledCell}</td>
         <td class="amount ${c.unsettled > 0 ? 'warning' : ''}">${c.unsettled > 0 ? fmt(c.unsettled) : '—'}</td>
+        <td class="link-cell">${linkDisplay}</td>
         <td>${actions}</td>
       </tr>
       <tr class="detail-row" id="detail-${p.id}">
-        <td colspan="16">
+        <td colspan="17">
           <div class="detail-grid">
             <div class="detail-item"><div class="d-label">制作周期</div><div class="d-value">${p.production_days}天 (${(c.months).toFixed(2)}月)</div></div>
             <div class="detail-item"><div class="d-label">制作人数</div><div class="d-value">${p.team_size}人</div></div>
@@ -378,7 +381,7 @@ function loadData() {
   const failTimer = setTimeout(function() {
     if (myToken !== loadDataToken) return;
     document.getElementById('loadingOverlay').classList.remove('show');
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="16" style="text-align:center;padding:40px;color:var(--danger)"><div style="font-size:16px;margin-bottom:12px">⚠️ 连接超时</div><div style="font-size:13px;margin-bottom:16px;color:var(--text-light)">可能是网络问题，请点击下方按钮重试</div><button onclick="loadData()" style="padding:10px 32px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">🔄 重新加载</button></td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="17" style="text-align:center;padding:40px;color:var(--danger)"><div style="font-size:16px;margin-bottom:12px">⚠️ 连接超时</div><div style="font-size:13px;margin-bottom:16px;color:var(--text-light)">可能是网络问题，请点击下方按钮重试</div><button onclick="loadData()" style="padding:10px 32px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">🔄 重新加载</button></td></tr>';
   }, 20000);
   api('list', { orderBy: 'created_at', orderDir: 'desc', pageSize: 100 }).then(res => {
     if (myToken !== loadDataToken) return;
@@ -401,7 +404,7 @@ function loadData() {
     })
     .catch(e => {
       if (myToken !== loadDataToken) return;
-      document.getElementById('tableBody').innerHTML = '<tr><td colspan="16" style="text-align:center;padding:40px;color:var(--danger)">加载失败：'+e.message+'</td></tr>';
+      document.getElementById('tableBody').innerHTML = '<tr><td colspan="17" style="text-align:center;padding:40px;color:var(--danger)">加载失败：'+e.message+'</td></tr>';
     })
     .finally(() => { if (myToken !== loadDataToken) return; document.getElementById('loadingOverlay').classList.remove('show'); });
 }
