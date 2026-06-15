@@ -305,20 +305,7 @@
         <input type="text" id="f_totalCompute" readonly>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>订单单价（元/分钟）</label>
-        <input type="number" id="f_price" min="0" step="0.01">
-      </div>
-      <div class="form-group">
-        <label>提成（元）</label>
-        <input type="number" id="f_commission" min="0" step="0.01">
-      </div>
-    </div>
-    <div class="form-group">
-      <label>已结算金额（元）</label>
-      <input type="number" id="f_settled" min="0" step="0.01">
-    </div>
+
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">取消</button>
       <button class="btn-primary" id="modalSubmitBtn" onclick="modalSubmit()">✅ 提交</button>
@@ -509,7 +496,7 @@ function openAddModal() {
   editingId = null;
   document.getElementById('modalTitle').textContent = '📝 新增登记';
   document.getElementById('modalSubmitBtn').textContent = '✅ 提交';
-  ['f_name','f_subDate','f_link','f_duration','f_episodes','f_days','f_team','f_software','f_computePerMin','f_price','f_commission','f_settled'].forEach(id => {
+  ['f_name','f_subDate','f_link','f_duration','f_episodes','f_days','f_team','f_software','f_computePerMin'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('f_totalCompute').value = '';
@@ -534,9 +521,7 @@ function openEditModal(p) {
   const cp = parseComputePower(p);
   document.getElementById('f_computePerMin').value = cp.perMin || '';
   calcCompute();
-  document.getElementById('f_price').value = p.order_price || '';
-  document.getElementById('f_commission').value = p.commission || '';
-  document.getElementById('f_settled').value = p.settled_amount || '';
+
   document.getElementById('modalOverlay').classList.add('show');
 }
 
@@ -555,9 +540,7 @@ function modalSubmit() {
   const software = document.getElementById('f_software').value.trim();
   const computePerMin = parseFloat(document.getElementById('f_computePerMin').value) || 0;
   const totalCompute = calcCompute();
-  const price = parseFloat(document.getElementById('f_price').value) || 0;
-  const commission = parseFloat(document.getElementById('f_commission').value) || 0;
-  const settled = parseFloat(document.getElementById('f_settled').value) || 0;
+  const price = 0, commission = 0, settled = 0;
 
   if (!name) { toast('请输入项目名称'); return; }
   if (!subDate) { toast('请选择提交时间'); return; }
