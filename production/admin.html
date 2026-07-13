@@ -230,15 +230,15 @@ function renderTable(list) {
     const isEditing = editingId === p.id;
 
     const priceCell = isEditing
-      ? `<div class="edit-actions"><input class="editable-input" type="number" id="editPrice-${p.id}" value="${c.perMinPrice}" step="0.01" min="0"></div>`
+      ? `<div class="edit-actions"><input class="editable-input" type="number" id="editPrice-${p.id}" value="${c.perMinPrice}" step="0.01" min="0" onkeydown="if(event.key==='Enter')saveEdit(${p.id})"></div>`
       : `<span class="editable" onclick="startEdit(${p.id})">${c.perMinPrice > 0 ? '¥' + c.perMinPrice.toFixed(2) : '—'}</span>`;
 
     const commCell = isEditing
-      ? `<input class="editable-input" type="number" id="editComm-${p.id}" value="${c.commission}" step="0.01" min="0" style="width:75px">`
+      ? `<input class="editable-input" type="number" id="editComm-${p.id}" value="${c.commission}" step="0.01" min="0" style="width:75px" onkeydown="if(event.key==='Enter')saveEdit(${p.id})">`
       : `<span class="editable" onclick="startEdit(${p.id})">${c.commission ? fmt(c.commission) : '—'}</span>`;
 
     const settledCell = isEditing
-      ? `<input class="editable-input" type="number" id="editSettled-${p.id}" value="${c.settled}" step="0.01" min="0">`
+      ? `<input class="editable-input" type="number" id="editSettled-${p.id}" value="${c.settled}" step="0.01" min="0" onkeydown="if(event.key==='Enter')saveEdit(${p.id})">`
       : `<span class="editable" onclick="startEdit(${p.id})">${c.settled ? fmt(c.settled) : '—'}</span>`;
 
     const actions = isEditing
