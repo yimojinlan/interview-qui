@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一抹金蓝面试评测 · 管理后台（龙岩）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    background: #F0F2F5;
+    color: #2C3E50;
+  }
+
+  /* ========== HEADER ========== */
+  .app-header {
+    background: linear-gradient(135deg, #2C3E50, #34495E);
+    color: #fff;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .app-header h1 { font-size: 18px; font-weight: 700; }
+  .app-header .subtitle { font-size: 12px; opacity: .7; margin-top: 2px; }
+  .app-header .logout-btn { font-size: 12px; cursor: pointer; opacity: .6; }
+  .app-header .logout-btn:hover { opacity: 1; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+
+  /* ========== STATS ========== */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);
+  }
+  .stat-card .num { font-size: 28px; font-weight: 700; }
+  .stat-card .label { font-size: 12px; color: #7F8C8D; margin-top: 2px; }
+
+  /* ========== TABLE ========== */
+  .table-wrap {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    overflow-x: auto;
+    padding: 16px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 2px solid #E8ECF0;
+    font-weight: 700;
+    font-size: 12px;
+    color: #7F8C8D;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  td { padding: 10px 8px; border-bottom: 1px solid #EEF0F2; }
+  tr:hover td { background: #F8F9FA; }
+  .type-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .btn-sm {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid;
+    background: none;
+  }
+  .btn-view { border-color: #3498DB; color: #3498DB; }
+  .btn-view:hover { background: #EBF5FB; }
+  .btn-del { border-color: #E74C3C; color: #E74C3C; }
+  .btn-del:hover { background: #FDEDEC; }
+  .empty-msg { text-align: center; padding: 40px; color: #95A5A6; font-size: 14px; }
+
+  /* ========== MODAL ========== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 999;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 30px 20px;
+    overflow-y: auto;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px;
+    max-width: 700px;
+    width: 100%;
+    margin: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,.2);
+  }
+
+  /* Report blocks */
+  .report-section {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #EEF0F2;
+  }
+  .report-section:last-child { border-bottom: none; }
+  .report-section h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .report-section p, .report-section li {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #444;
+  }
+  .report-section ul { padding-left: 18px; margin: 4px 0; }
+  .report-section ul li { margin-bottom: 4px; }
+
+  .qa-block {
+    background: #F8F9FA;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .qa-block .q { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .qa-block .a { font-size: 13px; color: #555; }
+  .qa-block .a strong { color: var(--accent); }
+
+  .section-divider {
+    font-weight: 700; margin: 14px 0 8px; padding: 6px 0;
+    border-bottom: 1px solid #E8ECF0; font-size: 14px; color: #555;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 2px 3px 2px 0;
+  }
+  .tag-green { background: #E8F8F5; color: #1ABC9C; }
+  .tag-red { background: #FDEDEC; color: #E74C3C; }
+  .tag-blue { background: #EBF5FB; color: #3498DB; }
+  .tag-yellow { background: #FEF9E7; color: #F39C12; }
+
+  .count-grid { display: flex; gap: 6px; margin: 6px 0; }
+  .count-block { flex: 1; text-align: center; padding: 8px 4px; border-radius: 6px; font-size: 13px; font-weight: 700; }
+
+  .btn-close-modal {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #E8ECF0;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .btn-close-modal:hover { background: #D5D9DC; }
+
+  /* ========== SEARCH / FILTER BAR ========== */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+  .toolbar input, .toolbar select {
+    padding: 8px 12px;
+    border: 1.5px solid #E8ECF0;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    background: #fff;
+  }
+  .toolbar input:focus, .toolbar select:focus { border-color: #3498DB; }
+  .toolbar .search-box { flex: 1; min-width: 160px; }
+  .toolbar .search-box input { width: 100%; }
+  .toolbar .btn-export {
+    padding: 8px 16px;
+    border: 1.5px solid #27AE60;
+    border-radius: 8px;
+    background: #fff;
+    color: #27AE60;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .toolbar .btn-export:hover { background: #E8F8F5; }
+
+  /* ========== MINI BAR (分布柱) ========== */
+  .mini-bar-wrap {
+    display: flex;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+    min-width: 80px;
+    max-width: 120px;
+  }
+  .mini-bar-wrap .bar-seg {
+    height: 100%;
+    transition: width .3s;
+  }
+
+  /* ========== RISK BADGE ========== */
+  .risk-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .risk-high { background: #FDEDEC; color: #E74C3C; }
+  .risk-mid { background: #FEF9E7; color: #F39C12; }
+  .risk-low { background: #E8F8F5; color: #27AE60; }
+  .risk-info { font-size: 11px; color: #95A5A6; }
+
+  /* ========== DASHBOARD CHARTS AREA ========== */
+  .dashboard-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .dashboard-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);
+  }
+  .dashboard-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .pie-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .pie-legend-item { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+  .pie-legend-item .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .trend-bar-wrap { display: flex; align-items: flex-end; gap: 4px; height: 60px; padding-top: 4px; }
+  .trend-bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    position: relative;
+  }
+  .trend-bar .trend-label {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: #95A5A6;
+    white-space: nowrap;
+  }
+
+  /* ========== COMPACT TABLE ========== */
+  .table-wrap .type-bar-cell { min-width: 100px; }
+  .table-wrap .risk-cell { min-width: 72px; text-align: center; }
+
+  .count-grid-inline { display: flex; gap: 3px; font-size: 11px; font-weight: 700; }
+  .count-grid-inline span { padding: 1px 4px; border-radius: 3px; }
+
+  /* ========== LOGIN ========== */
+  .login-gate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2C3E50, #34495E);
+  }
+  .login-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    width: 320px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.3);
+  }
+  .login-box h2 { text-align: center; margin-bottom: 20px; font-size: 18px; }
+  .login-box input {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid #E8ECF0;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .login-box input:focus { border-color: #3498DB; }
+  .login-box button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #3498DB;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .login-box button:active { opacity: .9; }
+  .login-error { color: #E74C3C; font-size: 13px; text-align: center; margin-top: 8px; }
+
+  /* ========== TOLERANCE TABLE IN MODAL ========== */
+  .mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 8px 0;
+  }
+  .mini-table th {
+    background: #F0F3F5;
+    padding: 6px 4px;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: 1px solid #E8ECF0;
+  }
+  .mini-table td {
+    padding: 5px 4px;
+    text-align: center;
+    border-bottom: 1px solid #EEF0F2;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div class="login-gate" id="loginGate">
+  <div class="login-box">
+    <h2>🔐 测评管理后台</h2>
+    <input type="password" id="loginPwd" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">登录</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ========== MAIN ========== -->
+<div id="mainApp" style="display:none">
+  <div class="app-header">
+    <div>
+      <h1>📊 一抹金蓝面试评测 · 管理后台（龙岩）</h1>
+      <div class="subtitle">龙岩一抹金蓝传媒</div>
+    </div>
+    <div class="logout-btn" onclick="doLogout()">退出</div>
+  </div>
+  <div class="container">
+    <div class="stats-bar" id="statsBar"></div>
+
+    <!-- Dashboard row -->
+    <div class="dashboard-row" id="dashboardRow"></div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 按姓名搜索..." oninput="applyFilter()"></div>
+      <select id="typeFilter" onchange="applyFilter()">
+        <option value="">全部类型</option>
+        <option value="A">A型·掌控者</option>
+        <option value="B">B型·完美主义</option>
+        <option value="C">C型·社交家</option>
+        <option value="D">D型·讨好者</option>
+      </select>
+      <select id="riskFilter" onchange="applyFilter()">
+        <option value="">全部风险</option>
+        <option value="high">🔴 高风险</option>
+        <option value="mid">🟡 有冲突</option>
+        <option value="low">🟢 低风险</option>
+      </select>
+      <button class="btn-export" onclick="exportCSV()">📥 导出CSV</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:32px">#</th>
+            <th>姓名</th>
+            <th>基本信息</th>
+            <th>主导类型</th>
+            <th class="type-bar-cell">选项分布</th>
+            <th class="risk-cell">风险预警</th>
+            <th>答题时间</th>
+            <th style="width:50px">详情</th>
+            <th style="width:50px">删除</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="9" class="empty-msg">暂无数据</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========== DETAIL MODAL ========== -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box" id="modalBox">
+    <div id="modalContent"></div>
+    <button class="btn-close-modal" onclick="closeModal()">关闭</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const PASSWORD = 'jinlan2025';
+const client = aipexbase.createClient({
+  baseUrl: 'https://baas.kuafuai.net/baas-api',
+  apiKey: 'baas_0us8Xwxy'
+});
+
+// ============================================================
+// TYPE PROFILES (完整的类型分析报告数据)
+// ============================================================
+const PROFILES = {
+  A: {
+    name: '傲慢的掌控者',
+    emoji: '🔴',
+    color: '#E74C3C',
+    bgColor: '#FDEDEC',
+    strengths: '果断高效、结果导向、抗压能力强，适合在混乱中打开局面。善于在不确定的环境中快速决策，是攻坚期的核心战力。',
+    flaws: [
+      '挑战规则与越权：压力下变得专横，可能绕过组长直接决策，成为管线管理的不稳定因素',
+      '缺乏协作耐心：对跟不上节奏的同事攻击性强，容易制造对立氛围，破坏管线连续性',
+      '为质量走捷径：在高目标驱动下牺牲细节质量，埋下成片一致性隐患'
+    ],
+    burnoutCurve: [
+      '第1-3周：战斗力爆表，主动顶上去，节奏带得飞起',
+      '第4-6周：开始暴躁，对他人效率没耐心，可能与人吵架',
+      '第7周+：项目还拖则可能"老子不干了"式离职或摆烂'
+    ],
+    burnoutConclusion: '短期攻坚的神器，长期消耗的炸点。A型最适合救火，不适合常态化高压。',
+    goodRoles: ['项目组长（攻坚开荒）', '抽卡师（快速试错出方案）'],
+    badRoles: ['剪辑（需长期精细化维护）', '稳定管线岗位（需高度流程配合）'],
+    management: '必配能牵制他的副手（如B或D型），给结果指标也要给行为红线。直言不讳反馈他对他人破坏性影响，他能承受。',
+    tolerance: { peak: '第1-3周', danger: '开始吵架、越权', survival: '3-6个月', suggestion: '短期攻坚救火队' }
+  },
+  B: {
+    name: '偏执的完美主义者',
+    emoji: '🔵',
+    color: '#3498DB',
+    bgColor: '#EBF5FB',
+    strengths: '逻辑严谨、专业精深、对质量敏感，能够把交付标准拉高到行业水准以上，是品质的守护者。',
+    flaws: [
+      '分析瘫痪：为追求完美反复抽卡/精修，拖慢整个管线产出节奏',
+      '挑剔孤立：用自己的高标准审判所有人，以冷暴力或技术细节刁难协作方，成为"孤岛专家"',
+      '被动攻击：不满不直说，但内心积累评判，可能在某次复盘拿证据"一剑封喉"破坏信任'
+    ],
+    burnoutCurve: [
+      '第1-2周：默默扛不出声，活干得最规矩',
+      '第3-8周：内心疯狂记账，表面正常但挑剔上升',
+      '第9周+：可能突然递交字斟句酌的离职信，无法挽留'
+    ],
+    burnoutConclusion: '燃烧最缓慢但最突然。B型走的决定往往是深思熟虑不可挽回的。',
+    goodRoles: ['角色一致性质检', '成片终审', '技术标准制定'],
+    badRoles: ['编剧（需创意灵活度和反复推翻重来）', '项目组长（需快速决策）'],
+    management: '肯定专业深度，但要明确"完成比完美重要"。鼓励书面化担忧而非心里憋，给他清晰的流程保护。',
+    tolerance: { peak: '第1-6周', danger: '挑剔变多、记账', survival: '6-12个月', suggestion: '质量控制节点岗' }
+  },
+  C: {
+    name: '戏剧化的社交家',
+    emoji: '🟡',
+    color: '#F39C12',
+    bgColor: '#FEF9E7',
+    strengths: '沟通力强、有创意、能凝聚团队氛围，善于发掘新鲜点子和调动大家情绪，是团队的活力源。',
+    flaws: [
+      '注意力涣散：点子多落地差，热情转移快，可能最需要出片阶段找不到人',
+      '情绪绑架制造内耗：情绪波动大，把私人关系带入工作，容易拉帮结派',
+      '过度依赖认可逃避责任：遇批评时擅长调动情绪资源辩解，难以独立扛压'
+    ],
+    burnoutCurve: [
+      '第1周：还挺兴奋，"大家一起熬夜好热血啊"',
+      '第2-4周：开始疯狂吐槽，成为负能量中心',
+      '第5周+：热情燃尽，摸鱼迟到请假，质量断崖下跌'
+    ],
+    burnoutConclusion: '情绪续航最短的类型。需要高压氛围中的短期爆发，不适合长期稳定输出。',
+    goodRoles: ['编剧（创意输出）', '对外宣传'],
+    badRoles: ['抽卡师（需高度专注和一致审美）', '剪辑（需耐性和独立闭环）'],
+    management: '赞美公开热烈，批评务必私下。任务切割成短期可交付物，用机制而非热情跟进。',
+    tolerance: { peak: '第1-2周', danger: '吐槽成常态、请假', survival: '2-4个月', suggestion: '创意爆发短项目' }
+  },
+  D: {
+    name: '隐忍的讨好者',
+    emoji: '🟢',
+    color: '#27AE60',
+    bgColor: '#E8F8F5',
+    strengths: '耐心、配合度高、情绪稳定、服务意识强，是管线运行的润滑剂，所有组长梦寐以求的执行者。',
+    flaws: [
+      '压抑到爆发（定时炸弹）：不满积累到临界点，会以极端方式突然离职，让团队措手不及',
+      '不敢担责成隐形人：需要立场和决策时习惯性退缩，沉默常被误读为同意',
+      '被动消耗身心耗竭：不会拒绝，承担过多情绪劳动和杂务，最终效率归零'
+    ],
+    burnoutCurve: [
+      '第1-4周：毫无怨言地撑，甚至帮别人分担，组长觉得"真好用"',
+      '第5-10周：效率下滑但从不主动说"我不行了"',
+      '第11周+：身心崩盘，突然情绪爆发或病倒提离职'
+    ],
+    burnoutConclusion: '前期最让人省心，后期最让人措手不及。管理者必须主动问，不能等她/他开口。',
+    goodRoles: ['剪辑（需耐心和稳定性）', '人事（服务意识强）'],
+    badRoles: ['项目组长（需果断决策主动推进）', '编剧（需鲜明创意立场）'],
+    management: '最需主动关心的类型。定期私下问"需要什么支持？""对哪里不满意？"，创造安全空间。绝不要把平静当理所当然。',
+    tolerance: { peak: '第1-8周', danger: '效率下滑不出声', survival: '6-12个月(需关心)', suggestion: '稳定执行岗' }
+  }
+};
+
+const RED_LINES = [
+  { job: '编剧', conflict: 'B型（僵化完美主义）', reason: '创意工种无法接受反复推翻重来' },
+  { job: '抽卡师', conflict: 'A型（走捷径）+ C型（注意力涣散）', reason: '角色一致性需要极端耐心和稳定输出' },
+  { job: '剪辑师', conflict: 'C型（情绪化无耐心）', reason: '逐帧工作是磨出来的，不是冲出来的' },
+  { job: '项目组长', conflict: 'D型（不敢决策）', reason: '组长必须能扛事、能拍板，D型会累垮自己' },
+  { job: '所有岗位', conflict: '拒绝学习新工具的倾向', reason: 'AI动态漫行业日新月异，学习能力是生存条件' }
+];
+
+const QUESTIONS_TEXT = [
+  '一个已推进两周的剧集项目，因AI模型突发崩坏导致角色一致性大面积失控，重渲代价极大，必须向上汇报。你的第一反应是？',
+  '在管线协作中，你和一位跨岗同事长期存在审美/标准分歧，你会？',
+  '在项目审片会上，精心完成的一批成片/分镜被负责人当众全盘否定并严厉批评，你的本能反应是？',
+  '面对极度枯燥、重复且看不到即时价值的长期工作（如逐帧修复AI伪影、角色一致性校验），你最可能的表现是？',
+  '这个行业加班是常态，连续三周日均12小时赶项目进度时，你最符合的表现是？',
+  '项目组长在关键决策上长期优柔寡断（反复改风格、迟迟不确认分镜），严重影响你的进度，你最可能走向的极端是？',
+  '当得知同级同事获得了一次你渴望已久的晋升机会时，你内心最阴暗的念头是？',
+  '公司对AI生成素材的"风格参考度"有模糊的灰色地带，你内心深处对此的态度是？',
+  '一位同事私下向你透露了另一位同事的薪资或离职打算，你的处理方式是？',
+  '在项目赶进度的最忙时期，你怎么看待需要你花时间指导的新人或跟不上节奏的同事？',
+  '公司刚引入了一套全新的AI工具链，你之前熟练的工作流程完全被推翻，需要从头学习。你最可能的表现是？',
+  '在项目中，你被分配到一个跟你工作风格完全不搭的搭档组队。几周下来配合极差，项目进度严重滞后。你的走向是？',
+  '你在工作中有一套自己摸索出来的高效工作流，但公司推行统一标准化流程，要求所有人一致执行。你的态度是？',
+  '公司有一个跨部门协作需求，需要你频繁与风格截然不同的编剧或技术团队对接。对方经常提出你看来"外行"的要求，你会？',
+  '项目结束后复盘会上需要客观评价协作过的同事。你和一个同事配合得特别不愉快，你会？'
+];
+
+const OPTIONS_TEXT = [
+  { A: 'A. 迅速整理"补救翻盘"方案，重点汇报如何用最少帧替换挽回', B: 'B. 出详尽的事故复盘报告，分析根因证明过程合规', C: 'C. 先私下找制片/组长沟通争取谅解', D: 'D. 主动揽下全部责任，汇报教训' },
+  { A: 'A. 公开划清界限，用客观数据压倒对方', B: 'B. 保持礼貌距离，用正式渠道沟通', C: 'C. 时而争论时而妥协，内耗严重', D: 'D. 极度压抑不满，可能突然爆发' },
+  { A: 'A. 当场反驳，事后越想越气', B: 'B. 表面镇定，陷入自我怀疑', C: 'C. 迎合后找同事发泄', D: 'D. 一言不发，变得保守' },
+  { A: 'A. 不耐烦，走捷径或要求换任务', B: 'B. 咬牙坚持但暴躁挑剔', C: 'C. 摸鱼吐槽，拖延赶工', D: 'D. 默默完成，情感隔离' },
+  { A: 'A. 调整节奏续命，能顶到结束', B: 'B. 表面扛着，后两周出错率上升', C: 'C. 到处吐槽影响周围人', D: 'D. 沉默机械，不走心了' },
+  { A: 'A. 架空他！先斩后奏当实际负责人', B: 'B. 用逻辑论证逼他就范', C: 'C. 拉拢共识用舆论施压', D: 'D. 无限期忍耐替人善后' },
+  { A: 'A. "运气好而已"，准备挑战', B: 'B. "评审没眼光"，用专业刁难', C: 'C. 传播信息拉拢失意者联盟', D: 'D. 自我贬低，消极应付' },
+  { A: 'A. 规则是给弱者定的，灵活操作', B: 'B. 严格按规范执行，盯别人也做到', C: 'C. 关系好标准可放宽', D: 'D. 照做但内心渴望打破' },
+  { A: 'A. 评估可用价值，留作己用', B: 'B. 守口如瓶但形成预判', C: 'C. 修饰后跟熟人"分析"', D: 'D. 装作无事但刻意回避' },
+  { A: 'A. 视为累赘，表达不满', B: 'B. 厌恶但冷淡让对方知趣', C: 'C. 边帮边抱怨求回报', D: 'D. 牺牲自己去帮，积攒委屈' },
+  { A: 'A. 立刻研究新工具的优势，主动探索出更高效的工作方式，快速切换', B: 'B. 仔细读完所有文档再开始，进度偏慢但步骤扎实', C: 'C. 兴奋讨论新功能，但对核心流程掌握不够扎实', D: 'D. 感到焦虑和抗拒，能拖就拖直到被强制要求切换' },
+  { A: 'A. 直接找组长要求换搭档，不接受磨合建议', B: 'B. 内心不满隐忍不发，对搭档产出用高标准挑剔', C: 'C. 拉近关系化解矛盾无效后向其他人抱怨', D: 'D. 独自扛下大部分工作，内心积怨越来越深' },
+  { A: 'A. 认为标准化是效率的敌人，表面遵守实际保留自己的流程', B: 'B. 认为自己的流程更优，不断论证标准流程缺陷', C: 'C. 被束缚后开始吐槽标准流程扼杀创意', D: 'D. 默默遵守但效率下滑，不主动反馈' },
+  { A: 'A. 定义清晰边界，不接受越界指挥也不插手对方领域', B: 'B. 用专业术语和详细文档回复让对方知难而退', C: 'C. 表面配合，私下吐槽引发对立情绪', D: 'D. 来者不拒结果被拖垮也不敢拒绝' },
+  { A: 'A. 客观指出问题点，提出改进建议，对事不对人', B: 'B. 只谈事实用数据，措辞严苛不留情面', C: 'C. 模糊带过，私下跟信任的人说真话', D: 'D. 为维护和谐给出超出实际的好评，心里憋屈' }
+];
+
+const SECTION_NAMES = ['', '压力与防御机制', '暗面特质倾向', '能量与边界感'];
+const QUESTIONS_SECTION = [1,1,1,1,1,2,2,2,3,3,1,2,2,3,3];
+
+// ============================================================
+// LOGIN
+// ============================================================
+function doLogin() {
+  const pwd = document.getElementById('loginPwd').value;
+  if (pwd === PASSWORD) {
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    loadData();
+  } else {
+    document.getElementById('loginError').textContent = '密码错误，请重试';
+  }
+}
+function doLogout() {
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginGate').style.display = 'flex';
+  document.getElementById('loginPwd').value = '';
+  document.getElementById('loginError').textContent = '';
+}
+
+// ============================================================
+// DATA STORE
+// ============================================================
+let allData = [];
+
+// ============================================================
+// DATA LOADING
+// ============================================================
+async function loadData() {
+  try {
+    const res = await client.db.from('quiz_results_ly').list().order('id', 'desc');
+    if (res.success && res.data) {
+      allData = res.data;
+      renderStats(allData);
+      renderDashboard(allData);
+      applyFilter();
+    } else {
+      document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-msg">加载失败</td></tr>';
+    }
+  } catch (e) {
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-msg">加载失败：' + e.message + '</td></tr>';
+  }
+}
+
+// ============================================================
+// FILTER + SEARCH
+// ============================================================
+function applyFilter() {
+  const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+  const typeVal = document.getElementById('typeFilter').value;
+  const riskVal = document.getElementById('riskFilter').value;
+
+  let filtered = allData;
+  if (searchVal) {
+    filtered = filtered.filter(r => (r.candidate_name || '').toLowerCase().includes(searchVal));
+  }
+  if (typeVal) {
+    filtered = filtered.filter(r => r.dominant_type === typeVal);
+  }
+  if (riskVal) {
+    filtered = filtered.filter(r => calcRiskLevel(r.dominant_type || 'A') === riskVal);
+  }
+  renderTable(filtered);
+}
+
+// ============================================================
+// RISK CALC
+// ============================================================
+function calcRiskLevel(type) {
+  const riskMap = { A: 'mid', B: 'low', C: 'high', D: 'mid' };
+  return riskMap[type] || 'low';
+}
+function riskDisplay(level) {
+  if (level === 'high') return '<span class="risk-badge risk-high">🔴 高</span>';
+  if (level === 'mid') return '<span class="risk-badge risk-mid">🟡 中</span>';
+  return '<span class="risk-badge risk-low">🟢 低</span>';
+}
+
+// ============================================================
+// STATS BAR
+// ============================================================
+function renderStats(data) {
+  const total = data.length;
+  const typeCount = { A: 0, B: 0, C: 0, D: 0 };
+  const today = new Date().toISOString().slice(0,10);
+  let todayCount = 0, maleCount = 0, femaleCount = 0;
+  let ageSum = 0, ageCount = 0, ageMin = 99, ageMax = 0;
+  data.forEach(r => {
+    if (r.dominant_type && typeCount[r.dominant_type] !== undefined) typeCount[r.dominant_type]++;
+    if (r.created_at && r.created_at.slice(0,10) === today) todayCount++;
+    if (r.gender === '男') maleCount++;
+    if (r.gender === '女') femaleCount++;
+    const a = parseInt(r.age, 10);
+    if (!isNaN(a) && a > 0) { ageSum += a; ageCount++; if (a < ageMin) ageMin = a; if (a > ageMax) ageMax = a; }
+  });
+  const avgAge = ageCount > 0 ? (ageSum / ageCount).toFixed(1) : '-';
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card"><div class="num">${total}</div><div class="label">总答题人数</div></div>
+    <div class="stat-card"><div class="num">${todayCount}</div><div class="label">今日答题</div></div>
+    <div class="stat-card"><div class="num">${avgAge}</div><div class="label">平均年龄</div></div>
+    <div class="stat-card"><div class="num">${maleCount}/${femaleCount}</div><div class="label">男/女</div></div>
+    <div class="stat-card" style="border-left:3px solid #E74C3C"><div class="num" style="color:#E74C3C">${typeCount.A}</div><div class="label">A型·掌控者</div></div>
+    <div class="stat-card" style="border-left:3px solid #3498DB"><div class="num" style="color:#3498DB">${typeCount.B}</div><div class="label">B型·完美主义</div></div>
+    <div class="stat-card" style="border-left:3px solid #F39C12"><div class="num" style="color:#F39C12">${typeCount.C}</div><div class="label">C型·社交家</div></div>
+    <div class="stat-card" style="border-left:3px solid #27AE60"><div class="num" style="color:#27AE60">${typeCount.D}</div><div class="label">D型·讨好者</div></div>
+  `;
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard(data) {
+  if (data.length === 0) {
+    document.getElementById('dashboardRow').innerHTML = '<div class="dashboard-card" style="grid-column:1/-1;text-align:center;color:#95A5A6;padding:30px">暂无数据，无法生成分析图表</div>';
+    return;
+  }
+
+  // --- 左：类型分布雷达 ---
+  const typeCount = { A: 0, B: 0, C: 0, D: 0 };
+  data.forEach(r => { if (r.dominant_type && typeCount[r.dominant_type] !== undefined) typeCount[r.dominant_type]++; });
+  const total = data.length;
+  const typeColors = { A: '#E74C3C', B: '#3498DB', C: '#F39C12', D: '#27AE60' };
+  const typeNames = { A: '掌控者', B: '完美主义', C: '社交家', D: '讨好者' };
+
+  let pieHtml = `<h4>📊 候选人类型分布</h4>`;
+  let hasData = false;
+  for (const k of ['A','B','C','D']) {
+    if (typeCount[k] > 0) {
+      hasData = true;
+      const pct = ((typeCount[k] / total) * 100).toFixed(1);
+      pieHtml += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <div style="width:12px;height:12px;border-radius:3px;background:${typeColors[k]};flex-shrink:0"></div>
+        <div style="flex:1;font-size:13px">${k}型 ${typeNames[k]}</div>
+        <div style="font-size:13px;font-weight:700;color:${typeColors[k]}">${typeCount[k]}人</div>
+        <div style="width:100px;height:12px;background:#F0F0F0;border-radius:6px;overflow:hidden;flex-shrink:0">
+          <div style="height:100%;width:${pct}%;background:${typeColors[k]};border-radius:6px"></div>
+        </div>
+        <div style="font-size:11px;color:#95A5A6;width:36px;text-align:right">${pct}%</div>
+      </div>`;
+    }
+  }
+  if (!hasData) pieHtml += '<div style="color:#95A5A6;font-size:13px;text-align:center;padding:12px">暂无数据</div>';
+  pieHtml += `<div class="pie-legend">🏷️ 类型说明：A=果断进攻 · B=严谨求稳 · C=创意社交 · D=配合执行</div>`;
+
+  // --- 右：近7天趋势 ---
+  let trendHtml = '<h4>📈 近7天答题趋势</h4><div class="trend-bar-wrap">';
+  const days = [];
+  const today = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  const dayCounts = {};
+  days.forEach(d => dayCounts[d] = 0);
+  data.forEach(r => {
+    if (r.created_at) {
+      const day = r.created_at.slice(0,10);
+      if (dayCounts[day] !== undefined) dayCounts[day]++;
+    }
+  });
+  const maxCount = Math.max(1, ...Object.values(dayCounts));
+  const dayNames = ['日','一','二','三','四','五','六'];
+  days.forEach(d => {
+    const cnt = dayCounts[d] || 0;
+    const h = Math.max(4, (cnt / maxCount) * 56);
+    const dateObj = new Date(d + 'T00:00:00');
+    const dow = dayNames[dateObj.getDay()];
+    const label = (d === days[6]) ? '今天' : (d === days[5] ? '昨天' : `${dateObj.getMonth()+1}/${dateObj.getDate()}`);
+    trendHtml += `<div class="trend-bar" style="height:${h}px;background:#3498DB">
+      <div class="trend-label">${label}<br>${cnt}</div>
+    </div>`;
+  });
+  trendHtml += '</div>';
+  trendHtml += '<div style="margin-top:18px;font-size:12px;color:#7F8C8D">📌 合计 ' + data.length + ' 人，类型占比可在一览中快速判断面试者结构偏向</div>';
+
+  document.getElementById('dashboardRow').innerHTML =
+    '<div class="dashboard-card">' + pieHtml + '</div>' +
+    '<div class="dashboard-card">' + trendHtml + '</div>';
+}
+
+// ============================================================
+// TABLE RENDER (COMPACT)
+// ============================================================
+function renderTable(data) {
+  if (data.length === 0) {
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-msg">无匹配数据</td></tr>';
+    return;
+  }
+  const TYPE_STYLES = { A: 'background:#FDEDEC;color:#E74C3C', B: 'background:#EBF5FB;color:#3498DB', C: 'background:#FEF9E7;color:#F39C12', D: 'background:#E8F8F5;color:#27AE60' };
+  const TYPE_NAMES = { A: '掌控者', B: '完美主义', C: '社交家', D: '讨好者' };
+  const BAR_COLORS = { A: '#E74C3C', B: '#3498DB', C: '#F39C12', D: '#27AE60' };
+  let html = '';
+  data.forEach((r, idx) => {
+    const t = r.dominant_type || 'A';
+    const style = TYPE_STYLES[t] || '';
+    const name = TYPE_NAMES[t] || '';
+    const safeName = (r.candidate_name || '').replace(/'/g, "\\'");
+
+    // Mini bar
+    const counts = { A: r.count_a||0, B: r.count_b||0, C: r.count_c||0, D: r.count_d||0 };
+    const totalC = counts.A + counts.B + counts.C + counts.D || 1;
+    const barHtml = `<div class="mini-bar-wrap">
+      <div class="bar-seg" style="width:${(counts.A/totalC*100).toFixed(0)}%;background:#E74C3C" title="A:${counts.A}"></div>
+      <div class="bar-seg" style="width:${(counts.B/totalC*100).toFixed(0)}%;background:#3498DB" title="B:${counts.B}"></div>
+      <div class="bar-seg" style="width:${(counts.C/totalC*100).toFixed(0)}%;background:#F39C12" title="C:${counts.C}"></div>
+      <div class="bar-seg" style="width:${(counts.D/totalC*100).toFixed(0)}%;background:#27AE60" title="D:${counts.D}"></div>
+    </div>`;
+
+    // Risk
+    const riskLvl = calcRiskLevel(t);
+
+    // Basic info
+    const infoParts = [];
+    if (r.gender) infoParts.push(r.gender);
+    if (r.age) infoParts.push(r.age + '岁');
+    if (r.education) infoParts.push(r.education);
+    if (r.major) infoParts.push(r.major.length > 6 ? r.major.slice(0,6) + '…' : r.major);
+
+    html += `<tr>
+      <td>${idx + 1}</td>
+      <td><strong>${r.candidate_name || '-'}</strong></td>
+      <td style="font-size:12px;color:#7F8C8D">${infoParts.join(' · ') || '-'}</td>
+      <td><span class="type-badge" style="${style}">${t}型·${name}</span></td>
+      <td>${barHtml}</td>
+      <td class="risk-cell">${riskDisplay(riskLvl)}</td>
+      <td style="font-size:12px;color:#7F8C8D">${r.created_at ? formatTime(r.created_at) : '-'}</td>
+      <td><button class="btn-sm btn-view" onclick='showDetail(${JSON.stringify(r).replace(/'/g,"&#39;")})'>查看</button></td>
+      <td><button class="btn-sm btn-del" onclick="deleteRecord(${r.id}, '${safeName}')">删除</button></td>
+    </tr>`;
+  });
+  document.getElementById('tableBody').innerHTML = html;
+}
+
+function formatTime(t) {
+  if (!t) return '-';
+  const d = new Date(t);
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// ============================================================
+// DETAIL - COMPREHENSIVE REPORT
+// ============================================================
+function showDetail(r) {
+  const t = r.dominant_type || 'A';
+  const prof = PROFILES[t];
+  const counts = {
+    A: r.count_a ?? 0, B: r.count_b ?? 0, C: r.count_c ?? 0, D: r.count_d ?? 0
+  };
+
+  // Parse answers
+  let answers = [];
+  try { answers = JSON.parse(r.answers || '[]'); } catch(e) {}
+
+  // Build answer block
+  let answersHtml = '';
+  let curSection = 0;
+  answers.forEach((a, i) => {
+    if (i >= QUESTIONS_TEXT.length) return;
+    const sn = QUESTIONS_SECTION[i];
+    if (sn !== curSection) {
+      curSection = sn;
+      answersHtml += `<div class="section-divider">📌 第${sn}部分：${SECTION_NAMES[sn]}</div>`;
+    }
+    const optDesc = OPTIONS_TEXT[i] && OPTIONS_TEXT[i][a] ? OPTIONS_TEXT[i][a] : `选 ${a}`;
+    answersHtml += `<div class="qa-block">
+      <div class="q">Q${i+1}. ${QUESTIONS_TEXT[i]}</div>
+      <div class="a">答：<strong>${optDesc}</strong></div>
+    </div>`;
+  });
+
+  // Build section analysis (各部分分析)
+  const sectionCounts = {1:{A:0,B:0,C:0,D:0},2:{A:0,B:0,C:0,D:0},3:{A:0,B:0,C:0,D:0}};
+  const sectionTotals = {1:0,2:0,3:0};
+  answers.forEach((a, i) => {
+    if (i >= QUESTIONS_SECTION.length || !a) return;
+    const sn = QUESTIONS_SECTION[i];
+    if (sectionCounts[sn] && sectionCounts[sn][a] !== undefined) {
+      sectionCounts[sn][a]++;
+      sectionTotals[sn]++;
+    }
+  });
+  const SECTION_THEORY = {
+    1: '防御机制理论（Vaillant层级）：评估候选人面对压力、冲突、枯燥时的心理防御方式——从成熟的幽默/升华到不成熟的压抑/行为发泄。',
+    2: '暗面人格理论（HDS 11维度）：评估候选人在压力下暴露的"职场暗面"——Excitable（情绪化波动）、Skeptical（多疑不信任）、Reserved（退缩回避）等维度倾向。',
+    3: '能量边界理论：评估候选人的人际能量管理——边界清晰度、拒绝能力、情绪劳动承受度、反馈接收与输出方式。'
+  };
+  const SECTION_DOMINANT = {
+    1: { A: '适应性高，主动控制局面', B: '防御性合规，靠逻辑自保', C: '情绪驱动，寻求外部认同', D: '被动压抑，内耗高风险' },
+    2: { A: '权力导向，挑战等级秩序', B: '道德审判，严苛标尺', C: '关系操控，拉帮结派倾向', D: '顺从退缩，隐性记仇' },
+    3: { A: '清晰果断，边界分明', B: '防御性封闭，疏离沟通', C: '情绪渗漏，三角化倾向', D: '无边界吸收，耗竭风险' }
+  };
+  let sectionHtml = '';
+  for (let sn = 1; sn <= 3; sn++) {
+    const sc = sectionCounts[sn];
+    const total = sectionTotals[sn] || 1;
+    let dom = 'A';
+    let maxC = 0;
+    for (const k of ['A','B','C','D']) {
+      if (sc[k] > maxC) { maxC = sc[k]; dom = k; }
+    }
+    const profile = SECTION_DOMINANT[sn][dom];
+    sectionHtml += `<div style="background:#F8F9FA;border-radius:8px;padding:10px 14px;margin-bottom:10px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">📌 第${sn}部分：${SECTION_NAMES[sn]}</div>
+      <div style="font-size:12px;color:#7F8C8D;margin-bottom:6px">${SECTION_THEORY[sn]}</div>
+      <div class="count-grid" style="max-width:280px;margin:4px 0">
+        <div class="count-block" style="background:#FDEDEC;color:#E74C3C;font-size:12px;padding:4px">A: ${sc.A}</div>
+        <div class="count-block" style="background:#EBF5FB;color:#3498DB;font-size:12px;padding:4px">B: ${sc.B}</div>
+        <div class="count-block" style="background:#FEF9E7;color:#F39C12;font-size:12px;padding:4px">C: ${sc.C}</div>
+        <div class="count-block" style="background:#E8F8F5;color:#27AE60;font-size:12px;padding:4px">D: ${sc.D}</div>
+      </div>
+      <div style="font-size:13px;color:#555"><strong>主导倾向 (${dom}选型)：</strong>${profile}</div>
+    </div>`;
+  }
+
+  // Build interview suggestions (面试追问建议)
+  const INTERVIEW_QUESTIONS = {
+    A: [
+      '🎯 挑战越权倾向："请回忆一次你绕过直接上级、自行决策的经历。后果是什么？如果再给你一次机会，你会怎么做？"',
+      '🎯 规则尊重度："面对一条你认为明显不合理的工作流程，你的处理方式是怎样的？请举具体例子。"',
+      '🎯 团队协作："描述一次你与非常缓慢/低于你标准的同事协作的经历。你是忍了、说了、还是采取了行动？结果如何？"',
+      '🎯 长期耐力："你能否接受完全重复性工作长达数月的岗位？如果必须做，你会如何调整自己？"',
+      '🎯 学习适应力（Q11衍生）："面对完全颠覆现有技能的新工具/新流程，你的具体学习策略是什么？请举例。"'
+    ],
+    B: [
+      '🎯 完美主义与进度平衡："当质量与截止时间冲突时，你如何取舍？请举一个你为进度牺牲过质量（或反之）的例子。"',
+      '🎯 协作中的标准冲突："如果协作方的交付质量明显低于你接受的标准，而你反馈多次无效，你的极限在哪里？"',
+      '🎯 暗面评判倾向："你如何看待那些专业水准不如你的同事？你会跟他们建立工作关系还是保持距离？"',
+      '🎯 沟通方式："当你有不同意见时，你更倾向于写邮件文档、当面说服、还是向上汇报？请举例说明最有效的方式。"',
+      '🎯 灵活性与创新（Q13衍生）："标准化流程和你自己摸索的高效工作流冲突时，你怎么解决这个矛盾？请具体描述。"'
+    ],
+    C: [
+      '🎯 注意力持久性："描述一个需要长时间（1个月以上）高度专注但没有即时反馈的项目。你的状态变化是怎样的？"',
+      '🎯 情绪独立："当你的创意或方案被连续否定时，你会如何面对？是继续争取还是换个方向？"',
+      '🎯 工作边界："同事频繁找你倾诉工作烦恼/吐槽，你如何处理这种情况？"',
+      '🎯 独立产出能力："请分享一次你完全独立完成一项从0到1任务的经历——没有团队互动、没有外部认可。感受如何？"',
+      '🎯 跨部门协作（Q14衍生）："对方提出你看来\"外行\"的要求时，你的真实第一反应是什么？之后你实际怎么处理的？"'
+    ],
+    D: [
+      '🎯 拒绝能力："请回忆一次你明确对上级或同事说\"不\"的经历。如果完全没有过，为什么？"',
+      '🎯 主动表达分歧："当所有同事都同意一个方向，但你心里觉得有问题时，你会说出来吗？为什么？"',
+      '🎯 压抑与爆发："你上一次感到工作中极度不公平是什么时候？你是怎么处理的？"',
+      '🎯 自我保护机制："如果你的工作量已经饱和，但同事还把任务推给你，你会怎么做？"',
+      '🎯 反馈评价倾向（Q15衍生）："当需要客观评价一个与你协作不愉快的同事时，你的本能处理方式是什么？为什么？"'
+    ]
+  };
+  let interviewHtml = '';
+  const iqList = INTERVIEW_QUESTIONS[t] || INTERVIEW_QUESTIONS['A'];
+  interviewHtml += '<div style="margin-bottom:8px;font-size:13px;color:#7F8C8D">基于候选人认定为【' + t + '型 · ' + prof.name + '】类型的针对性追问建议（适用于面试官根据测评结果深入挖掘）：</div>';
+  interviewHtml += '<ul style="padding-left:18px;margin:4px 0">' + iqList.map(q => '<li style="font-size:13px;line-height:1.6;margin-bottom:6px">' + q + '</li>').join('') + '</ul>';
+  interviewHtml += '<div style="margin-top:8px;font-size:12px;color:#7F8C8D">💡 建议根据投递岗位（编剧/抽卡师/剪辑/组长等）选择2-3个最相关的问题深入追问，观察候选人回答时的诚实度与自我觉察能力。</div>';
+
+  // Build red line match
+  let redLineHtml = '';
+  RED_LINES.forEach(rl => {
+    const conflictTypes = rl.conflict.match(/[A-D]/g) || [];
+    const isMatch = conflictTypes.includes(t);
+    if (isMatch) {
+      redLineHtml += '<div style="background:#FDEDEC;padding:8px 12px;border-radius:8px;margin-bottom:6px;border-left:3px solid #E74C3C">' +
+        '<strong>' + rl.job + '</strong> → ' + rl.conflict + '<br><span style="font-size:13px;color:#666">' + rl.reason + '</span></div>';
+    }
+  });
+  if (!redLineHtml) redLineHtml = '<p style="color:#7F8C8D;font-size:13px">该类型在标准红线范围内无明显冲突。</p>';
+
+  const modalHtml = `
+    <!-- 顶部概览 -->
+    <div style="text-align:center;margin-bottom:16px">
+      <span class="type-badge" style="background:${prof.bgColor};color:${prof.color};font-size:14px;padding:4px 16px">
+        ${prof.emoji} ${t}型 — ${prof.name}
+      </span>
+      <h2 style="margin:10px 0 4px;font-size:20px">${r.candidate_name || '未知'}</h2>
+      <div style="font-size:13px;color:#7F8C8D;margin-bottom:6px">
+        ${r.gender || '-'} · ${r.age ?? '-'}岁 · ${r.education || '-'}${r.major ? ' · '+r.major : ''}
+      </div>
+      <div style="font-size:13px;color:#7F8C8D">答题时间：${r.created_at ? formatTime(r.created_at) : '-'}</div>
+      <div class="count-grid" style="max-width:320px;margin:8px auto">
+        <div class="count-block" style="background:#FDEDEC;color:#E74C3C">A: ${counts.A}</div>
+        <div class="count-block" style="background:#EBF5FB;color:#3498DB">B: ${counts.B}</div>
+        <div class="count-block" style="background:#FEF9E7;color:#F39C12">C: ${counts.C}</div>
+        <div class="count-block" style="background:#E8F8F5;color:#27AE60">D: ${counts.D}</div>
+      </div>
+    </div>
+
+    <!-- 核心竞争力 -->
+    <div class="report-section">
+      <h3>💪 核心竞争力</h3>
+      <p>${prof.strengths}</p>
+    </div>
+
+    <!-- 致命缺陷 -->
+    <div class="report-section">
+      <h3>⚠️ 致命缺陷</h3>
+      <ul>${prof.flaws.map(f => `<li>${f}</li>`).join('')}</ul>
+    </div>
+
+    <!-- 加班燃烧曲线 -->
+    <div class="report-section">
+      <h3>🔥 加班燃烧曲线</h3>
+      <p style="font-size:13px;color:#7F8C8D;margin-bottom:6px">常态化连续加班后的状态演变：</p>
+      <ul>${prof.burnoutCurve.map(b => `<li>${b}</li>`).join('')}</ul>
+      <p style="margin-top:6px;font-weight:600;font-size:13px;color:${prof.color}">${prof.burnoutConclusion}</p>
+    </div>
+
+    <!-- 岗位适配 -->
+    <div class="report-section">
+      <h3>🎯 岗位适配建议</h3>
+      <p><span class="tag tag-green">✅ 适合</span> ${prof.goodRoles.join('、')}</p>
+      <p><span class="tag tag-red">❌ 不宜</span> ${prof.badRoles.join('、')}</p>
+      <p style="margin-top:8px"><strong>管理要点：</strong>${prof.management}</p>
+    </div>
+
+    <!-- 抗压底线 -->
+    <div class="report-section">
+      <h3>💪 抗压底线速查</h3>
+      <table class="mini-table">
+        <thead><tr><th>类型</th><th>峰值期</th><th>危险信号</th><th>存活期</th><th>建议方向</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:${prof.color}">${t}型</strong></td>
+            <td>${prof.tolerance.peak}</td>
+            <td>${prof.tolerance.danger}</td>
+            <td>${prof.tolerance.survival}</td>
+            <td>${prof.tolerance.suggestion}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:6px;font-size:12px;color:#E74C3C">⚠️ C型在常态化高压下存活期最短；D型耐力最长但可能无声崩盘。</p>
+    </div>
+
+    <!-- 各部分分析 -->
+    <div class="report-section">
+      <h3>📊 各部分分析</h3>
+      ${sectionHtml || '无各部分数据'}
+    </div>
+
+    <!-- 面试追问建议 -->
+    <div class="report-section">
+      <h3>🎙️ 面试追问建议</h3>
+      ${interviewHtml || '无追问建议数据'}
+    </div>
+
+    <!-- 红线冲突评估 -->
+    <div class="report-section">
+      <h3>🚫 岗位红线冲突评估</h3>
+      ${redLineHtml}
+    </div>
+
+    <!-- 答题详情 -->
+    <div class="report-section">
+      <h3>📝 完整答题记录</h3>
+      ${answersHtml || '<p class="no-data">无答题记录</p>'}
+    </div>
+  `;
+
+  document.getElementById('modalContent').innerHTML = modalHtml;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('show');
+}
+
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ============================================================
+// DELETE
+// ============================================================
+async function deleteRecord(id, name) {
+  if (!confirm(`确定要删除 ${name} 的测评记录吗？此操作不可恢复。`)) return;
+  try {
+    const res = await client.db.from('quiz_results_ly').delete().eq('id', id);
+    if (res.success) { loadData(); }
+    else { alert('删除失败：' + (res.message || '未知错误')); }
+  } catch (e) { alert('删除失败：' + e.message); }
+}
+
+// ============================================================
+// AUTO REFRESH
+// ============================================================
+// ============================================================
+// CSV EXPORT
+// ============================================================
+function exportCSV() {
+  if (allData.length === 0) { alert('暂无数据可导出'); return; }
+  const rows = [['序号','姓名','性别','年龄','学历','专业','主导类型','A数','B数','C数','D数','答题时间']];
+  allData.forEach((r, idx) => {
+    rows.push([
+      idx+1, r.candidate_name||'', r.gender||'', r.age||'', r.education||'', r.major||'',
+      r.dominant_type||'', r.count_a||0, r.count_b||0, r.count_c||0, r.count_d||0,
+      r.created_at ? formatTime(r.created_at) : ''
+    ]);
+  });
+  const csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '一抹金蓝测评结果_' + new Date().toISOString().slice(0,10) + '.csv';
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>

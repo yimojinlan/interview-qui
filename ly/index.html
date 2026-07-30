@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2C3E50">
+<title>一抹金蓝面试评测（龙岩）</title>
+<style>
+  :root {
+    --primary: #1a1a2e;
+    --accent: #4361ee;
+    --accent-light: #eef0ff;
+    --success: #06d6a0;
+    --text: #1a1a2e;
+    --text-light: #6b7280;
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --radius: 12px;
+    --safe-bottom: env(safe-area-inset-bottom, 16px);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: 90px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== Header ===== */
+  .header {
+    background: linear-gradient(135deg, #2C3E50, #3498DB);
+    color: #fff;
+    padding: 18px 20px 20px;
+    text-align: center;
+    position: relative;
+  }
+  .header h1 { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+  .header p { font-size: 12px; opacity: .75; }
+  .header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,.18);
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-size: 11px;
+    margin-top: 6px;
+  }
+  .progress-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgba(255,255,255,.15);
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: #fff;
+    transition: width .35s ease;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* ===== Container ===== */
+  .container {
+    max-width: 100%;
+    padding: 12px 16px 0;
+  }
+
+  /* ===== Card ===== */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    padding: 20px 16px 16px;
+    margin-bottom: 0;
+    animation: fadeInUp .3s ease;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Question ===== */
+  .q-number-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .q-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .q-text {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  /* ===== Options ===== */
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .15s;
+    font-size: 14px;
+    line-height: 1.5;
+    user-select: none;
+    position: relative;
+    min-height: 48px;
+  }
+  .option:active { background: #f8f9ff; transform: scale(.99); }
+  .option .letter {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid #d1d5db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #9ca3af;
+    transition: all .2s;
+    margin-top: 1px;
+  }
+  .option.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .option.selected .letter {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* ===== Basic Info ===== */
+  .basic-info-wrap {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .basic-info-wrap .info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .basic-info-wrap .info-header h3 { font-size: 14px; font-weight: 600; }
+  .basic-info-wrap .info-header .toggle-collapse {
+    font-size: 12px;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .basic-info-wrap .field-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .basic-info-wrap .field-full { grid-column: 1 / -1; }
+  .basic-info-wrap label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--text-light);
+  }
+  .basic-info-wrap label .red { color: #ef4444; }
+  .basic-info-wrap input,
+  .basic-info-wrap select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    font-family: inherit;
+    min-height: 42px;
+  }
+  .basic-info-wrap input:focus,
+  .basic-info-wrap select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+  }
+
+  /* ===== Bottom Nav Bar (sticky) ===== */
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 10px 16px calc(10px + var(--safe-bottom));
+    display: flex;
+    gap: 10px;
+    box-shadow: 0 -1px 6px rgba(0,0,0,.06);
+    z-index: 200;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,.95);
+  }
+  .nav-bar button {
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    padding: 12px 0;
+    flex: 1;
+    min-height: 48px;
+  }
+  .nav-bar button:active { transform: scale(.97); }
+  .nav-bar .btn-prev {
+    background: #E8ECF0;
+    color: var(--text);
+    flex: 0 0 90px;
+  }
+  .nav-bar .btn-prev:disabled { opacity: .3; cursor: not-allowed; }
+  .nav-bar .btn-next {
+    background: var(--accent);
+    color: #fff;
+  }
+  .nav-bar .btn-next:disabled { opacity: .5; cursor: not-allowed; }
+  .nav-bar .btn-submit {
+    background: var(--success);
+    color: #fff;
+  }
+  .nav-bar .btn-submit:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ===== Success ===== */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 80px 20px;
+    animation: fadeInUp .4s ease;
+  }
+  .success-screen .check-icon {
+    width: 56px; height: 56px;
+    margin: 0 auto 14px;
+    background: linear-gradient(135deg, #06d6a0, #059669);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(6,208,160,.3);
+  }
+  .success-screen h2 { font-size: 20px; color: #059669; margin-bottom: 6px; }
+  .success-screen p { font-size: 14px; color: var(--text-light); line-height: 1.6; }
+
+  /* ===== Footer ===== */
+  .footer {
+    text-align: center;
+    padding: 24px 20px;
+    font-size: 11px;
+    color: #d1d5db;
+  }
+
+  /* ===== Loading ===== */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,15,30,.4);
+    backdrop-filter: blur(3px);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-box {
+    background: #fff;
+    border-radius: 18px;
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(0,0,0,.12);
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-box p { font-size: 14px; color: var(--text-light); }
+
+  /* ===== Mobile first: everything already mobile-optimized ===== */
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 面试评测</h1>
+  <p>龙岩一抹金蓝传媒</p>
+  <span class="badge">15题 · 约20分钟</span>
+  <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div class="container" id="quizApp">
+  <!-- 基本信息 -->
+  <div class="basic-info-wrap" id="basicInfoWrap">
+    <div class="info-header">
+      <h3>📝 基本信息</h3>
+      <span class="toggle-collapse" id="toggleInfo" onclick="toggleBasicInfo()">收起 ▲</span>
+    </div>
+    <div id="basicInfoBody">
+    <div class="field-group">
+      <div class="field-full">
+        <label>姓名 <span class="red">*</span></label>
+        <input type="text" id="candidateName" placeholder="请输入姓名" maxlength="30" autocomplete="off">
+      </div>
+      <div>
+        <label>性别 <span class="red">*</span></label>
+        <select id="gender">
+          <option value="">请选择</option>
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+      </div>
+      <div>
+        <label>年龄 <span class="red">*</span></label>
+        <input type="number" id="age" placeholder="如 25" min="16" max="99">
+      </div>
+      <div>
+        <label>学历 <span class="red">*</span></label>
+        <select id="education">
+          <option value="">请选择</option>
+          <option value="高中/中专">高中/中专</option>
+          <option value="大专">大专</option>
+          <option value="本科">本科</option>
+          <option value="硕士">硕士</option>
+          <option value="博士">博士</option>
+        </select>
+      </div>
+      <div>
+        <label>专业</label>
+        <input type="text" id="major" placeholder="如：编导、数字媒体" maxlength="40">
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- 题目 -->
+  <div id="questionsContainer"></div>
+
+  <!-- 提交成功 -->
+  <div class="success-screen" id="successScreen">
+    <div class="check-icon">✓</div>
+    <h2>提交成功！</h2>
+    <p>感谢您的参与，测评结果已记录。<br>如有疑问请联系人事部门。</p>
+  </div>
+
+  <div class="footer">龙岩一抹金蓝传媒 · 人事测评工具</div>
+</div>
+
+<!-- 底部导航栏（固定） -->
+<div class="nav-bar" id="navBar">
+  <button class="btn-prev" id="btnPrev" onclick="prevQuestion()">← 上一题</button>
+  <button class="btn-next" id="btnNext" onclick="nextQuestion()">下一题 →</button>
+  <button class="btn-submit" id="btnSubmit" onclick="submitQuiz()" style="display:none">✅ 提交测评</button>
+</div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p>正在提交测评结果...</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/aipexbase-js/dist/aipexbase.umd.min.js"></script>
+<script>
+const QUESTIONS = [
+  { text: '一个已推进两周的剧集项目，因AI模型突发崩坏导致角色一致性大面积失控，重渲代价极大，必须向上汇报。你的第一反应是？',
+    options: [
+      { letter: 'A', text: '迅速整理"补救翻盘"方案，重点汇报如何用最少帧替换、风格迁移等手法抢回进度，主动提出延期备选方案，淡化损失。' },
+      { letter: 'B', text: '出一份详尽的事故复盘报告，分析根因（模型版本/抽卡策略/参数设定），证明过程执行符合最优标准，问题出在外部不可控因素。' },
+      { letter: 'C', text: '先私下找制片/组长沟通争取谅解，强调团队加班付出和模型的不稳定性，避免被贴上"质量把控不力"标签。' },
+      { letter: 'D', text: '主动揽下全部责任，表示是自己验收没到位，着重汇报已吸取的教训，表现出诚恳改进的姿态。' }
+    ]
+  },
+  { text: '在管线协作中，你和一位跨岗同事长期存在审美/标准分歧，你会？',
+    options: [
+      { letter: 'A', text: '公开划清界限，直接表明"我的专业判断是这样"，用客观数据或参考片说服对方，在专业上压倒对方。' },
+      { letter: 'B', text: '保持礼貌距离，严格用需求文档、修改记录等正式渠道沟通，避免把柄，但内心觉得对方不专业。' },
+      { letter: 'C', text: '时而激烈争论坚持己见，时而又担心破坏气氛而妥协，态度忽冷忽热，内耗严重。' },
+      { letter: 'D', text: '极度压抑不满，表面照单全收修改意见，但内心积累怨气，可能在某处突然爆发或冷暴力不回消息。' }
+    ]
+  },
+  { text: '在项目审片会上，精心完成的一批成片/分镜被负责人当众全盘否定并严厉批评，你的本能反应是？',
+    options: [
+      { letter: 'A', text: '当场反驳，指出对方没理解设计意图或技术限制，事后越想越气。' },
+      { letter: 'B', text: '表面镇定内心受打击，会后反复琢磨每个细节，陷入"我是不是能力不行"的自我怀疑。' },
+      { letter: 'C', text: '感到羞辱但马上迎合意见，会后私下找同事发泄，寻求情绪认同。' },
+      { letter: 'D', text: '一言不发脸色异常，会后很长时间不敢再主动提新想法，变得被动保守。' }
+    ]
+  },
+  { text: '面对极度枯燥、重复且看不到即时价值的长期工作（如逐帧修复AI伪影、角色一致性校验），你最可能的表现是？',
+    options: [
+      { letter: 'A', text: '极度不耐烦，做一段时间就走捷径/写脚本简化流程，或不断要求换更有挑战的任务。' },
+      { letter: 'B', text: '咬牙坚持但情绪阴郁暴躁，对打扰自己的人发脾气，变得挑剔刻薄。' },
+      { letter: 'C', text: '频繁聊天吐槽，通过摸鱼社交缓解痛苦，拖延症爆发，最后截至日期前赶工。' },
+      { letter: 'D', text: '默默按部就班完成，但进入麻木和情感隔离的状态，对周遭漠不关心。' }
+    ]
+  },
+  { text: '这个行业加班是常态，连续三周日均12小时赶项目进度时，你最符合的表现是？',
+    options: [
+      { letter: 'A', text: '主动调整节奏（间隙眯10分钟、换不同环节保持新鲜感），想办法给自己续命，能顶到项目结束。' },
+      { letter: 'B', text: '表面不吭声一直接着干，但内心越来越烦躁，后两周出错率上升，对同事催促变得暴躁。' },
+      { letter: 'C', text: '到处喊累吐槽"干不下去了"，但活能赶完，不过周围人都被负面情绪影响。' },
+      { letter: 'D', text: '变得沉默寡言，机械性干活，能交差但明显不走心了，下班后完全不想说话。' }
+    ]
+  },
+  { text: '项目组长在关键决策上长期优柔寡断（反复改风格、迟迟不确认分镜），严重影响你的进度，你最可能走向的极端是？',
+    options: [
+      { letter: 'A', text: '架空他！直接绕过他决策先斩后奏，自己当"实际负责人"，觉得团队没我不行。' },
+      { letter: 'B', text: '拿出更多无可挑剔的参考素材和数据，不断用逻辑论证逼他就范。' },
+      { letter: 'C', text: '拉拢其他组员形成共识，用舆论压力迫使他改变。' },
+      { letter: 'D', text: '内心痛苦但无限期忍耐，替他的每一个犹豫善后，把自己拖垮。' }
+    ]
+  },
+  { text: '当得知同级同事获得了一次你渴望已久的晋升机会时，你内心最阴暗的念头是？',
+    options: [
+      { letter: 'A', text: '"他不过是运气好/更会来事"，随即开始分析他上位后的权力格局，准备挑战。' },
+      { letter: 'B', text: '"评审没眼光，看不出谁才是真正懂行的"，之后用专业细节挑对方毛病。' },
+      { letter: 'C', text: '"他肯定在背后做了见不得人的事"，开始有倾向性地传播信息，拉拢"失意者联盟"。' },
+      { letter: 'D', text: '"也许我就是不够好"，陷入自我贬低和不公平感，工作热情锐减。' }
+    ]
+  },
+  { text: '公司对AI生成素材的"风格参考度"有模糊的灰色地带，你内心深处对此的态度是？',
+    options: [
+      { letter: 'A', text: '规则是给跟不上节奏的人定的，只要不被追责、能提升效率，灵活操作无所谓。' },
+      { letter: 'B', text: '必须严格按规范执行，而且盯着身边的人也做到。有人打擦边球我会极其愤怒。' },
+      { letter: 'C', text: '规则是可以谈的，如果我跟负责规范的人关系好，标准自然可放宽。' },
+      { letter: 'D', text: '肯定严格照做，但内心感到被束缚，渴望有人带头打破条条框框。' }
+    ]
+  },
+  { text: '一位同事私下向你透露了另一位同事的薪资或离职打算，你的处理方式是？',
+    options: [
+      { letter: 'A', text: '根据信息重新评估各方在管线中的位置，不动声色地留作己用。' },
+      { letter: 'B', text: '守口如瓶，但因此形成预判，在工作对接中下意识流露出来。' },
+      { letter: 'C', text: '感到负担又因被信任而愉悦，修饰后跟另一个关系好的同事"分析"一下。' },
+      { letter: 'D', text: '装作什么都没发生，但刻意回避跟被谈论同事的接触，异常疏远。' }
+    ]
+  },
+  { text: '在项目赶进度的最忙时期，你怎么看待需要你花时间指导的新人或跟不上节奏的同事？',
+    options: [
+      { letter: 'A', text: '视为累赘，毫不掩饰不耐烦，甚至直接表达不满要求换人。' },
+      { letter: 'B', text: '心生厌恶但隐忍不发，用冷淡和公事公办的态度让对方知趣离开。' },
+      { letter: 'C', text: '一边帮忙一边到处抱怨自己有多累，期望获得情感回报。' },
+      { letter: 'D', text: '无法拒绝，咬牙牺牲自己的时间和质量去帮，但内心积攒委屈。' }
+    ]
+  },
+  { text: '公司刚引入了一套全新的AI工具链，你之前熟练的工作流程完全被推翻，需要从头学习。你最可能的表现是？',
+    options: [
+      { letter: 'A', text: '立刻研究新工具的优势，主动探索出比旧工具更高效的工作方式，快速切换。' },
+      { letter: 'B', text: '先仔细读完所有官方文档和教程，确认完全理解后才开始使用，进度偏慢但步骤扎实。' },
+      { letter: 'C', text: '兴奋地跟同事讨论新功能，尝试各种花哨效果，但对核心生产流程的掌握不够扎实。' },
+      { letter: 'D', text: '感到焦虑和抗拒，继续用旧工具干活能拖就拖，直到被强制要求切换。' }
+    ]
+  },
+  { text: '在项目中，你被分配到一个跟你工作风格完全不搭的搭档组队。几周下来配合极差，项目进度严重滞后。你的走向是？',
+    options: [
+      { letter: 'A', text: '直接找组长要求换搭档，不接受"磨合"建议，认为时间成本耗不起。' },
+      { letter: 'B', text: '内心极度不满但隐忍不发，工作效率大幅下降，对搭档的一切产出都用最高标准挑剔。' },
+      { letter: 'C', text: '尝试拉近关系（请客/帮忙），希望用感情牌化解矛盾，无效后开始向其他人抱怨。' },
+      { letter: 'D', text: '默默扛下大部分工作，独自加班完成本该两人分担的任务，内心积怨越来越深。' }
+    ]
+  },
+  { text: '你在工作中有一套自己摸索出来的高效工作流，但公司推行统一标准化流程，要求所有人一致执行。你的态度是？',
+    options: [
+      { letter: 'A', text: '认为标准化是效率的敌人，表面遵守实际保留自己的流程，暗地里"两手抓"。' },
+      { letter: 'B', text: '认为标准化是对的但自己的流程更优，不断在会议上论证标准流程的缺陷。' },
+      { letter: 'C', text: '配合一阵子后很快感到被束缚，开始在非正式场合吐槽标准流程"扼杀创意"。' },
+      { letter: 'D', text: '默默遵守但效率明显下滑，不主动反馈问题，等别人发现问题来优化。' }
+    ]
+  },
+  { text: '公司有一个跨部门协作需求，需要你频繁与风格截然不同的编剧或技术团队对接。对方经常提出你看来"外行"的要求，你会？',
+    options: [
+      { letter: 'A', text: '定义清晰边界，明确你的专业范围，不接受越界指挥也坚决不插手对方领域。' },
+      { letter: 'B', text: '内心烦躁但礼貌回应，用专业术语和详细文档回复对方，让对方"知难而退"。' },
+      { letter: 'C', text: '表面热情配合，私下频繁向本部门同事吐槽"那群人什么都不懂"，引发对立情绪。' },
+      { letter: 'D', text: '来者不拒什么需求都接，结果自己工作被拖垮，还不敢跟对方说"不"。' }
+    ]
+  },
+  { text: '项目结束后复盘会上需要客观评价协作过的同事。你和一个同事配合得特别不愉快，你会？',
+    options: [
+      { letter: 'A', text: '客观指出问题点，提出具体改进建议，对事不对人。' },
+      { letter: 'B', text: '只谈事实不谈感受，用数据说话但措辞严苛不留情面。' },
+      { letter: 'C', text: '回避正面评价用"还可以""还行"模糊带过，私下跟信任的人说真话。' },
+      { letter: 'D', text: '为维护和谐给出超出实际情况的好评，但心里憋屈。' }
+    ]
+  }
+];
+
+let answers = new Array(QUESTIONS.length).fill(null);
+let currentQ = 0;
+let isAnimating = false;
+
+const client = aipexbase.createClient({
+  baseUrl: 'https://baas.kuafuai.net/baas-api',
+  apiKey: 'baas_0us8Xwxy'
+});
+
+// ========== 更新进度条 ==========
+function updateProgressFill() {
+  const answered = answers.filter(a => a !== null).length;
+  const total = QUESTIONS.length;
+  document.getElementById('progressFill').style.width = Math.round((answered / total) * 100) + '%';
+}
+
+// ========== 渲染题目 ==========
+function renderQuestions() {
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = '';
+  QUESTIONS.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `q-${idx}`;
+    card.style.display = idx === 0 ? 'block' : 'none';
+    card.innerHTML = `
+      <div class="q-number-wrap">
+        <span class="q-number">${idx + 1}</span>
+      </div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">
+        ${q.options.map(opt => `
+          <div class="option" data-q="${idx}" data-letter="${opt.letter}" onclick="selectOption(${idx}, '${opt.letter}')">
+            <span class="letter">${opt.letter}</span>
+            <span>${opt.text}</span>
+          </div>
+        `).join('')}
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function selectOption(qIdx, letter) {
+  if (isAnimating) return;
+  answers[qIdx] = letter;
+  const card = document.getElementById(`q-${qIdx}`);
+  card.querySelectorAll('.option').forEach(opt => {
+    opt.classList.toggle('selected', opt.dataset.letter === letter);
+  });
+  updateProgressFill();
+  updateNavState();
+}
+
+function nextQuestion() {
+  if (currentQ < QUESTIONS.length - 1 && !isAnimating) {
+    showQuestion(currentQ + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function showQuestion(idx) {
+  if (idx === currentQ) return;
+  isAnimating = true;
+  const currentCard = document.getElementById(`q-${currentQ}`);
+  if (currentCard) currentCard.style.display = 'none';
+  const nextCard = document.getElementById(`q-${idx}`);
+  if (nextCard) nextCard.style.display = 'block';
+  currentQ = idx;
+  updateProgressFill();
+  updateNavState();
+  isAnimating = false;
+}
+
+// ========== 基本信息校验 ==========
+function isBasicInfoValid() {
+  return !!(
+    document.getElementById('candidateName').value.trim() &&
+    document.getElementById('gender').value &&
+    document.getElementById('age').value.trim() &&
+    document.getElementById('education').value
+  );
+}
+
+// ========== 导航状态 ==========
+function updateNavState() {
+  const prevBtn = document.getElementById('btnPrev');
+  const nextBtn = document.getElementById('btnNext');
+  const submitBtn = document.getElementById('btnSubmit');
+
+  prevBtn.style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+
+  if (currentQ === QUESTIONS.length - 1) {
+    nextBtn.style.display = 'none';
+    submitBtn.style.display = 'block';
+    submitBtn.disabled = !isBasicInfoValid() || answers.some(a => a === null);
+  } else {
+    nextBtn.style.display = 'block';
+    submitBtn.style.display = 'none';
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0 && !isAnimating) {
+    showQuestion(currentQ - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// ========== 提交 ==========
+async function submitQuiz() {
+  if (!isBasicInfoValid()) { alert('请先填完基本信息（姓名、性别、年龄、学历为必填）'); return; }
+  if (answers.some(a => a === null)) { alert('还有题目未作答'); return; }
+
+  const name = document.getElementById('candidateName').value.trim();
+  const gender = document.getElementById('gender').value;
+  const age = parseInt(document.getElementById('age').value.trim(), 10);
+  const education = document.getElementById('education').value;
+  const major = document.getElementById('major').value.trim();
+
+  const counts = { A: 0, B: 0, C: 0, D: 0 };
+  answers.forEach(a => counts[a]++);
+  let dominant = 'A', max = 0;
+  for (const [k, v] of Object.entries(counts)) { if (v > max) { max = v; dominant = k; } }
+
+  document.getElementById('loadingOverlay').classList.add('show');
+  try {
+    const res = await client.db.from('quiz_results_ly').insert().values({
+      candidate_name: name, gender, age, education,
+      major: major || '',
+      answers: JSON.stringify(answers),
+      count_a: counts.A, count_b: counts.B, count_c: counts.C, count_d: counts.D,
+      dominant_type: dominant
+    });
+    if (res.success) {
+      document.getElementById('basicInfoWrap').style.display = 'none';
+      document.getElementById('questionsContainer').style.display = 'none';
+      document.getElementById('navBar').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+      document.getElementById('progressFill').style.width = '100%';
+    } else {
+      alert('提交失败：' + (res.message || '未知错误'));
+    }
+  } catch (e) {
+    alert('提交失败，请检查网络：' + e.message);
+  } finally {
+    document.getElementById('loadingOverlay').classList.remove('show');
+  }
+}
+
+// ========== 输入监听 ==========
+['candidateName','gender','age','education'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', updateNavState);
+  el.addEventListener('change', updateNavState);
+});
+
+// ========== 键盘快捷操作 ==========
+document.addEventListener('keydown', e => {
+  if (['1','2','3','4'].includes(e.key)) {
+    const opts = document.querySelector(`#q-${currentQ}`)?.querySelectorAll('.option');
+    if (opts && opts[+e.key - 1]) opts[+e.key - 1].click();
+  }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevQuestion(); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); nextQuestion(); }
+});
+
+// ========== 基础信息折叠 ==========
+function toggleBasicInfo() {
+  const body = document.getElementById('basicInfoBody');
+  const toggle = document.getElementById('toggleInfo');
+  const isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? 'block' : 'none';
+  toggle.textContent = isHidden ? '收起 ▲' : '展开 ▼';
+}
+
+// ========== 初始化 ==========
+renderQuestions();
+showQuestion(0);
+updateProgressFill();
+updateNavState();
+</script>
+</body>
+</html>
