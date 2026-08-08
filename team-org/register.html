@@ -121,21 +121,27 @@ function renderPick(){
         return `<div class="pick" data-pick="${gi}"><div class="no">${gi+1}</div><div class="nm">${esc(g.name||('小组'+(gi+1)))}</div><div class="pp">成员 ${n} 人 · ${esc(g.project||'')}</div></div>`;
       }).join('')}
     </div>`;
-  w.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>showLogin(parseInt(el.dataset.pick,10)));
+  w.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>showBoard(parseInt(el.dataset.pick,10)));
 }
 
-function showLogin(gi){
-  curGi=gi;
-  const g=data&&data.groups[gi];
-  document.getElementById('pickWrap').style.display='none';
-  document.getElementById('loginBox').style.display='';
-  document.getElementById('loginTitle').textContent='小组 '+(gi+1)+' · '+(g?g.name:'小组')+' 登录';
-  document.getElementById('loginErr').textContent='';
-  document.getElementById('gPass').value='';
+/* 内部使用：免密，选组直接进 */
+function ensureData(){
+  if(data) return true;
+  data=defaultData();
+  localStorage.setItem(KEY,JSON.stringify(data));
+  return true;
+}
+function defaultData(){
+  return { leader:'制作负责人', groups:[
+    {name:'项目一组',leader:'组长A',project:'短剧《重生之千金》',progress:65,need:'45天',credit:0,timeSpent:'',members:['组员1','组员2','组员3','组员4','组员5','组员6']},
+    {name:'项目二组',leader:'组长B',project:'动态漫《都市医仙》',progress:35,need:'30天',credit:0,timeSpent:'',members:['组员7','组员8','组员9','组员10','组员11','组员12']},
+    {name:'项目三组',leader:'组长C',project:'短剧《战神归来》',progress:80,need:'20天',credit:0,timeSpent:'',members:['组员13','组员14','组员15','组员16','组员17','组员18']},
+    {name:'项目四组',leader:'组长D',project:'动画《灵域传说》',progress:12,need:'60天',credit:0,timeSpent:'',members:['组员19','组员20','组员21','组员22','组员23','组员24']}
+  ]};
 }
 
 function showBoard(gi){
-  curGi=gi; const g=data.groups[gi];
+  curGi=gi; ensureData(); const g=data.groups[gi];
   document.getElementById('pickWrap').style.display='none';
   document.getElementById('loginBox').style.display='none';
   document.getElementById('board').style.display='';
@@ -220,26 +226,15 @@ function bindBoard(gi){
   root.querySelector('[data-sync]').addEventListener('click',()=>{ data=loadData(); bindBoard(gi); toast('已刷新最新数据'); });
 }
 
-/* 登录动作 */
-document.getElementById('loginGo').addEventListener('click',()=>{
-  const v=document.getElementById('gPass').value;
-  const gi=curGi;
-  const need=data?data.groups[gi]?1:0:0;
-  if(!data || !data.groups[gi]){ document.getElementById('loginErr').textContent='该小组数据尚未初始化，请先联系管理员在管理后台建立'; return; }
-  const pass=keys.groups[gi]||DEFAULT_KEYS.groups[gi];
-  if(v===pass){ sessionStorage.setItem('ymjl_group_'+gi,'1'); showBoard(gi); }
-  else document.getElementById('loginErr').textContent='口令错误，请重试';
-});
-document.getElementById('gPass').addEventListener('keydown',e=>{ if(e.key==='Enter')document.getElementById('loginGo').click(); });
-document.getElementById('backPick').addEventListener('click',()=>{ curGi=-1; document.getElementById('loginBox').style.display='none'; document.getElementById('pickWrap').style.display=''; renderPick(); });
-document.getElementById('logoutBtn').addEventListener('click',()=>{ curGi=-1; document.getElementById('board').style.display='none'; document.getElementById('logoutBtn').style.display='none'; document.getElementById('hSub').textContent='选择你的小组并登录，登记本组信息'; data=loadData(); renderPick(); });
+/* 内部免密：无登录动作，logout 按钮仅作返回主菜单 */
+document.getElementById('logoutBtn').addEventListener('click',()=>{ curGi=-1; document.getElementById('board').style.display='none'; document.getElementById('logoutBtn').style.display='none'; document.getElementById('hSub').textContent='选择你的小组，登记本组信息'; data=loadData(); ensureData(); renderPick(); });
 
 /* 初始化：支持 #!/g/N 直达 */
 function init(){
   data=loadData();
+  if(!data){ data=defaultData(); localStorage.setItem(KEY,JSON.stringify(data)); }
   const m=location.hash.match(/^#!\/g\/(\d+)/);
-  if(m && data && data.groups[m[1]] && sessionStorage.getItem('ymjl_group_'+m[1])==='1'){ showBoard(parseInt(m[1],10)); }
-  else if(m && data && data.groups[m[1]]){ showLogin(parseInt(m[1],10)); }
+  if(m && data.groups[m[1]]){ showBoard(parseInt(m[1],10)); }
   else renderPick();
 }
 init();

@@ -74,7 +74,7 @@
 </head>
 <body>
 
-<div class="login-bg" id="loginBg">
+<div class="login-bg" id="loginBg" style="display:none">
   <div class="login-box">
     <h2>🔐 制作团队管理后台</h2>
     <div class="hint">请输入管理口令（默认 ymjl888）</div>
@@ -92,8 +92,7 @@
       <div class="sub">全量汇总 · 4 个小组统一管理</div>
     </div>
     <div class="spacer"></div>
-    <button id="passBtn" class="ghost">🔑 改口令</button>
-    <button id="logoutBtn" class="ghost">退出</button>
+    <button id="logoutBtn" class="ghost">← 返回管理图</button>
   </header>
 
   <div class="toolbar">
@@ -139,19 +138,13 @@ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 function clamp(n){n=parseInt(n,10);if(isNaN(n))return 0;return Math.max(0,Math.min(100,n));}
 let timer; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('show'),1800);}
 
-/* 登录 */
-function checkLogin(){
-  const ls=sessionStorage.getItem('ymjl_admin_authed');
-  if(ls==='1'){ document.getElementById('loginBg').style.display='none'; document.getElementById('app').style.display=''; render(); }
-}
-document.getElementById('loginBtn').addEventListener('click',()=>{
-  const v=document.getElementById('loginPass').value;
-  if(v===keys.admin){ sessionStorage.setItem('ymjl_admin_authed','1'); document.getElementById('loginBg').style.display='none'; document.getElementById('app').style.display=''; render(); }
-  else document.getElementById('loginErr').textContent='口令错误，请重试';
-});
-document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter')document.getElementById('loginBtn').click(); });
-document.getElementById('logoutBtn').addEventListener('click',()=>{ sessionStorage.removeItem('ymjl_admin_authed'); location.reload(); });
-checkLogin();
+/* 内部使用：免密直接进入 */
+(function enterApp(){
+  document.getElementById('loginBg').style.display='none';
+  document.getElementById('app').style.display='';
+  render();
+})();
+document.getElementById('logoutBtn').addEventListener('click',()=>{ location.href='index.html'; });
 
 /* 汇总 */
 function renderSummary(){
@@ -245,25 +238,6 @@ function saveEdit(){
   if(window._isNew){ data.groups.push(obj); }
   else if(window._gi!==undefined){ data.groups[window._gi]=obj; }
   persist(); render(); closeModal();
-}
-
-/* 改口令 */
-document.getElementById('passBtn').addEventListener('click',()=>{
-  modal(`
-    <h3>修改管理口令<span class="x" onclick="closeModal()">✕</span></h3>
-    <div class="row"><label>新口令</label><input id="p1" placeholder="输入新口令"></div>
-    <div class="row"><label>确认新口令</label><input id="p2" placeholder="再次输入"></div>
-    <div class="actions">
-      <button class="cancel" onclick="closeModal()">取消</button>
-      <button class="ok" onclick="savePass()">保存</button>
-    </div>
-  `);
-});
-function savePass(){
-  const p1=document.getElementById('p1').value, p2=document.getElementById('p2').value;
-  if(!p1){toast('请输入新口令');return;}
-  if(p1!==p2){toast('两次输入不一致');return;}
-  keys.admin=p1; saveKeys(); toast('口令已更新'); closeModal();
 }
 
 /* 工具栏 */
