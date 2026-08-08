@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一抹金蓝 · 制作团队管理图</title>
+<style>
+  :root{
+    --gold:#d4af6a; --gold-d:#b8934b; --gold-l:#f0e3c4;
+    --ink:#1f2430; --sub:#6b7280; --line:#e7e3d8;
+    --bg:#f6f4ee; --card:#ffffff;
+    --blue:#4a6fa5; --red:#c65f5f; --green:#5b8c5a;
+    --shadow:0 6px 22px rgba(31,36,48,.08);
+    --r:16px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--ink); min-height:100vh; padding-bottom:40px;
+  }
+  header{
+    background:linear-gradient(135deg,#1f2430 0%,#2c3140 100%);
+    color:#fff; padding:22px 28px; display:flex; align-items:center; gap:18px;
+    box-shadow:var(--shadow); position:sticky; top:0; z-index:20;
+  }
+  header h1{font-size:20px; font-weight:700; letter-spacing:.5px;}
+  header h1 .gold{color:var(--gold);}
+  header .sub{font-size:12px; color:#b9c0cf; margin-top:3px;}
+  .spacer{flex:1;}
+  .save-badge{font-size:12px; padding:5px 12px; border-radius:20px; background:rgba(255,255,255,.12);}
+  .save-badge.saved{background:rgba(91,140,90,.35); color:#cfe9cf;}
+  header button{
+    background:var(--gold); border:none; color:#1f2430; font-weight:700;
+    padding:8px 14px; border-radius:10px; cursor:pointer; font-size:13px;
+    transition:.15s;
+  }
+  header button:hover{background:var(--gold-l);}
+  header button.ghost{background:transparent; color:#dfe4ef; border:1px solid #454c5f;}
+  header button.ghost:hover{background:rgba(255,255,255,.08);}
+
+  .toolbar{
+    max-width:1400px; margin:22px auto 0; padding:0 24px;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  }
+  .toolbar button{
+    background:#fff; border:1px solid var(--line); color:var(--ink);
+    padding:8px 14px; border-radius:10px; cursor:pointer; font-size:13px;
+    box-shadow:0 2px 6px rgba(0,0,0,.04); transition:.15s;
+  }
+  .toolbar button:hover{border-color:var(--gold); color:var(--gold-d);}
+  .toolbar .tip{font-size:12px; color:var(--sub); margin-left:auto;}
+
+  /* 架构连接线示意：负责人 → 组 */
+  .chain{
+    max-width:1400px; margin:18px auto 0; padding:0 24px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .leader-card{
+    background:linear-gradient(135deg,#2c3140,#394055); color:#fff;
+    padding:18px 34px; border-radius:var(--r); text-align:center;
+    box-shadow:var(--shadow); min-width:240px; position:relative;
+  }
+  .leader-card .role{font-size:11px; color:var(--gold); letter-spacing:2px; margin-bottom:4px;}
+  .leader-card .name{font-size:20px; font-weight:800;}
+  .leader-card .meta{font-size:12px; color:#b9c0cf; margin-top:6px;}
+  .leader-card .edit-btn{
+    position:absolute; right:10px; top:10px; background:none; border:1px solid rgba(255,255,255,.3);
+    color:#fff; width:26px;height:26px;border-radius:8px;cursor:pointer;font-size:13px;opacity:.7;
+  }
+  .leader-card .edit-btn:hover{opacity:1; background:rgba(255,255,255,.12);}
+  .trunk{width:2px; height:26px; background:linear-gradient(var(--gold-d),var(--gold-l));}
+  .branches{display:flex; width:100%; justify-content:space-around; position:relative;}
+  .branch-line{position:absolute; top:0; height:2px; background:linear-gradient(90deg,var(--gold-l),var(--gold-d),var(--gold-l));
+    left:8%; right:8%;}
+  .branch-drop{width:2px; height:16px; background:var(--gold-d);}
+
+  .grid{
+    max-width:1400px; margin:0 auto; padding:20px 24px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:20px;
+  }
+  @media (max-width:1120px){ .grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:640px){ .grid{grid-template-columns:1fr;} }
+
+  .group-card{
+    background:var(--card); border-radius:var(--r); box-shadow:var(--shadow);
+    border:1px solid var(--line); overflow:hidden; position:relative;
+    display:flex; flex-direction:column; animation:fadeIn .3s ease;
+  }
+  @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .group-head{
+    padding:16px 18px 12px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#fbfaf6,#f4f1e8);
+  }
+  .group-head .g-row{display:flex; align-items:center; gap:8px;}
+  .group-head .g-index{
+    width:26px;height:26px;border-radius:8px;background:var(--gold);color:#1f2430;
+    font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .group-head .g-name{font-size:17px;font-weight:800;cursor:pointer;border-bottom:1px dashed transparent;}
+  .group-head .g-name:hover{border-bottom-color:var(--gold);}
+  .group-head .g-name input{font-size:16px;font-weight:800;border:1px solid var(--gold);border-radius:6px;padding:2px 6px;width:150px;}
+  .stats{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .stat{font-size:12px; padding:3px 9px; border-radius:14px; background:#fff; border:1px solid var(--line); color:var(--sub);}
+  .stat b{color:var(--ink);}
+
+  .group-body{padding:14px 18px; display:flex; flex-direction:column; gap:12px; flex:1;}
+  .field{font-size:12px; color:var(--sub);}
+  .field .label{display:flex; justify-content:space-between; margin-bottom:4px; align-items:center;}
+  .field .val{font-size:13px; color:var(--ink); font-weight:600; cursor:pointer;
+    background:#f7f5ee; border-radius:8px; padding:7px 10px; border:1px solid transparent;}
+  .field .val:hover{border-color:var(--gold); background:#fdfaf2;}
+  .field .val input{width:100%; border:none; outline:none; background:transparent; font:inherit; border-bottom:1px solid var(--gold);}
+  .field .val.project{display:flex; align-items:center; gap:6px;}
+  .field .val.project .pj{width:22px;height:22px;border-radius:6px;background:var(--blue);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:12px;flex:none;}
+
+  .progress-row{margin-top:2px;}
+  .progress-bar{height:12px; border-radius:8px; background:#eee9dc; overflow:hidden; position:relative;}
+  .progress-bar > i{display:block; height:100%; border-radius:8px;
+    background:linear-gradient(90deg,var(--gold-d),var(--gold)); transition:width .25s;}
+  .progress-ctrl{display:flex; align-items:center; gap:10px; margin-top:6px;}
+  .progress-ctrl input[type=range]{flex:1; accent-color:var(--gold-d);}
+  .progress-ctrl span{font-size:12px; font-weight:800; width:34px; text-align:right;}
+
+  .members{margin-top:2px;}
+  .members-label{font-size:12px; color:var(--sub); margin-bottom:6px; display:flex; justify-content:space-between;}
+  .member-chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip{
+    background:var(--gold-l); color:#5c4a24; font-size:12px; padding:4px 10px;
+    border-radius:14px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:.12s;
+  }
+  .chip:hover{background:var(--gold); color:#1f2430;}
+  .chip .x{font-weight:800; opacity:.5; font-size:13px;}
+  .chip .x:hover{opacity:1; color:var(--red);}
+  .add-member{
+    background:none; border:1px dashed var(--gold); color:var(--gold-d); font-size:12px;
+    padding:4px 12px; border-radius:14px; cursor:pointer; transition:.12s;
+  }
+  .add-member:hover{background:var(--gold-l);}
+
+  .group-foot{
+    padding:10px 18px; border-top:1px solid var(--line); display:flex; gap:8px; justify-content:space-between;
+  }
+  .group-foot button{
+    background:none; border:1px solid var(--line); color:var(--sub); font-size:12px;
+    padding:5px 10px; border-radius:8px; cursor:pointer; transition:.12s;
+  }
+  .group-foot button:hover{border-color:var(--red); color:var(--red);}
+  .group-foot .dup{border-color:var(--line);}
+  .group-foot .dup:hover{border-color:var(--blue); color:var(--blue);}
+
+  .add-group-btn{
+    border:2px dashed var(--gold); background:transparent; color:var(--gold-d);
+    border-radius:var(--r); min-height:160px; font-size:15px; font-weight:700;
+    cursor:pointer; transition:.15s; display:flex; align-items:center; justify-content:center;
+  }
+  .add-group-btn:hover{background:var(--gold-l);}
+
+  /* modal */
+  .modal-bg{position:fixed; inset:0; background:rgba(20,24,32,.5); z-index:50;
+    display:none; align-items:center; justify-content:center; padding:20px;}
+  .modal-bg.show{display:flex;}
+  .modal{background:#fff; border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,.25);
+    width:100%; max-width:420px; padding:24px; animation:pop .2s ease;}
+  @keyframes pop{from{transform:scale(.94); opacity:0;} to{transform:none; opacity:1;}}
+  .modal h3{font-size:16px; margin-bottom:16px;}
+  .modal label{display:block; font-size:12px; color:var(--sub); margin:12px 0 5px;}
+  .modal input, .modal select{
+    width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:9px; font-size:14px; outline:none;
+  }
+  .modal input:focus{border-color:var(--gold);}
+  .modal .actions{display:flex; gap:10px; margin-top:20px; justify-content:flex-end;}
+  .modal .actions button{padding:9px 18px; border-radius:9px; font-weight:700; cursor:pointer; font-size:13px; border:none;}
+  .modal .actions .ok{background:var(--gold); color:#1f2430;}
+  .modal .actions .cancel{background:#eee9dc; color:var(--sub);}
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:#1f2430; color:#fff; padding:10px 20px; border-radius:12px; font-size:13px;
+    opacity:0; transition:.3s; z-index:99; box-shadow:var(--shadow);
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🎬 一抹金蓝 <span class="gold">· 制作团队管理图</span></h1>
+    <div class="sub">制作负责人 → 项目组长 → 组员 · 实时人数 / 项目 / 进度 / 所需时间</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="save-badge saved" id="saveBadge">✓ 已自动保存</div>
+  <button id="editLeaderBtn" class="ghost">改负责人</button>
+</header>
+
+<div class="toolbar">
+  <button id="exportBtn">📤 导出数据</button>
+  <button id="importBtn">📥 导入数据</button>
+  <button id="resetDemoBtn">♻️ 载入示例</button>
+  <input type="file" id="fileInput" accept=".json" style="display:none">
+  <span class="tip">💡 点击任意文字即可编辑 · 数据自动保存在本机浏览器</span>
+</div>
+
+<!-- 架构连接 -->
+<div class="chain">
+  <div class="leader-card">
+    <div class="role">制片 · 制作负责人</div>
+    <div class="name" id="leaderName">郭秋</div>
+    <div class="meta" id="leaderMeta">统筹 4 个项目组 · 24 名成员</div>
+    <button class="edit-btn" title="编辑" onclick="openLeaderEdit()">·</button>
+  </div>
+  <div class="trunk"></div>
+  <div class="branches">
+    <div class="branch-line"></div>
+  </div>
+</div>
+
+<!-- 组卡片 -->
+<div class="grid" id="grid"></div>
+
+<!-- modal -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<input type="file" id="importFile" accept=".json,.txt" style="display:none">
+
+<script>
+/* ================= 数据模型 ================= */
+const STORAGE_KEY = 'ymjl_team_org_v1';
+const DEFAULT_DATA = {
+  leader: '制作负责人',
+  groups: [
+    { name:'项目一组', leader:'组长A', project:'短剧《重生之千金》', progress:65, need:'45天', members:['组员1','组员2','组员3','组员4','组员5','组员6'] },
+    { name:'项目二组', leader:'组长B', project:'动态漫《都市医仙》', progress:35, need:'30天', members:['组员7','组员8','组员9','组员10','组员11','组员12'] },
+    { name:'项目三组', leader:'组长C', project:'短剧《战神归来》', progress:80, need:'20天', members:['组员13','组员14','组员15','组员16','组员17','组员18'] },
+    { name:'项目四组', leader:'组长D', project:'动画《灵域传说》', progress:12, need:'60天', members:['组员19','组员20','组员21','组员22','组员23','组员24'] }
+  ]
+};
+
+let data = load();
+let saveTimer = null;
+
+function load(){
+  try{ const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ const d = JSON.parse(raw); if(d && d.groups && Array.isArray(d.groups)) return d; }
+  }catch(e){}
+  return copy(DEFAULT_DATA);
+}
+function copy(o){ return JSON.parse(JSON.stringify(o)); }
+function persist(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  const b = document.getElementById('saveBadge');
+  b.textContent = '✓ 已自动保存';
+  b.classList.remove('saved'); void b.offsetWidth; b.classList.add('saved');
+}
+
+/* ================= 渲染 ================= */
+function render(){
+  const total = data.groups.reduce((s,g)=> s + (g.members?g.members.length:0), 0);
+  document.getElementById('leaderName').textContent = data.leader;
+  document.getElementById('leaderMeta').textContent =
+    `统筹 ${data.groups.length} 个项目组 · ${total} 名成员`;
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  data.groups.forEach((g, gi)=>{
+    const card = document.createElement('div');
+    card.className = 'group-card';
+    card.innerHTML = groupHTML(g, gi);
+    grid.appendChild(card);
+    bindGroup(card, g, gi);
+  });
+
+  // 加一组按钮
+  const addBtn = document.createElement('div');
+  addBtn.className = 'add-group-btn';
+  addBtn.textContent = '+ 添加项目组';
+  addBtn.onclick = ()=> openGroupEdit(-1);
+  grid.appendChild(addBtn);
+}
+
+function groupHTML(g, gi){
+  const n = g.members?g.members.length:0;
+  const chips = g.members.map((m,mi)=>
+    `<span class="chip" title="点击改名/删除"><span class="mname">${esc(m)}</span></span>`
+  ).join('');
+  return `
+    <div class="group-head">
+      <div class="g-row">
+        <div class="g-index">${gi+1}</div>
+        <span class="g-name" data-name-edit>${esc(g.name)}</span>
+      </div>
+      <div class="stats">
+        <span class="stat">组长 <b>${esc(g.leader||'—')}</b></span>
+        <span class="stat">成员 <b>${n}</b> 人</span>
+      </div>
+    </div>
+    <div class="group-body">
+      <div class="field">
+        <div class="label"><span>当前项目</span></div>
+        <div class="val project" data-project-edit>
+          <span class="pj">项</span><span>${esc(g.project||'未分配')}</span>
+        </div>
+      </div>
+      <div class="field progress-row">
+        <div class="label"><span>项目完成进度</span><span class="pnum"></span></div>
+        <div class="progress-bar"><i style="width:${clamp(g.progress||0)}%"></i></div>
+        <div class="progress-ctrl">
+          <input type="range" min="0" max="100" step="1" value="${clamp(g.progress||0)}">
+          <span>${clamp(g.progress||0)}%</span>
+        </div>
+      </div>
+      <div class="field">
+        <div class="label"><span>所需时间</span></div>
+        <div class="val" data-need-edit><span>${esc(g.need||'—')}</span></div>
+      </div>
+      <div class="members">
+        <div class="members-label"><span>组员（${n} 人）</span></div>
+        <div class="member-chips">
+          ${chips}
+          <button class="add-member" data-add-member>+ 添加组员</button>
+        </div>
+      </div>
+    </div>
+    <div class="group-foot">
+      <button data-edit>✎ 设置</button>
+      <button data-dup class="dup">⧉ 复制组</button>
+      <button data-del>🗑 删除组</button>
+    </div>`;
+}
+
+function bindGroup(card, g, gi){
+  // 组名编辑
+  card.querySelector('[data-name-edit]').addEventListener('click', function(){
+    inlineRename(this, (v)=>{ g.name = v; persist(); refreshLeader(); });
+  });
+  // 组长编辑（通过设置弹窗，但也可直接在卡片上：加到 stats? 放设置里）
+  // 项目名编辑
+  card.querySelector('[data-project-edit]').addEventListener('click', function(){
+    const span = this.querySelector('span:last-child');
+    inlineInput(span, (v)=>{ g.project = v; persist(); });
+  });
+  // 所需时间编辑
+  card.querySelector('[data-need-edit]').addEventListener('click', function(){
+    const span = this.querySelector('span');
+    inlineInput(span, (v)=>{ g.need = v; persist(); });
+  });
+  // 进度滑块
+  const range = card.querySelector('input[type=range]');
+  const pnum = card.querySelector('.pnum');
+  range.addEventListener('input', ()=>{
+    g.progress = parseInt(range.value,10);
+    card.querySelector('.progress-bar i').style.width = g.progress + '%';
+    range.nextElementSibling.textContent = g.progress + '%';
+    pnum.textContent = g.progress + '%';
+    persist();
+  });
+  // 成员chip点击：改名；右下角提供删除（长按？）→ 用弹窗编辑每个成员
+  card.querySelectorAll('.chip').forEach((chip, mi)=>{
+    chip.addEventListener('click', (e)=>{
+      if(e.target.classList.contains('mname')){
+        openMemberMenu(gi, mi, chip);
+      }
+    });
+  });
+  card.querySelectorAll('.chip .mname').forEach(()=>{});
+  // 添加成员
+  card.querySelector('[data-add-member]').addEventListener('click', ()=>{
+    openAddMember(gi);
+  });
+  // 底部操作
+  card.querySelector('[data-edit]').addEventListener('click', ()=> openGroupEdit(gi));
+  card.querySelector('[data-dup]').addEventListener('click', ()=>{
+    const clone = copy(g); clone.name = g.name + ' · 副本';
+    data.groups.push(clone); persist(); render();
+  });
+  card.querySelector('[data-del]').addEventListener('click', ()=>{
+    if(confirm(`确定删除「${g.name}」整个组？`)){ data.groups.splice(gi,1); persist(); render(); }
+  });
+}
+
+/* ================= 编辑辅助 ================= */
+/* 标题类：点击改为输入框，回车保存（带初始值，可直接覆盖，含旧值方便） */
+function inlineRename(el, cb){
+  if(el.querySelector('input')) return;
+  const old = el.textContent;
+  el.innerHTML = `<input value="${esc(old)}">`;
+  const input = el.querySelector('input');
+  let done = false;
+  const commit = (save)=>{
+    if(done) return; done = true;
+    if(save && input.value.trim()){ cb(input.value.trim()); }
+    render();
+  };
+  input.focus(); input.select();
+  input.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){commit(true);} if(e.key==='Escape'){commit(false);} });
+  input.addEventListener('blur', ()=>commit(input.value.trim()!==old));
+}
+
+function inlineInput(el, cb){
+  if(el.querySelector('input')) return;
+  const old = el.textContent;
+  const inp = document.createElement('input');
+  inp.value = old;
+  inp.style.cssText='border:none;outline:none;background:transparent;font:inherit;width:100%;border-bottom:1px solid var(--gold);';
+  el.textContent=''; el.appendChild(inp);
+  let done = false;
+  const commit = (save)=>{
+    if(done) return; done = true;
+    if(save && inp.value.trim()){ cb(inp.value.trim()); }
+    render();
+  };
+  inp.focus(); inp.select();
+  inp.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){commit(true);} if(e.key==='Escape'){commit(false);} });
+  inp.addEventListener('blur', ()=>commit(inp.value.trim()!==old));
+}
+
+/* 成员chip菜单：弹窗改名/删除 */
+function openMemberMenu(gi, mi, chip){
+  const g = data.groups[gi];
+  const old = g.members[mi];
+  modal(`
+    <h3>编辑成员</h3>
+    <label>成员姓名</label>
+    <input id="mmName" value="${esc(old)}">
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="ok" onclick="saveMember()">保存</button>
+    </div>
+  `, ()=>{
+    const input = document.getElementById('mmName');
+    input.focus(); input.select();
+    window._memberCtx = {gi, mi};
+  });
+}
+function saveMember(){
+  const {gi, mi} = window._memberCtx || {};
+  if(gi===undefined) return;
+  const v = document.getElementById('mmName').value.trim();
+  if(v){ data.groups[gi].members[mi] = v; persist(); render(); }
+  closeModal();
+}
+
+/* 添加成员 */
+function openAddMember(gi){
+  modal(`
+    <h3>添加组员</h3>
+    <label>成员姓名</label>
+    <input id="mmNew" placeholder="输入姓名后回车">
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="ok" onclick="addMember()">添加</button>
+    </div>
+  `, ()=>{
+    const input = document.getElementById('mmNew');
+    input.focus();
+    window._addGi = gi;
+    input.addEventListener('keydown',(e)=>{ if(e.key==='Enter') addMember(); });
+  });
+}
+function addMember(){
+  const inp = document.getElementById('mmNew');
+  const v = inp ? inp.value.trim() : '';
+  const gi = window._addGi;
+  if(v && gi!==undefined){
+    data.groups[gi].members.push(v); persist(); render();
+    inp.value='';
+    toast('已添加：'+v);
+    if(inp.focus) inp.focus();
+    // 保持弹窗开启，便于连续录入
+  } else if(!v){
+    closeModal();
+  }
+}
+
+/* 添加/编辑整组 */
+function openGroupEdit(gi){
+  const isNew = gi === -1;
+  const g = isNew ? {name:'', leader:'', project:'', progress:0, need:'', members:[]} : data.groups[gi];
+  modal(`
+    <h3>${isNew?'添加项目组':'编辑项目组'}</h3>
+    <label>组名称</label><input id="geName" value="${esc(g.name)}" placeholder="如：项目一组">
+    <label>组长姓名</label><input id="geLeader" value="${esc(g.leader)}" placeholder="组长姓名">
+    <label>当前项目</label><input id="geProject" value="${esc(g.project)}" placeholder="项目名称">
+    <label>所需时间</label><input id="geNeed" value="${esc(g.need)}" placeholder="如：45天 / 进行中">
+    <label>完成进度（%）</label>
+    <div class="progress-ctrl">
+      <input id="geProgress" type="range" min="0" max="100" step="1" value="${clamp(g.progress||0)}" style="flex:1">
+      <span id="gePv">${clamp(g.progress||0)}%</span>
+    </div>
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="ok" onclick="saveGroup()">保存</button>
+    </div>
+  `, ()=>{
+    document.getElementById('geProgress').addEventListener('input',()=>{
+      document.getElementById('gePv').textContent = document.getElementById('geProgress').value + '%';
+    });
+    window._groupGi = gi;
+    window._isNew = isNew;
+  });
+}
+function saveGroup(){
+  const name = document.getElementById('geName').value.trim();
+  const leader = document.getElementById('geLeader').value.trim();
+  const project = document.getElementById('geProject').value.trim();
+  const need = document.getElementById('geNeed').value.trim();
+  const progress = parseInt(document.getElementById('geProgress').value,10)||0;
+  if(!name){ toast('请填写组名称'); return; }
+  if(window._isNew){
+    data.groups.push({name, leader, project, progress, need, members:[]});
+  }else{
+    const g = data.groups[window._groupGi];
+    g.name=name; g.leader=leader; g.project=project; g.need=need; g.progress=progress;
+  }
+  persist(); render(); closeModal();
+}
+
+/* 负责人编辑 */
+function openLeaderEdit(){
+  modal(`
+    <h3>制作负责人</h3>
+    <label>负责人姓名</label><input id="leaderInput" value="${esc(data.leader)}">
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="ok" onclick="saveLeader()">保存</button>
+    </div>
+  `, ()=>{
+    const i = document.getElementById('leaderInput'); i.focus(); i.select();
+  });
+}
+function saveLeader(){
+  const v = document.getElementById('leaderInput').value.trim();
+  if(v){ data.leader = v; persist(); render(); }
+  closeModal();
+}
+
+/* ================= modal 通用 ================= */
+function modal(html, onOpen){
+  document.getElementById('modalBox').innerHTML = html;
+  const bg = document.getElementById('modalBg');
+  bg.classList.add('show');
+  if(onOpen) onOpen();
+}
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('show');
+  window._memberCtx=null; window._addGi=undefined; window._groupGi=undefined;
+}
+
+/* ================= 工具栏 ================= */
+function refreshLeader(){ document.getElementById('leaderMeta').textContent =
+  `统筹 ${data.groups.length} 个项目组 · ${data.groups.reduce((s,g)=>s+(g.members?g.members.length:0),0)} 名成员`; }
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '制作团队管理数据.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('已导出 JSON 备份');
+});
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  document.getElementById('importFile').click();
+});
+document.getElementById('importFile').addEventListener('change', (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const d = JSON.parse(r.result);
+      if(!d || !Array.isArray(d.groups)) throw new Error('bad');
+      // 规范化
+      d.groups.forEach(g=>{
+        g.name=g.name||''; g.leader=g.leader||''; g.project=g.project||'';
+        g.progress=g.progress||0; g.need=g.need||''; g.members = Array.isArray(g.members)?g.members:[];
+      });
+      data = d; persist(); render(); toast('导入成功');
+    }catch(err){ toast('导入失败：文件格式不正确'); }
+  };
+  r.readAsText(f);
+  e.target.value='';
+});
+document.getElementById('resetDemoBtn').addEventListener('click', ()=>{
+  if(confirm('载入示例数据？当前编辑内容将被覆盖。')){
+    data = copy(DEFAULT_DATA); persist(); render(); toast('已载入示例');
+  }
+});
+document.getElementById('editLeaderBtn').addEventListener('click', openLeaderEdit);
+
+/* ================= 工具 ================= */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function clamp(n){ n=parseInt(n,10); if(isNaN(n))return 0; return Math.max(0, Math.min(100,n)); }
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove('show'), 2000);
+}
+
+/* 初始化 */
+render();
+</script>
+</body>
+</html>
