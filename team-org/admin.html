@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一抹金蓝 · 制作团队管理后台</title>
+<style>
+  :root{--gold:#d4af6a;--gold-d:#b8934b;--gold-l:#f0e3c4;--ink:#1f2430;--sub:#6b7280;--line:#e7e3d8;--bg:#f6f4ee;--card:#fff;--red:#c65f5f;--blue:#4a6fa5;
+    --shadow:0 6px 22px rgba(31,36,48,.08);--r:16px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:40px;}
+  header{background:linear-gradient(135deg,#1f2430,#2c3140);color:#fff;padding:20px 28px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow);}
+  header h1{font-size:19px;} header h1 .gold{color:var(--gold);}
+  header .sub{font-size:12px;color:#b9c0cf;margin-top:3px;}
+  .spacer{flex:1;}
+  header button{background:var(--gold);border:none;color:#1f2430;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:13px;}
+  header button.ghost{background:transparent;color:#dfe4ef;border:1px solid #454c5f;}
+  .toolbar{max-width:1400px;margin:18px auto 0;padding:0 24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .toolbar button{background:#fff;border:1px solid var(--line);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.04);}
+  .toolbar button:hover{border-color:var(--gold);color:var(--gold-d);}
+  .toolbar .tip{font-size:12px;color:var(--sub);margin-left:auto;}
+  .summary{max-width:1400px;margin:16px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .sum-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .sum-card .k{font-size:12px;color:var(--sub);}
+  .sum-card .v{font-size:26px;font-weight:800;margin-top:6px;color:var(--ink);}
+  .sum-card .v small{font-size:13px;color:var(--sub);font-weight:600;}
+  .grid{max-width:1400px;margin:20px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  @media(max-width:1120px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:640px){.grid{grid-template-columns:1fr;}}
+  .gc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:.15s;position:relative;}
+  .gc:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(31,36,48,.12);border-color:var(--gold);}
+  .gc-head{padding:15px 18px;background:linear-gradient(180deg,#fbfaf6,#f4f1e8);border-bottom:1px solid var(--line);}
+  .gc-index{width:26px;height:26px;border-radius:8px;background:var(--gold);color:#1f2430;font-weight:800;font-size:14px;display:inline-flex;align-items:center;justify-content:center;margin-right:8px;}
+  .gc-name{font-size:16px;font-weight:800;}
+  .gc-leader{font-size:12px;color:var(--sub);margin-top:6px;}
+  .gc-body{padding:14px 18px;}
+  .kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed #f0ece0;}
+  .kv .k{color:var(--sub);} .kv .v{font-weight:700;color:var(--ink);}
+  .bar{height:9px;border-radius:6px;background:#eee9dc;overflow:hidden;margin-top:8px;}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));}
+  .gc-badge{position:absolute;top:12px;right:14px;font-size:11px;padding:3px 9px;border-radius:12px;background:var(--gold-l);color:var(--gold-d);}
+  .add-btn{border:2px dashed var(--gold);background:transparent;color:var(--gold-d);border-radius:var(--r);min-height:180px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .add-btn:hover{background:var(--gold-l);}
+  /* 登录 */
+  .login-bg{position:fixed;inset:0;background:linear-gradient(135deg,#1f2430,#2c3140);display:flex;align-items:center;justify-content:center;z-index:100;}
+  .login-box{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+  .login-box h2{font-size:18px;margin-bottom:6px;}
+  .login-box .hint{font-size:12px;color:var(--sub);margin-bottom:20px;}
+  .login-box input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;outline:none;margin-bottom:14px;}
+  .login-box input:focus{border-color:var(--gold);}
+  .login-box button{width:100%;background:var(--gold);border:none;color:#1f2430;font-weight:700;padding:11px;border-radius:10px;font-size:15px;cursor:pointer;}
+  .login-box .err{color:var(--red);font-size:12px;margin-top:10px;text-align:center;}
+  .login-box a{display:block;text-align:center;font-size:12px;color:var(--sub);margin-top:14px;text-decoration:none;}
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(20,24,32,.5);z-index:80;display:none;align-items:center;justify-content:center;padding:18px;}
+  .modal-bg.show{display:flex;}
+  .modal{background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.25);width:100%;max-width:460px;padding:24px;max-height:90vh;overflow:auto;animation:pop .2s ease;}
+  @keyframes pop{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:none;}}
+  .modal h3{font-size:16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+  .modal h3 .x{cursor:pointer;color:var(--sub);}
+  .modal .row{margin-bottom:11px;}
+  .modal label{font-size:12px;color:var(--sub);display:block;margin-bottom:4px;}
+  .modal input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;outline:none;}
+  .modal input:focus{border-color:var(--gold);}
+  .modal .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .chip{display:inline-flex;align-items:center;gap:4px;background:var(--gold-l);color:#5c4a24;font-size:12px;padding:4px 10px;border-radius:14px;margin:3px 4px 0 0;}
+  .chip .x{cursor:pointer;font-weight:800;opacity:.5;} .chip .x:hover{opacity:1;color:var(--red);}
+  .modal .actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;}
+  .modal .actions button{padding:9px 18px;border-radius:9px;font-weight:700;cursor:pointer;font-size:13px;border:none;}
+  .modal .ok{background:var(--gold);color:#1f2430;} .modal .cancel{background:#eee9dc;color:var(--sub);}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1f2430;color:#fff;padding:10px 20px;border-radius:12px;font-size:13px;opacity:0;transition:.3s;z-index:99;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="login-bg" id="loginBg">
+  <div class="login-box">
+    <h2>🔐 制作团队管理后台</h2>
+    <div class="hint">请输入管理口令（默认 ymjl888）</div>
+    <input type="password" id="loginPass" placeholder="管理口令">
+    <button id="loginBtn">进入后台</button>
+    <div class="err" id="loginErr"></div>
+    <a href="index.html">‹ 返回团队管理图</a>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <header>
+    <div>
+      <h1>🎬 一抹金蓝 <span class="gold">· 制作团队管理后台</span></h1>
+      <div class="sub">全量汇总 · 4 个小组统一管理</div>
+    </div>
+    <div class="spacer"></div>
+    <button id="passBtn" class="ghost">🔑 改口令</button>
+    <button id="logoutBtn" class="ghost">退出</button>
+  </header>
+
+  <div class="toolbar">
+    <button id="exportBtn">📤 导出数据</button>
+    <button id="importBtn">📥 导入数据</button>
+    <button id="resetBtn">♻️ 载入示例</button>
+    <input type="file" id="importFile" accept=".json,.txt" style="display:none">
+    <span class="tip">💡 点击卡片可编辑该小组全部信息</span>
+  </div>
+
+  <div class="summary" id="summary"></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='ymjl_team_org_v1';
+const KEYS='ymjl_team_keys';
+const DEFAULT_KEYS={admin:'ymjl888'};
+const DEFAULT_DATA={
+  leader:'制作负责人',
+  groups:[
+    {name:'项目一组',leader:'组长A',project:'短剧《重生之千金》',progress:65,need:'45天',credit:0,timeSpent:'',members:['组员1','组员2','组员3','组员4','组员5','组员6']},
+    {name:'项目二组',leader:'组长B',project:'动态漫《都市医仙》',progress:35,need:'30天',credit:0,timeSpent:'',members:['组员7','组员8','组员9','组员10','组员11','组员12']},
+    {name:'项目三组',leader:'组长C',project:'短剧《战神归来》',progress:80,need:'20天',credit:0,timeSpent:'',members:['组员13','组员14','组员15','组员16','组员17','组员18']},
+    {name:'项目四组',leader:'组长D',project:'动画《灵域传说》',progress:12,need:'60天',credit:0,timeSpent:'',members:['组员19','组员20','组员21','组员22','组员23','组员24']}
+  ]
+};
+let data=load(); let keys=getKeys();
+
+function load(){ try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);if(d&&Array.isArray(d.groups)){d.groups.forEach(norm);return d;}}}catch(e){}
+  const d=copy(DEFAULT_DATA);d.groups.forEach(norm);return d;}
+function norm(g){ if(g.credit==null)g.credit=0; if(g.timeSpent==null)g.timeSpent=''; return g;}
+function getKeys(){ try{const r=localStorage.getItem(KEYS);if(r)return JSON.parse(r);}catch(e){} return copy(DEFAULT_KEYS);}
+function saveKeys(){ localStorage.setItem(KEYS,JSON.stringify(keys)); }
+function copy(o){return JSON.parse(JSON.stringify(o));}
+function persist(noToast){ localStorage.setItem(KEY,JSON.stringify(data)); if(!noToast)toast('✓ 已保存'); }
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function clamp(n){n=parseInt(n,10);if(isNaN(n))return 0;return Math.max(0,Math.min(100,n));}
+let timer; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('show'),1800);}
+
+/* 登录 */
+function checkLogin(){
+  const ls=sessionStorage.getItem('ymjl_admin_authed');
+  if(ls==='1'){ document.getElementById('loginBg').style.display='none'; document.getElementById('app').style.display=''; render(); }
+}
+document.getElementById('loginBtn').addEventListener('click',()=>{
+  const v=document.getElementById('loginPass').value;
+  if(v===keys.admin){ sessionStorage.setItem('ymjl_admin_authed','1'); document.getElementById('loginBg').style.display='none'; document.getElementById('app').style.display=''; render(); }
+  else document.getElementById('loginErr').textContent='口令错误，请重试';
+});
+document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter')document.getElementById('loginBtn').click(); });
+document.getElementById('logoutBtn').addEventListener('click',()=>{ sessionStorage.removeItem('ymjl_admin_authed'); location.reload(); });
+checkLogin();
+
+/* 汇总 */
+function renderSummary(){
+  const total=data.groups.reduce((s,g)=>s+(g.members?g.members.length:0),0);
+  const totalCredit=data.groups.reduce((s,g)=>s+(parseInt(g.credit,10)||0),0);
+  const avgProg=data.groups.length?Math.round(data.groups.reduce((s,g)=>s+clamp(g.progress),0)/data.groups.length):0;
+  document.getElementById('summary').innerHTML=`
+    <div class="sum-card"><div class="k">项目小组</div><div class="v">${data.groups.length}<small> 组</small></div></div>
+    <div class="sum-card"><div class="k">成员总数</div><div class="v">${total}<small> 人</small></div></div>
+    <div class="sum-card"><div class="k">累计已充积分</div><div class="v">${totalCredit}</div></div>
+    <div class="sum-card"><div class="k">平均完成进度</div><div class="v">${avgProg}<small> %</small></div></div>`;
+}
+
+/* 渲染卡片 */
+function render(){
+  renderSummary();
+  const grid=document.getElementById('grid'); grid.innerHTML='';
+  data.groups.forEach((g,gi)=>{
+    const card=document.createElement('div'); card.className='gc';
+    const n=g.members?g.members.length:0;
+    card.innerHTML=`
+      <div class="gc-badge">${clamp(g.progress)}%</div>
+      <div class="gc-head">
+        <span class="gc-index">${gi+1}</span><span class="gc-name">${esc(g.name)}</span>
+        <div class="gc-leader">组长：${esc(g.leader||'—')} · ${n}人</div>
+      </div>
+      <div class="gc-body">
+        <div class="kv"><span class="k">当前项目</span><span class="v">${esc(g.project||'未分配')}</span></div>
+        <div class="kv"><span class="k">制作周期</span><span class="v">${esc(g.need||'—')}</span></div>
+        <div class="kv"><span class="k">已充积分</span><span class="v">${g.credit==null?0:g.credit}</span></div>
+        <div class="kv"><span class="k">已消耗时间</span><span class="v">${esc(g.timeSpent||'—')}</span></div>
+        <div class="bar"><i style="width:${clamp(g.progress)}%"></i></div>
+      </div>`;
+    card.onclick=()=>openEdit(gi);
+    grid.appendChild(card);
+  });
+  const add=document.createElement('div'); add.className='add-btn'; add.textContent='+ 添加项目组';
+  add.onclick=()=>openEdit(-1); grid.appendChild(add);
+}
+
+/* 编辑整组 */
+function openEdit(gi){
+  const isNew=gi===-1;
+  const g=isNew?{name:'',leader:'',project:'',progress:0,need:'',credit:0,timeSpent:'',members:[]}:data.groups[gi];
+  modal(`
+    <h3>${isNew?'添加项目组':'编辑 '+esc(g.name)}<span class="x" onclick="closeModal()">✕</span></h3>
+    <div class="two">
+      <div class="row"><label>组名称</label><input id="eName" value="${esc(g.name)}"></div>
+      <div class="row"><label>组长</label><input id="eLeader" value="${esc(g.leader)}"></div>
+    </div>
+    <div class="row"><label>当前项目</label><input id="eProject" value="${esc(g.project)}"></div>
+    <div class="two">
+      <div class="row"><label>完成进度 %</label><input id="eProgress" type="number" min="0" max="100" value="${clamp(g.progress)}"></div>
+      <div class="row"><label>所需周期</label><input id="eNeed" value="${esc(g.need)}"></div>
+    </div>
+    <div class="two">
+      <div class="row"><label>已充积分</label><input id="eCredit" type="number" min="0" value="${g.credit==null?0:g.credit}"></div>
+      <div class="row"><label>已消耗时间</label><input id="eTime" value="${esc(g.timeSpent)}" placeholder="如：120小时"></div>
+    </div>
+    <div class="row"><label>成员（点击 × 删除）</label>
+      <div id="memberBox">
+        ${(g.members||[]).map((m,mi)=>`<span class="chip">${esc(m)}<span class="x" data-m="${mi}">×</span></span>`).join('')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px"><input id="eMember" placeholder="输入姓名后点击添加"><button class="ok" id="addM" style="padding:8px 14px">＋</button></div>
+    </div>
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="ok" onclick="saveEdit()">保存</button>
+    </div>
+  `,()=>{
+    window._gi=gi; window._isNew=isNew; window._members=(g.members||[]).slice();
+    document.getElementById('memberBox').addEventListener('click',e=>{
+      if(e.target.classList.contains('x')){ const i=parseInt(e.target.dataset.m,10); window._members.splice(i,1); renderMembers(); }
+    });
+    document.getElementById('addM').addEventListener('click',()=>{ addMember(); });
+    document.getElementById('eMember').addEventListener('keydown',e=>{ if(e.key==='Enter')addMember(); });
+    function addMember(){ const v=document.getElementById('eMember').value.trim(); if(v){ window._members.push(v); document.getElementById('eMember').value=''; renderMembers(); } }
+    function renderMembers(){ document.getElementById('memberBox').innerHTML=window._members.map((m,mi)=>`<span class="chip">${esc(m)}<span class="x" data-m="${mi}">×</span></span>`).join(''); }
+  });
+}
+function saveEdit(){
+  const name=document.getElementById('eName').value.trim();
+  if(!name){toast('请填写组名称');return;}
+  const obj={ name, leader:document.getElementById('eLeader').value.trim(),
+    project:document.getElementById('eProject').value.trim(),
+    progress:clamp(document.getElementById('eProgress').value),
+    need:document.getElementById('eNeed').value.trim(),
+    credit:parseInt(document.getElementById('eCredit').value,10)||0,
+    timeSpent:document.getElementById('eTime').value.trim(),
+    members:window._members||[] };
+  if(window._isNew){ data.groups.push(obj); }
+  else if(window._gi!==undefined){ data.groups[window._gi]=obj; }
+  persist(); render(); closeModal();
+}
+
+/* 改口令 */
+document.getElementById('passBtn').addEventListener('click',()=>{
+  modal(`
+    <h3>修改管理口令<span class="x" onclick="closeModal()">✕</span></h3>
+    <div class="row"><label>新口令</label><input id="p1" placeholder="输入新口令"></div>
+    <div class="row"><label>确认新口令</label><input id="p2" placeholder="再次输入"></div>
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="ok" onclick="savePass()">保存</button>
+    </div>
+  `);
+});
+function savePass(){
+  const p1=document.getElementById('p1').value, p2=document.getElementById('p2').value;
+  if(!p1){toast('请输入新口令');return;}
+  if(p1!==p2){toast('两次输入不一致');return;}
+  keys.admin=p1; saveKeys(); toast('口令已更新'); closeModal();
+}
+
+/* 工具栏 */
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='制作团队管理数据.json'; a.click(); URL.revokeObjectURL(a.href); toast('已导出');
+});
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return; const r=new FileReader();
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d||!Array.isArray(d.groups))throw 0; d.groups.forEach(norm); data=d; persist('1'); render(); toast('导入成功'); }catch(e){ toast('导入失败：格式错误'); } };
+  r.readAsText(f); e.target.value='';
+});
+document.getElementById('resetBtn').addEventListener('click',()=>{ if(confirm('载入示例数据？当前数据将被覆盖')){ data=copy(DEFAULT_DATA); data.groups.forEach(norm); persist('1'); render(); toast('已载入示例'); } });
+
+/* modal */
+function modal(html,onOpen){ document.getElementById('modalBox').innerHTML=html; document.getElementById('modalBg').classList.add('show'); if(onOpen)onOpen(); }
+function closeModal(){ document.getElementById('modalBg').classList.remove('show'); window._gi=undefined; }
+</script>
+</body>
+</html>

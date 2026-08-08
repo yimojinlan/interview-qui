@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一抹金蓝 · 小组登记后台</title>
+<style>
+  :root{--gold:#d4af6a;--gold-d:#b8934b;--gold-l:#f0e3c4;--ink:#1f2430;--sub:#6b7280;--line:#e7e3d8;--bg:#f6f4ee;--card:#fff;--red:#c65f5f;--green:#5b8c5a;
+    --shadow:0 6px 22px rgba(31,36,48,.08);--r:16px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:40px;}
+  header{background:linear-gradient(135deg,#1f2430,#2c3140);color:#fff;padding:20px 28px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow);position:sticky;top:0;z-index:20;}
+  header h1{font-size:19px;} header h1 .gold{color:var(--gold);}
+  header .sub{font-size:12px;color:#b9c0cf;margin-top:3px;}
+  .spacer{flex:1;}
+  header button{background:var(--gold);border:none;color:#1f2430;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:13px;}
+  header button.ghost{background:transparent;color:#dfe4ef;border:1px solid #454c5f;}
+  /* 选组页 */
+  .pick-wrap{max-width:980px;margin:50px auto 0;padding:0 24px;}
+  .pick-wrap h2{font-size:22px;margin-bottom:8px;text-align:center;}
+  .pick-wrap .p-sub{text-align:center;color:var(--sub);font-size:13px;margin-bottom:26px;}
+  .pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;}
+  .pick{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:22px;cursor:pointer;text-align:center;transition:.15s;}
+  .pick:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 10px 26px rgba(31,36,48,.1);}
+  .pick .no{width:46px;height:46px;border-radius:12px;background:var(--gold);color:#1f2430;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+  .pick .nm{font-size:16px;font-weight:700;}
+  .pick .pp{font-size:12px;color:var(--sub);margin-top:6px;}
+  /* 登录 */
+  .login-box{max-width:380px;margin:60px auto 0;padding:28px;background:#fff;border-radius:20px;box-shadow:var(--shadow);}
+  .login-box h2{font-size:18px;margin-bottom:20px;}
+  .login-box input{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;font-size:15px;outline:none;margin-bottom:12px;}
+  .login-box input:focus{border-color:var(--gold);}
+  .login-box .btns{display:flex;gap:10px;}
+  .login-box .btns button{flex:1;padding:11px;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;}
+  .login-box .go{background:var(--gold);color:#1f2430;}
+  .login-box .back2{background:#eee9dc;color:var(--sub);}
+  .err{color:var(--red);font-size:12px;margin-bottom:10px;text-align:center;min-height:16px;}
+  /* 登记看板 */
+  .board{max-width:980px;margin:0 auto 0;padding:0 24px;}
+  .group-head{background:linear-gradient(135deg,#2c3140,#454c5f);color:#fff;border-radius:var(--r);padding:24px 28px;box-shadow:var(--shadow);margin-top:18px;position:relative;}
+  .group-head .gh-role{font-size:12px;color:var(--gold);letter-spacing:2px;}
+  .group-head .gh-title{font-size:24px;font-weight:800;margin-top:6px;}
+  .group-head .sub{font-size:13px;color:#c5cad6;margin-top:6px;}
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:20px;}
+  @media(max-width:620px){.cards{grid-template-columns:1fr;}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;}
+  .card h4{font-size:12px;color:var(--sub);margin-bottom:10px;display:flex;align-items:center;gap:8px;letter-spacing:.5px;}
+  .card h4 .ic{width:26px;height:26px;border-radius:8px;background:var(--gold-l);color:var(--gold-d);display:flex;align-items:center;justify-content:center;flex:none;font-size:14px;}
+  .ev{cursor:pointer;background:#f8f6ef;border-radius:9px;padding:9px 12px;font-size:15px;font-weight:600;border:1px solid transparent;}
+  .ev:hover{border-color:var(--gold);background:#fdfaf2;}
+  .ev input{border:none;outline:none;background:transparent;font:inherit;width:100%;border-bottom:1px solid var(--gold);}
+  .big-num{font-size:30px;font-weight:800;}
+  .big-num small{font-size:13px;color:var(--sub);font-weight:600;}
+  .bar{height:14px;border-radius:8px;background:#eee9dc;overflow:hidden;margin-top:8px;}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:width .25s;}
+  .prog-ctrl{display:flex;align-items:center;gap:10px;margin-top:8px;}
+  .prog-ctrl input[type=range]{flex:1;accent-color:var(--gold-d);}
+  .prog-ctrl span{font-weight:800;font-size:13px;width:36px;text-align:right;}
+  .members{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{background:var(--gold-l);color:#5c4a24;font-size:13px;padding:6px 13px;border-radius:16px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+  .chip .x{font-weight:800;opacity:.5;cursor:pointer;}
+  .chip .x:hover{opacity:1;color:var(--red);}
+  .add-m{background:none;border:1px dashed var(--gold);color:var(--gold-d);font-size:13px;padding:6px 14px;border-radius:16px;cursor:pointer;}
+  .foot{margin:22px 0;display:flex;gap:10px;justify-content:center;}
+  .foot button{background:#fff;border:1px solid var(--line);color:var(--sub);padding:9px 18px;border-radius:10px;cursor:pointer;font-size:13px;}
+  .foot button:hover{border-color:var(--gold);color:var(--gold-d);}
+  .savetip{text-align:center;font-size:12px;color:var(--green);opacity:0;transition:.3s;}
+  .savetip.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🎬 一抹金蓝 <span class="gold">· 项目小组登记后台</span></h1>
+    <div class="sub" id="hSub">选择你的小组并登录，登记本组信息</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="ghost" id="logoutBtn" style="display:none">退出登录</button>
+</header>
+
+<!-- 选组 -->
+<div class="pick-wrap" id="pickWrap"></div>
+
+<!-- 登录 -->
+<div class="login-box" id="loginBox" style="display:none">
+  <h2 id="loginTitle">小组登录</h2>
+  <div class="err" id="loginErr"></div>
+  <input type="password" id="gPass" placeholder="本组口令">
+  <div class="btns"><button class="back2" id="backPick">‹ 换组</button><button class="go" id="loginGo">进入登记</button></div>
+</div>
+
+<!-- 登记看板 -->
+<div class="board" id="board" style="display:none"></div>
+
+<script>
+const KEY='ymjl_team_org_v1';
+const KEYS='ymjl_team_keys';
+const DEFAULT_KEYS={admin:'ymjl888',groups:['g1001','g2001','g3001','g4001']};
+function copy(o){return JSON.parse(JSON.stringify(o));}
+function loadData(){ try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);if(d&&Array.isArray(d.groups)){d.groups.forEach(norm);return d;}}}catch(e){} return null; }
+function norm(g){ if(g.credit==null)g.credit=0; if(g.timeSpent==null)g.timeSpent=''; return g; }
+function getKeys(){ try{const r=localStorage.getItem(KEYS);if(r){const k=JSON.parse(r);if(!k.groups)k.groups=copy(DEFAULT_KEYS.groups);return k;}}catch(e){} return copy(DEFAULT_KEYS); }
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function clamp(n){n=parseInt(n,10);if(isNaN(n))return 0;return Math.max(0,Math.min(100,n));}
+
+let keys=getKeys(); let curGi=-1;
+let data=loadData(); // null 表示还没数据（管理后台尚未初始化）
+let savetimer;
+function showSave(){const t=document.getElementById('savetip'); }
+function toast(msg){const el=document.createElement('div');el.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2430;color:#fff;padding:9px 18px;border-radius:10px;font-size:13px;z-index:99;box-shadow:0 4px 16px rgba(0,0,0,.3)';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),1600);}
+
+/* 渲染选组 */
+function renderPick(){
+  const w=document.getElementById('pickWrap'); w.style.display=''; w.innerHTML=`
+    <h2>选择你的项目小组</h2>
+    <div class="p-sub">选好后输入本组口令进入登记</div>
+    <div class="pick-grid">
+      ${(data?data.groups:[{name:'项目一组',progress:0},{name:'项目二组',progress:0},{name:'项目三组',progress:0},{name:'项目四组',progress:0}]).map((g,gi)=>{
+        const n=data&&data.groups[gi]&&data.groups[gi].members?data.groups[gi].members.length:0;
+        return `<div class="pick" data-pick="${gi}"><div class="no">${gi+1}</div><div class="nm">${esc(g.name||('小组'+(gi+1)))}</div><div class="pp">成员 ${n} 人 · ${esc(g.project||'')}</div></div>`;
+      }).join('')}
+    </div>`;
+  w.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>showLogin(parseInt(el.dataset.pick,10)));
+}
+
+function showLogin(gi){
+  curGi=gi;
+  const g=data&&data.groups[gi];
+  document.getElementById('pickWrap').style.display='none';
+  document.getElementById('loginBox').style.display='';
+  document.getElementById('loginTitle').textContent='小组 '+(gi+1)+' · '+(g?g.name:'小组')+' 登录';
+  document.getElementById('loginErr').textContent='';
+  document.getElementById('gPass').value='';
+}
+
+function showBoard(gi){
+  curGi=gi; const g=data.groups[gi];
+  document.getElementById('pickWrap').style.display='none';
+  document.getElementById('loginBox').style.display='none';
+  document.getElementById('board').style.display='';
+  document.getElementById('logoutBtn').style.display='';
+  document.getElementById('hSub').textContent='当前登记：小组 '+(gi+1)+' · '+g.name;
+  const n=g.members?g.members.length:0;
+  const members=(g.members||[]).map((m,mi)=>`<span class="chip">${esc(m)}<span class="x" data-m="${mi}">×</span></span>`).join('');
+  document.getElementById('board').innerHTML=`
+    <div class="group-head">
+      <div class="gh-role">项目小组登记 · 制作组 ${gi+1}</div>
+      <div class="gh-title" data-name>${esc(g.name)}</div>
+      <div class="sub">组长：<span data-leader>${esc(g.leader||'未设置')}</span> · 成员 ${n} 人</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <h4><span class="ic">📋</span> 登记项目</h4>
+        <div class="ev" data-project>${esc(g.project||'未分配')}</div>
+      </div>
+      <div class="card">
+        <h4><span class="ic">👥</span> 组员登记</h4>
+        <div class="members">${members}</div>
+        <div style="margin-top:10px"><button class="add-m" data-add>+ 登记组员</button></div>
+      </div>
+      <div class="card">
+        <h4><span class="ic">📊</span> 项目进度</h4>
+        <div class="big-num"><span data-pnum>${clamp(g.progress)}</span><small> %</small></div>
+        <div class="bar"><i style="width:${clamp(g.progress)}%"></i></div>
+        <div class="prog-ctrl"><input type="range" min="0" max="100" value="${clamp(g.progress)}" data-range><span>${clamp(g.progress)}%</span></div>
+      </div>
+      <div class="card">
+        <h4><span class="ic">💰</span> 项目投入登记</h4>
+        <div style="font-size:12px;color:var(--sub);margin-bottom:6px">已充积分</div>
+        <div class="ev" data-credit>${g.credit==null?0:g.credit}</div>
+        <div style="font-size:12px;color:var(--sub);margin:12px 0 6px">已消耗时间</div>
+        <div class="ev" data-time>${esc(g.timeSpent||'—')}</div>
+      </div>
+    </div>
+    <div class="foot">
+      <button data-save style="background:var(--gold);color:#1f2430;font-weight:700">💾 保存本次登记</button>
+      <button data-back>换组 / 退出</button>
+      <button data-sync>↻ 刷新</button>
+    </div>`;
+  bindBoard(gi);
+}
+
+function inline(el,cb){
+  if(el.querySelector('input'))return;
+  const old=el.textContent.trim();
+  const inp=document.createElement('input'); inp.value=old;
+  el.textContent=''; el.appendChild(inp); inp.focus(); inp.select();
+  let done=false;
+  const fin=(save)=>{ if(done)return; done=true; const nv=inp.value.trim(); if(save&&nv){el.textContent=nv;cb(nv);} else el.textContent=old; };
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter')fin(true); if(e.key==='Escape')fin(false); });
+  inp.addEventListener('blur',()=>fin(inp.value.trim()!==old));
+}
+
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); toast('已保存'); }catch(e){ toast('保存失败：'+e.message); } }
+
+function bindBoard(gi){
+  const g=data.groups[gi];
+  const root=document.getElementById('board');
+  root.querySelector('[data-name]').addEventListener('click',function(){ inline(this,v=>{g.name=v;save();bindBoard(gi);}); });
+  root.querySelector('[data-leader]').addEventListener('click',function(){ inline(this,v=>{g.leader=v;save();}); });
+  root.querySelector('[data-project]').addEventListener('click',function(){ inline(this,v=>{g.project=v;save();}); });
+  root.querySelector('[data-credit]').addEventListener('click',function(){ inline(this,v=>{g.credit=parseInt(v,10)||0;save();}); });
+  root.querySelector('[data-time]').addEventListener('click',function(){ inline(this,v=>{g.timeSpent=v;save();}); });
+  root.querySelector('[data-range]').addEventListener('input',function(){
+    g.progress=parseInt(this.value,10); save();
+    root.querySelector('.bar i').style.width=g.progress+'%';
+    root.querySelector('[data-pnum]').textContent=g.progress;
+    this.nextElementSibling.textContent=g.progress+'%';
+  });
+  root.querySelectorAll('[data-m]').forEach(chip=>{
+    chip.addEventListener('click',e=>{ if(e.target.classList.contains('x')){ const i=parseInt(e.target.dataset.m,10); g.members.splice(i,1); save(); bindBoard(gi); } });
+  });
+  root.querySelector('[data-add]').addEventListener('click',()=>{
+    const name=prompt('登记组员姓名：');
+    if(name&&name.trim()){ g.members.push(name.trim()); save(); bindBoard(gi); }
+  });
+  root.querySelector('[data-save]').addEventListener('click',()=>{ save(); toast('💾 已保存本组登记'); });
+  root.querySelector('[data-back]').addEventListener('click',()=>{ curGi=-1; document.getElementById('board').style.display='none'; document.getElementById('logoutBtn').style.display='none'; document.getElementById('hSub').textContent='选择你的小组并登录，登记本组信息'; data=loadData(); renderPick(); });
+  root.querySelector('[data-sync]').addEventListener('click',()=>{ data=loadData(); bindBoard(gi); toast('已刷新最新数据'); });
+}
+
+/* 登录动作 */
+document.getElementById('loginGo').addEventListener('click',()=>{
+  const v=document.getElementById('gPass').value;
+  const gi=curGi;
+  const need=data?data.groups[gi]?1:0:0;
+  if(!data || !data.groups[gi]){ document.getElementById('loginErr').textContent='该小组数据尚未初始化，请先联系管理员在管理后台建立'; return; }
+  const pass=keys.groups[gi]||DEFAULT_KEYS.groups[gi];
+  if(v===pass){ sessionStorage.setItem('ymjl_group_'+gi,'1'); showBoard(gi); }
+  else document.getElementById('loginErr').textContent='口令错误，请重试';
+});
+document.getElementById('gPass').addEventListener('keydown',e=>{ if(e.key==='Enter')document.getElementById('loginGo').click(); });
+document.getElementById('backPick').addEventListener('click',()=>{ curGi=-1; document.getElementById('loginBox').style.display='none'; document.getElementById('pickWrap').style.display=''; renderPick(); });
+document.getElementById('logoutBtn').addEventListener('click',()=>{ curGi=-1; document.getElementById('board').style.display='none'; document.getElementById('logoutBtn').style.display='none'; document.getElementById('hSub').textContent='选择你的小组并登录，登记本组信息'; data=loadData(); renderPick(); });
+
+/* 初始化：支持 #!/g/N 直达 */
+function init(){
+  data=loadData();
+  const m=location.hash.match(/^#!\/g\/(\d+)/);
+  if(m && data && data.groups[m[1]] && sessionStorage.getItem('ymjl_group_'+m[1])==='1'){ showBoard(parseInt(m[1],10)); }
+  else if(m && data && data.groups[m[1]]){ showLogin(parseInt(m[1],10)); }
+  else renderPick();
+}
+init();
+</script>
+</body>
+</html>

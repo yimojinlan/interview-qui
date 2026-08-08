@@ -275,10 +275,10 @@ const STORAGE_KEY = 'ymjl_team_org_v1';
 const DEFAULT_DATA = {
   leader: '制作负责人',
   groups: [
-    { name:'项目一组', leader:'组长A', project:'短剧《重生之千金》', progress:65, need:'45天', members:['组员1','组员2','组员3','组员4','组员5','组员6'] },
-    { name:'项目二组', leader:'组长B', project:'动态漫《都市医仙》', progress:35, need:'30天', members:['组员7','组员8','组员9','组员10','组员11','组员12'] },
-    { name:'项目三组', leader:'组长C', project:'短剧《战神归来》', progress:80, need:'20天', members:['组员13','组员14','组员15','组员16','组员17','组员18'] },
-    { name:'项目四组', leader:'组长D', project:'动画《灵域传说》', progress:12, need:'60天', members:['组员19','组员20','组员21','组员22','组员23','组员24'] }
+    { name:'项目一组', leader:'组长A', project:'短剧《重生之千金》', progress:65, need:'45天', credit:0, timeSpent:'', members:['组员1','组员2','组员3','组员4','组员5','组员6'] },
+    { name:'项目二组', leader:'组长B', project:'动态漫《都市医仙》', progress:35, need:'30天', credit:0, timeSpent:'', members:['组员7','组员8','组员9','组员10','组员11','组员12'] },
+    { name:'项目三组', leader:'组长C', project:'短剧《战神归来》', progress:80, need:'20天', credit:0, timeSpent:'', members:['组员13','组员14','组员15','组员16','组员17','组员18'] },
+    { name:'项目四组', leader:'组长D', project:'动画《灵域传说》', progress:12, need:'60天', credit:0, timeSpent:'', members:['组员19','组员20','组员21','组员22','组员23','组员24'] }
   ]
 };
 
@@ -360,6 +360,14 @@ function groupHTML(g, gi){
         <div class="label"><span>所需时间</span></div>
         <div class="val" data-need-edit><span>${esc(g.need||'—')}</span></div>
       </div>
+      <div class="field">
+        <div class="label"><span>已充积分</span></div>
+        <div class="val" data-credit-edit><span>${esc(g.credit==null?0:g.credit)}</span></div>
+      </div>
+      <div class="field">
+        <div class="label"><span>已消耗时间</span></div>
+        <div class="val" data-tspent-edit><span>${esc(g.timeSpent||'—')}</span></div>
+      </div>
       <div class="members">
         <div class="members-label"><span>组员（${n} 人）</span></div>
         <div class="member-chips">
@@ -391,6 +399,16 @@ function bindGroup(card, g, gi){
   card.querySelector('[data-need-edit]').addEventListener('click', function(){
     const span = this.querySelector('span');
     inlineInput(span, (v)=>{ g.need = v; persist(); });
+  });
+  // 已充积分编辑
+  card.querySelector('[data-credit-edit]').addEventListener('click', function(){
+    const span = this.querySelector('span');
+    inlineInput(span, (v)=>{ g.credit = parseInt(v,10)||0; persist(); });
+  });
+  // 已消耗时间编辑
+  card.querySelector('[data-tspent-edit]').addEventListener('click', function(){
+    const span = this.querySelector('span');
+    inlineInput(span, (v)=>{ g.timeSpent = v; persist(); });
   });
   // 进度滑块
   const range = card.querySelector('input[type=range]');
@@ -525,7 +543,7 @@ function addMember(){
 /* 添加/编辑整组 */
 function openGroupEdit(gi){
   const isNew = gi === -1;
-  const g = isNew ? {name:'', leader:'', project:'', progress:0, need:'', members:[]} : data.groups[gi];
+  const g = isNew ? {name:'', leader:'', project:'', progress:0, need:'', credit:0, timeSpent:'', members:[]} : data.groups[gi];
   modal(`
     <h3>${isNew?'添加项目组':'编辑项目组'}</h3>
     <label>组名称</label><input id="geName" value="${esc(g.name)}" placeholder="如：项目一组">
@@ -648,6 +666,13 @@ function renderDetail(gi){
           <div class="d-project d-edit-val" data-dneed-edit>${esc(g.need||'—')}</div>
         </div>
         <div class="d-card">
+          <h4><span class="ic">💰</span> 项目投入</h4>
+          <div class="field" style="margin-bottom:12px"><div class="label"><span>已充积分</span></div>
+            <div class="d-edit-val" data-dcredit-edit>${esc(g.credit==null?0:g.credit)}</div></div>
+          <div class="field"><div class="label"><span>已消耗时间</span></div>
+            <div class="d-edit-val" data-dtspent-edit>${esc(g.timeSpent||'—')}</div></div>
+        </div>
+        <div class="d-card">
           <h4><span class="ic">📊</span> 项目完成进度</h4>
           <div class="d-num"><span data-dpnum>${clamp(g.progress||0)}</span><small> %</small></div>
           <div class="d-progress-big"><i style="width:${clamp(g.progress||0)}%"></i></div>
@@ -680,6 +705,12 @@ function bindDetail(gi){
   });
   root.querySelector('[data-dneed-edit]').addEventListener('click', function(){
     inlineInput(this, (v)=>{ g.need=v; persist(); renderDetail(gi); });
+  });
+  root.querySelector('[data-dcredit-edit]').addEventListener('click', function(){
+    inlineInput(this, (v)=>{ g.credit=parseInt(v,10)||0; persist(); renderDetail(gi); });
+  });
+  root.querySelector('[data-dtspent-edit]').addEventListener('click', function(){
+    inlineInput(this, (v)=>{ g.timeSpent=v; persist(); renderDetail(gi); });
   });
   const range = root.querySelector('[data-drange]');
   if(range){ range.addEventListener('input', ()=>{
